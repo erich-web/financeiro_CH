@@ -143,6 +143,9 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
         </div>
       </div>
       <div class="flex items-center gap-2 shrink-0">
+        <button id="btn-period" class="btn btn-ghost btn-sm max-w-[52vw] sm:max-w-none" title="Filtrar período">
+          <i data-feather="calendar" class="w-3.5 h-3.5 shrink-0"></i><span id="period-label" class="truncate hidden sm:inline">Período</span>
+        </button>
         <span id="stamp-cont" class="badge badge-slate hidden xl:inline-flex"></span>
         <span id="pipe-stamp" class="badge badge-amber hidden 2xl:inline-flex"></span>
         <button id="btn-save" class="btn btn-ghost btn-sm" title="Baixar o arquivo de trabalho"><i data-feather="download" class="w-3.5 h-3.5"></i><span class="hidden sm:inline">Salvar</span></button>
@@ -157,15 +160,16 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
         <h1 class="page-title">O ano até aqui</h1>
         <p class="page-sub" id="visao-sub"></p>
       </div>
+      <div id="aviso-visao" class="hidden mb-5"></div>
       <div id="kpis" class="grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6 gap-3 sm:gap-4"></div>
       <div class="grid grid-cols-1 xl:grid-cols-3 gap-5 mt-5">
         <div class="card card-body xl:col-span-2">
-          <div class="card-head"><h2 class="card-title">Receita líquida e EBITDA</h2><span class="card-hint">Competência · R$ mil</span></div>
+          <div class="card-head"><h2 class="card-title">Receita líquida e EBITDA</h2><span class="card-hint" id="hint-overview">Competência · R$ mil</span></div>
           <div class="chart-box"><canvas id="ch-overview"></canvas></div>
           <p class="card-note">Janeiro e fevereiro concentram os custos do Baile de Gala e do Carnaval. De março a maio a DRE ainda carrega os R$ 250 mil de aluguel do imóvel do Conexidades. A partir de maio a operação passa a se pagar.</p>
         </div>
         <div class="card card-body">
-          <div class="card-head"><h2 class="card-title">De onde vem a receita</h2><span class="card-hint">Caixa · acumulado</span></div>
+          <div class="card-head"><h2 class="card-title">De onde vem a receita</h2><span class="card-hint" id="hint-mix">Caixa · acumulado</span></div>
           <div class="chart-box short"><canvas id="ch-mix"></canvas></div>
           <div id="mix-legend" class="mt-4 space-y-2"></div>
         </div>
@@ -195,6 +199,13 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
           <button data-v="contabil">Visão contábil</button>
         </div>
       </div>
+      <div id="aviso-dre" class="hidden mb-5"></div>
+      <div id="dre-vazio" class="card card-body hidden">
+        <div class="flex gap-3"><i data-feather="calendar" class="w-5 h-5 text-slate-400 shrink-0 mt-0.5"></i>
+        <div><h2 class="card-title">Sem DRE no período escolhido</h2>
+        <p class="text-sm text-slate-600 mt-1 leading-relaxed">As demonstrações de resultado começam em janeiro de 2026, quando a casa entrou em operação. Antes disso só existe movimento de caixa, na aba Fluxo de caixa. Escolha um período que alcance 2026 para ver a DRE.</p></div></div>
+      </div>
+      <div id="dre-conteudo">
       <div id="dre-kpis" class="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4"></div>
       <div class="card mt-5">
         <div class="card-body pb-3">
@@ -212,6 +223,7 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
           <div class="card-head"><h2 class="card-title">O que mudar no plano de contas</h2><span class="card-hint">Recomendações à contabilidade</span></div>
           <div id="recs" class="divide-y divide-slate-100"></div>
         </div>
+      </div>
       </div>
     </section>
 
@@ -260,12 +272,9 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
       <div class="mb-7 flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 class="page-title">Fluxo de caixa</h1>
-          <p class="page-sub">A planilha atual soma aportes, compra do imóvel e operação em uma única linha de resultado. Aqui os três fluxos aparecem separados — operacional, investimento e financiamento — como pede a DFC.</p>
+          <p class="page-sub">A planilha atual soma aportes, compra do imóvel e operação em uma única linha de resultado. Aqui os três fluxos aparecem separados — operacional, investimento e financiamento — como pede a DFC. A série vai de julho de 2025 até o último fechamento, sem quebra por exercício.</p>
         </div>
-        <div class="seg" id="fluxo-seg">
-          <button class="on" data-v="2026">2026</button>
-          <button data-v="2025">2º semestre de 2025</button>
-        </div>
+        <button id="btn-period2" class="btn btn-ghost"><i data-feather="calendar" class="w-4 h-4"></i><span id="period-label2">Período</span></button>
       </div>
       <div id="fx-kpis" class="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4"></div>
       <div class="grid grid-cols-1 xl:grid-cols-3 gap-5 mt-5">
@@ -490,9 +499,28 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
   </div>
 </div>
 
+<div id="modal-period" class="modal">
+  <div class="card w-full max-w-lg mx-auto my-4 sm:my-8 p-4 sm:p-6">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="text-lg font-semibold text-slate-900">Período</h3>
+      <button id="p-close" class="text-slate-400 hover:text-slate-700"><i data-feather="x" class="w-5 h-5"></i></button>
+    </div>
+    <div id="p-presets" class="flex flex-wrap gap-2 mb-5"></div>
+    <div class="grid grid-cols-2 gap-4">
+      <div><label class="field-label">De</label><select class="field" id="p-ini"></select></div>
+      <div><label class="field-label">Até</label><select class="field" id="p-fim"></select></div>
+    </div>
+    <p id="p-aviso" class="text-xs text-slate-500 mt-3 leading-relaxed"></p>
+    <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 mt-6">
+      <button class="btn btn-ghost" id="p-cancel">Cancelar</button>
+      <button class="btn btn-primary" id="p-save">Aplicar período</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast" class="fixed bottom-6 right-6 z-[60] hidden items-center gap-2 rounded-lg bg-slate-900 text-white text-sm px-4 py-2.5 shadow-lg"></div>
 
-<script>const DATA = {"dre":{"months":["Jan","Fev","Mar","Abr","Mai","Jun","Jul"],"receita_bruta":[249737.7,385516.47,297682.75,255185,675539.18,611217.84,551733.96],"deducoes":[-9115.43,-14071.35,-10865.42,-9314.25,-24657.18,-22309.46,-20138.29],"receita_liquida":[240622.27,371445.12,286817.33,245870.75,650882,588908.38,531595.67],"custos_eventos":[-209998.66,-107312.99,-111655.72,-104408.22,-107090.95,-19322.98,-2661.56],"margem_contrib":[30623.61,264132.13,175161.61,141462.53,543791.05,569585.4,528934.11],"pessoal":[-31609.14,-40424.4,-38738.55,-43055.27,-46131.94,-36819.12,-43842.07],"comercial":[-83160,-54488.74,-42541,-43098,-47160,-47000,-28856.26],"ocupacao":[-30991.53,-127461.13,-76698.78,-93743.54,-65219.14,-47786.93,-69219.39],"admin":[-7747.15,-18840.61,-8645.48,-17748.53,-11716.47,-14836.61,-19602.24],"ebitda":[-122884.21,22917.25,8537.8,-56182.81,373563.5,423142.74,367414.15],"depreciacao":[-12.56,-215706.4,-47285.4,-47625.01,-47625.01,-47701.32,-48538.87],"rec_fin":[116.99,15.18,33.17,181.56,60,265.47,10632.01],"desp_fin":[-138148.96,495.88,-269.75,-318.19,-223.64,-177.03,-346.64],"outros":[0,0,1608.09,0,0,0,0],"lair":[-260928.74,-192278.09,-37376.09,-103944.45,325774.85,375529.86,329160.65],"ir_csll":[0,0,-95559.75,0,0,-161935.68,-840.8],"resultado":[-260928.74,-192278.09,-132935.84,-103944.45,325774.85,213594.18,328319.85],"detalhe":{"custos":{"aluguel_conexidades":[0,0,-83333.33,-83333.33,-83333.33,0,0],"eventos":[-16295.73,-28751.22,-12552.29,2500,-1085.11,-2450,0],"feiras":[0,0,-7060,-8242,-15552.5,0,0],"loc_equip":[-540.98,-1641.71,-8710.1,-4857.6,-306,-5050,-1440.86],"ecad":[0,-1891.25,0,0,0,0,0],"decoracao":[0,-274.8,0,0,0,0,0],"serv_pf":[-17190.95,-8633.23,0,-10475.29,-6186.83,-7974.98,0],"producao_eventos_proprios_est":[-175971,-66120.78,0,0,-627.18,-3848,-1220.7]},"comercial":{"assessoria_comercial_mkt":[-45000,-45000,-41991,-43098,-45000,-45000,-45000],"publicidade":[-31500,-2000,-400,0,0,-2000,-3150],"redes":[-5000,-3293.74,0,0,0,0,-706.26],"com_visual":[-1660,-4195,-150,0,-2160,0,20000]},"ocupacao":{"utilidades":[-2468.03,-62957.77,-30661.81,-30050.19,-31120.29,-32612.78,-34713.93],"conservacao":[-3196.19,-5389.74,-8692.06,-17690.09,-3352.06,-4606.41,-3852.05],"limpeza":[-6800,-510,-20000,-20000,-16580,-2453.49,-3484.6],"seguranca":[-13443,-25866.75,0,0,0,0,0],"serv_manut":[0,-13489.88,-2295,-11050,-1300,3380.88,-815.38],"peq_materiais":[-3222.57,-6603.43,-5250.56,-4327.65,-2458.33,-1051.36,-15950.55],"mat_limpeza":[-1768.24,-891.96,-937.01,65.8,0,0,0],"tributos_iptu":[-93.5,-11751.6,-8862.34,-10691.41,-10408.46,-10443.77,-10402.88]}}},"caixa":{"months":["Jan","Fev","Mar","Abr","Mai","Jun","Jul"],"aporte":[2264166,264168,270000,222326.85,97673.15,0,40000],"eventos":[25100,126730.44,29802.55,1200,693.6,0,0],"locacao":[151583.3,242605.93,224498.8,172557.03,607583.27,514071,498883.79],"outras":[2998,603.4,1686.09,117.27,1167.76,27945.92,15252.36],"repasses":[73054.4,49455.48,58085.62,81427.97,66094.55,69200.92,37850.17],"rendimento":[35.53,3.55,8.75,15.36,4.03,254.78,10569.81],"investimento":[1836750.36,400000,100000,140753.68,100000,107501.71,100000],"impostos":[28222.25,9311.6,170312.65,39108.77,14090.18,0,181441.03],"pessoal":[52596.48,50804.89,59796.46,62519.56,56676.97,76251.03,67560.64],"gerais":[163536.6,432451.51,307932.86,246108.66,224942.48,93799,197093.83],"saldo":[439174.75,230173.55,176213.39,165367.2,542873.93,876794.81,933255.44]},"mix":{"locacao":[217970.8,246453.42,225670,158208,423425,275613,352594.75],"patrocinio":[0,25000,25000,25000,220000,178458,141428.4],"eventos":[25100,93971.06,0,1200,1150.92,98.6,0],"comissionamento":[0,0,39881.99,40972.97,13396.92,13728.42,11735.54],"recup_energia":[6666.9,20607.99,6248.8,29804.03,16083.27,66267.32,9165.6],"nao_tributavel":[0,32159.38,29802.55,2155.44,0,30007.38,32850.17]},"c25":{"months":["Jul","Ago","Set","Out","Nov","Dez"],"aporte":[631576.08,2640000,2100000.01,1899991.67,2166663.34,1924999],"locacao":[0,0,115000,39897,218000,213000],"outras":[0,0,0,1998.15,5139.25,0],"repasses":[0,0,0,81445.55,82648.26,55867.5],"investimento":[631576.08,25388.51,4038955.59,2063829.4,1000000,3198853.29],"pessoal":[0,0,11426.52,17788.42,49651.52,54302.9],"gerais":[0,254631.52,99029.85,168259.09,370830.4,188576.18]},"balanco":{"data":"31/07/2026","ativo_circ":970537.13,"disponibilidades":935268.46,"aplicacoes":933255.8,"adiant_forn":34861.03,"trib_comp":407.64,"imobilizado_bruto":13388985.43,"edificios":12631576,"moveis":600000,"maquinas":142784.61,"informatica":14624.82,"depreciacao":-454681.33,"imobilizado_liq":12934304.1,"total_ativo":13904841.23,"passivo_circ":112917.5,"fornecedores":26774.66,"trabalhistas":40253.9,"tributarias":20333.06,"contas_pagar":25555.88,"afac":553844.56,"capital_social":13951564.1,"prejuizos_acum":-713484.93,"pl":13238079.17},"receber":[["Assoc. Brasileira de Eng. Química (ABEQ)","05/08/2026",44000],["Sociedade Brasileira de Dermatologia","05/08/2026",76000],["ABHV – Hospitais Veterinários","10/08/2026",45000],["ABHV – Hospitais Veterinários","10/08/2026",45000],["ABEQ","14/08/2026",22000],["SOPATI – Terapia Intensiva","15/08/2026",50000],["CRE Holding","25/08/2026",65350],["Do Carmo Vestuário","01/08/2026",750],["Sociedade Brasileira de Dermatologia","05/09/2026",76000],["AASP – Advogados de SP","11/09/2026",18000],["CRE Holding","25/09/2026",65350],["ABHV – Hospitais Veterinários","05/10/2026",50000],["Sociedade Brasileira de Dermatologia","10/11/2026",33000],["SOPATI – Terapia Intensiva","15/02/2027",25000],["SOPATI – Terapia Intensiva","15/03/2027",25000],["Sociedade Brasileira do Quadril","15/03/2027",75000],["Pedro H. Muratori (casamento)","08/04/2027",24000],["SOPATI – Terapia Intensiva","15/04/2027",25000],["SOPATI – Terapia Intensiva","15/05/2027",25000],["Sociedade Brasileira do Quadril","15/07/2027",75000]],"socios":[["FRK Empreendimentos e Participações",2,525000,"Integralizado"],["JRCL Empreendimentos Imobiliários",1,262500,"Integralizado"],["Luiz de Oliveira Rozette Filho",1,262500,"Integralizado"],["RPE Properties Gestão de Ativos",1,262500,"Integralizado"],["RPE Empreendimentos e Participações",1,262500,"Integralizado"],["Guimarães Confiance Administrativo",1,262500,"Integralizado"],["XRBM Empreendimentos e Participações",1,262500,"Integralizado"],["Hotel Toriba",1,262500,"Integralizado"],["Tarundu Empreendimentos Comerciais",1,270834,"Integralizado"],["Fábio Izar / Cesar Augusto F. dos Santos",1,259896,"Integralizado"],["RAMFEJ Engenharia",1,262500,"Pendente – chamada abr/mai"]],"caixa_detalhe":[["Aplicação Itaú Crédito Bancário",556691.39],["Aplicação Itaú Trust DI",343980.59],["Aplic Aut Mais (liquidez diária)",32583.82],["Fundo fixo e caixa",2012.66]],"pagar":[["Energia elétrica (Elektro) — provisão",50000],["Folha de pagamento — provisão",30000],["Gerente comercial (L&M) — salário + comissão",27000],["Vidraçaria São Benedito — 2ª parcela",17465],["IPTU + taxa de lixo — parcela 7/11",10397.65],["Representação comercial (Jenderson)",8700],["Benefícios Flash + Porto Seguro Saúde",7535.71],["Demais 38 lançamentos",33333.24]],"meta":{"competencia":"Julho de 2026","competencia_curta":"jul/2026","periodo":"janeiro a julho de 2026","fonte_contabil":"Pasta Digital 07/2026","fonte_caixa":"Fluxo de caixa v. 14/08/2026","balanco_data":"31/07/2026","gerado_em":"02/09/2026","resumo_visao":"Sete meses de operação depois da inauguração. A casa virou o jogo em maio: EBITDA positivo em três meses seguidos, caixa em alta e R$ 864 mil já contratados até julho de 2027.","balanco_sub":"Posição patrimonial em 31 de julho de 2026, conforme balancete da Ascon. R$ 13,9 milhões de ativo, quase tudo no imóvel, contra um passivo circulante de R$ 113 mil.","receber_hint":"R$ 864.450 em 20 parcelas · posição CondoNow de 03/08/2026","pagar_mes":"agosto","pagar_n":45,"pagar_note":"O saldo aplicado cobre 5,1 meses de compromissos no ritmo de agosto."},"alertas":[["trending-up","emerald","A rentabilidade mudou de patamar em maio","EBITDA de R$ 1,16 milhão nos três últimos meses, contra prejuízo operacional de R$ 148 mil no primeiro quadrimestre. Patrocínios (R$ 615 mil no ano) e os congressos de dermatologia e da UVESP explicam o salto. Desde junho a locação sozinha já cobre a casa.","Bom sinal","badge-green"],["shield","blue","R$ 933 mil em caixa sem política definida","São cinco meses de compromissos. Vale deliberar uma reserva mínima operacional (três meses, cerca de R$ 550 mil) e uma regra para o excedente antes de discutir distribuição ou novos aportes.","Deliberar","badge-blue"],["percent","amber","R$ 258 mil de IRPJ e CSLL com prejuízo acumulado de R$ 713 mil","O lucro presumido tributa 32% da receita mesmo com prejuízo contábil e R$ 454 mil de depreciação acumulada. O estudo do lucro real para 2027 precisa estar pronto antes do primeiro DARF de janeiro.","Estudo até dezembro","badge-amber"],["alert-triangle","red","Energia paga pelo estacionamento fora das demonstrações","A contabilidade registra ressalva em nota explicativa. Enquanto a receita do estacionamento compensa a despesa de energia fora do balanço, a DRE subestima as duas pontas e a base tributável fica exposta. O caminho é reconhecer pelo bruto.","Ressalva contábil","badge-red"],["user-plus","slate","Um aporte pendente e R$ 553,8 mil de AFAC no passivo","A chamada de abril e maio (R$ 25 mil por quota) tem uma quota em aberto. Os adiantamentos precisam de alteração contratual para virar capital e sair do passivo não circulante.","Societário","badge-slate"]],"recomendacoes":[["Crie a linha de custo direto por evento","Hoje a conta de custos dos serviços está zerada e o aluguel de R$ 250 mil do Conexidades virou despesa administrativa. Sem essa linha não existe margem por evento, e é ela que sustenta a decisão de preço e de patrocínio."],["Abra a conta de assessoria e consultoria","São R$ 558 mil, a maior conta da DRE, misturando gerência comercial, marketing e produção de festas. Pedir à contabilidade quatro centros de custo: comercial, marketing, eventos próprios e administrativo."],["Separe a receita por linha de negócio","Locação, patrocínio, eventos próprios e comissionamento têm margens e sazonalidades diferentes. A conta única de locação esconde que o patrocínio já responde por 27% do faturamento."],["Trate recuperação de despesa como redutora","Energia, gás e estacionamento repassados somam R$ 260 mil no caixa e inflam a receita e a base do presumido. Devem abater a despesa correspondente ou, se forem exploração do estacionamento, virar receita própria com o custo reconhecido."],["Marque o que não é recorrente","Juros de IPCA da compra do imóvel (R$ 137 mil em janeiro), depreciação retroativa (R$ 168 mil extras em fevereiro) e a segurança da inauguração distorcem a comparação mensal. Uma linha de não recorrentes abaixo do EBITDA resolve."],["Feche um orçamento 2027 por evento","Com doze meses de histórico e R$ 864 mil contratados, dá para orçar evento a evento e acompanhar realizado contra orçado nesta mesma tela, incluindo o estudo de lucro real."]],"delibs":[{"n":1,"t":"Aprovação das contas de julho de 2026","p":"Prestação de contas da Ascon com carta assinada pela diretora financeira. Depende do parecer dos quatro conselheiros fiscais e da homologação dos sócios.","m":"Pasta Digital 07/2026 · para a próxima reunião"},{"n":2,"t":"Política de caixa e reserva operacional","p":"Definir a reserva mínima (proposta de três meses de custo fixo, cerca de R$ 550 mil), o destino do excedente e a regra para novas chamadas de capital.","m":"Análise financeira · R$ 933 mil aplicados"},{"n":3,"t":"Regime tributário de 2027: lucro real ou presumido","p":"R$ 258 mil de IRPJ e CSLL em sete meses, com prejuízo contábil acumulado de R$ 713 mil e R$ 65 mil de depreciação por mês. O estudo precisa ser contratado até novembro.","m":"Decisão obrigatória em janeiro de 2027"},{"n":4,"t":"Contraprestação do estacionamento","p":"Ressalva da contabilidade: energia e água pagas pela Gianluca Pierri ficam fora das demonstrações. Deliberar o reconhecimento pelo bruto, com receita de exploração e despesa de energia.","m":"Nota explicativa de 07/2026"},{"n":5,"t":"Capitalização do AFAC e aporte pendente","p":"Alteração contratual para converter R$ 553,8 mil de adiantamentos em capital e regularizar a quota com a chamada de abril e maio em aberto.","m":"Balancete 07/2026 e planilha de sócios"},{"n":6,"t":"Reclassificação do plano de contas gerencial","p":"Autorizar a contabilidade a abrir custos diretos por evento, centros de custo comercial e de marketing e receita por linha de negócio.","m":"Recomendações da DRE gerencial"},{"n":7,"t":"Renovação da CRF do FGTS e do AVCB","p":"A CRF venceu em 26/08/2026 e a vistoria do AVCB foi paga em agosto. Confirmar a emissão da nova certidão e do laudo antes do congresso da ABHV, em 14 de outubro.","m":"Certidões da pasta · conformidade"}],"atas":[{"data":"2026-06-30","tipo":"Reunião ordinária de sócios","tit":"Reunião de sócios de junho de 2026","del":["Ata não recebida. Há despesa de reunião de sócios lançada em 30/06/2026, no valor de R$ 430,02.","Anexar a ata assinada e a lista de presença."],"pres":"A confirmar","link":"","ph":1},{"data":"2026-01-10","tipo":"Reunião extraordinária","tit":"Inauguração e chamada de capital de 2026","del":["Ata não recebida. Aportes de R$ 2,26 milhões em janeiro de 2026 para quitação do imóvel e do mobiliário.","Anexar a deliberação da chamada e a alteração contratual."],"pres":"A confirmar","link":"","ph":1}],"deals":[{"id":1,"cli":"Sociedade Brasileira de Dermatologia","evt":"31º RADESP e 19º Simpósio de Cosmiatria","data":"2026-11-02","val":413000,"st":"fechada","prob":100,"resp":"Gerência comercial","src":"Associação médica","obs":"Cessão de 02 a 09/11/2026. R$ 185 mil ainda a receber."},{"id":2,"cli":"ABHV — Hospitais Veterinários","evt":"Congresso ABHV","data":"2026-10-14","val":140000,"st":"fechada","prob":100,"resp":"Gerência comercial","src":"Associação","obs":"14 a 18/10/2026, em três parcelas."},{"id":3,"cli":"SOPATI — Terapia Intensiva","evt":"Congresso SOPATI 2027","data":"2027-08-31","val":150000,"st":"fechada","prob":100,"resp":"Gerência comercial","src":"Associação médica","obs":"31/08 a 05/09/2027, em cinco parcelas até maio."},{"id":4,"cli":"Sociedade Brasileira do Quadril","evt":"Congresso 2027","data":"2027-07-15","val":270000,"st":"fechada","prob":100,"resp":"Gerência comercial","src":"Associação médica","obs":"R$ 120 mil recebidos em 2026 e duas parcelas de R$ 75 mil em 2027."},{"id":5,"cli":"L'Étape Brasil by Tour de France","evt":"L'Étape Campos do Jordão 2026","data":"2026-09-22","val":0,"st":"fechada","prob":100,"resp":"Diretoria","src":"Evento esportivo","obs":"22 a 29/09/2026. Valor a confirmar na planilha de contratos."},{"id":6,"cli":"Monte Belo Empreendimentos","evt":"Evento corporativo","data":"2026-09-04","val":0,"st":"fechada","prob":100,"resp":"Gerência comercial","src":"Corporativo","obs":"Valor a confirmar."},{"id":7,"cli":"Casamento Pedro e Isadora","evt":"Casamento","data":"2027-05-08","val":24000,"st":"fechada","prob":100,"resp":"Gerência comercial","src":"Social","obs":"Parcela de R$ 24 mil em abril de 2027 já emitida."},{"id":8,"cli":"CRE Holding","evt":"Experience Day e patrocínio Diamante","data":"2026-06-01","val":130700,"st":"fechada","prob":100,"resp":"Diretoria","src":"Patrocínio","obs":"Duas parcelas de R$ 65.350 em agosto e setembro."},{"id":9,"cli":"Exemplo — congresso médico regional","evt":"3 dias, 400 pessoas, plenária e 4 salas","data":"2027-03-15","val":180000,"st":"prospect","prob":10,"resp":"Gerência comercial","src":"Convention Bureau","obs":"Card de exemplo. Substitua pelos prospects da semana.","ex":1},{"id":10,"cli":"Exemplo — montadora","evt":"Lançamento com test-drive e jantar, 2 dias","data":"2026-11-20","val":95000,"st":"proposta","prob":30,"resp":"Gerência comercial","src":"Agência","obs":"Card de exemplo.","ex":1},{"id":11,"cli":"Exemplo — feira de vinhos","evt":"Feira aberta ao público, 4 dias","data":"2027-06-10","val":120000,"st":"negociacao","prob":60,"resp":"Diretoria","src":"Indicação de sócio","obs":"Card de exemplo. Negociando patrocínio e bilheteria.","ex":1},{"id":12,"cli":"Exemplo — formatura universitária","evt":"Baile, 800 pessoas","data":"2026-12-12","val":60000,"st":"perdida","prob":0,"resp":"Gerência comercial","src":"Inbound","obs":"Card de exemplo. Perdida por conflito de data.","ex":1}],"docs":[{"c":"Societário","t":"Contrato social consolidado","d":"Registro na Junta Comercial concluído via Heracorp, com a segunda parcela paga em 10/08/2026. Razão social anterior: Expo Campos Empreendimentos SPE.","s":"ok","tag":"Vigente","org":"JUCESP","resp":"Jurídico","f":"PDF"},{"c":"Societário","t":"Acordo de sócios","d":"Citado na carta de aprovação de contas. Falta anexar a versão assinada.","s":"bad","tag":"Anexar","org":"Sócios","resp":"Jurídico","f":"—"},{"c":"Societário","t":"Livro de atas das reuniões de sócios","d":"Nenhuma ata veio no material recebido. Ver a aba de atas e deliberações.","s":"bad","tag":"Pendente","org":"Sócios","resp":"Secretário da reunião","f":"—"},{"c":"Societário","t":"Controle de aportes e AFAC 2025–2026","d":"R$ 13,95 milhões de capital integralizado e R$ 553,8 mil de AFAC, na planilha de sócios.","s":"warn","tag":"AFAC a capitalizar","org":"Interno","resp":"Diretoria financeira","f":"XLSX"},{"c":"Prestação de contas mensal","t":"Pasta Digital 07/2026","d":"371 páginas com dashboard, fluxo de caixa, extratos, balancete, balanço e DRE. Aprovação do conselho fiscal pendente.","s":"warn","tag":"Aguardando conselho","org":"Ascon","resp":"Conselho fiscal","f":"PDF"},{"c":"Prestação de contas mensal","t":"Pasta Digital 12/2025","d":"282 páginas com fluxo de caixa anual, extratos, contas a pagar e a receber e certidões. Emitida ainda como Expo Campos SPE.","s":"ok","tag":"Arquivada","org":"Ascon","resp":"Conselho fiscal","f":"PDF"},{"c":"Prestação de contas mensal","t":"Pastas de 01/2026 a 06/2026","d":"Não incluídas no material recebido. Anexar para completar a série do exercício.","s":"bad","tag":"Anexar","org":"Ascon","resp":"Diretoria financeira","f":"—"},{"c":"Contábil e fiscal","t":"Balancete, balanço e DRE de 31/07/2026","d":"Ascon Systems, emitido em 20/08/2026, em regime de competência.","s":"ok","tag":"Vigente","org":"Ascon Systems","resp":"Contabilidade","f":"PDF"},{"c":"Contábil e fiscal","t":"Fluxo de caixa 2026, versão de 14/08","d":"Razão do Itaú com mais de 1.400 lançamentos, provisão de impostos e projeção até dezembro.","s":"ok","tag":"Atualizado","org":"Interno","resp":"Diretoria financeira","f":"XLSX"},{"c":"Contábil e fiscal","t":"Fluxo de caixa 2025 com dashboard","d":"De julho a dezembro de 2025: R$ 11,4 milhões de aportes e R$ 11 milhões investidos no imóvel.","s":"ok","tag":"Arquivado","org":"Interno","resp":"Diretoria financeira","f":"XLSX"},{"c":"Contábil e fiscal","t":"Provisão trimestral de IRPJ e CSLL","d":"DARF do terceiro trimestre previsto em R$ 193,7 mil (setembro) e do quarto em R$ 189,8 mil (dezembro).","s":"warn","tag":"DARF em setembro","org":"Receita Federal","resp":"Ascon","f":"XLSX"},{"c":"Contratos de locação e patrocínio","t":"Sociedade Brasileira de Dermatologia","d":"Cessão de espaço de 02 a 09/11/2026, no valor de R$ 413 mil. Enviado ao fiscal.","s":"ok","tag":"Vigente","org":"Cliente","resp":"Comercial","f":"PDF"},{"c":"Contratos de locação e patrocínio","t":"ABHV — Hospitais Veterinários","d":"Evento de 14 a 18/10/2026, R$ 140 mil em três parcelas.","s":"ok","tag":"Vigente","org":"Cliente","resp":"Comercial","f":"PDF"},{"c":"Contratos de locação e patrocínio","t":"SOPATI — Terapia Intensiva 2027","d":"Evento de 31/08 a 05/09/2027, R$ 150 mil em cinco parcelas.","s":"ok","tag":"Vigente","org":"Cliente","resp":"Comercial","f":"PDF"},{"c":"Contratos de locação e patrocínio","t":"Sociedade Brasileira do Quadril 2027","d":"R$ 270 mil, com duas parcelas de R$ 75 mil em 2027.","s":"ok","tag":"Vigente","org":"Cliente","resp":"Comercial","f":"PDF"},{"c":"Contratos de locação e patrocínio","t":"CRE Holding — patrocínio Diamante","d":"Acordo referente ao pagamento de R$ 250 mil do Monte Carlo, em duas parcelas de R$ 65.350.","s":"ok","tag":"Vigente","org":"Patrocinador","resp":"Diretoria","f":"PDF"},{"c":"Contratos de locação e patrocínio","t":"Gianluca Pierri Estacionamentos","d":"Exploração do estacionamento, com repasses de comissionamento e energia. É o objeto da nota explicativa da Ascon.","s":"warn","tag":"Revisar cláusulas","org":"Parceiro","resp":"Jurídico","f":"PDF"},{"c":"Contratos de locação e patrocínio","t":"Contratos de 2025 e 2026 enviados ao fiscal","d":"Treze contratos: LTP Brasil, Porsche, TCE-SP, APEPREM, UVESP, Pub Cambio Beer, ABEQ, AASP, Mantiqueira Moto, Monte Carlo e outros.","s":"ok","tag":"Arquivados","org":"Clientes","resp":"Comercial","f":"PDF"},{"c":"Certidões e regularidade","t":"CRF — regularidade do FGTS","d":"Validade de 28/07/2026 a 26/08/2026. Precisa de nova emissão.","s":"bad","tag":"Vencida em 26/08","org":"Caixa","resp":"Ascon","f":"PDF"},{"c":"Certidões e regularidade","t":"CNDT — débitos trabalhistas","d":"Certidão nº 66504968/2026, válida até 30/01/2027.","s":"ok","tag":"Válida até 30/01/27","org":"TST","resp":"Ascon","f":"PDF"},{"c":"Certidões e regularidade","t":"Certidão negativa municipal nº 28671","d":"Prefeitura de Campos do Jordão, emitida em 03/08/2026, com validade de 30 dias.","s":"bad","tag":"Vence em 02/09","org":"Prefeitura","resp":"Ascon","f":"PDF"},{"c":"Certidões e regularidade","t":"Certidões judiciais do TRF3 e do TJSP","d":"Cível federal e estadual, emitidas em 03/08/2026, com nada consta.","s":"ok","tag":"Emitidas em 03/08","org":"Justiça","resp":"Ascon","f":"PDF"},{"c":"Certidões e regularidade","t":"Certidão de protesto","d":"Tabelião de Campos do Jordão, sem protestos em cinco anos, emitida em 04/08/2026.","s":"ok","tag":"Emitida em 04/08","org":"Cartório","resp":"Ascon","f":"PDF"},{"c":"Certidões e regularidade","t":"CND federal (Receita e PGFN)","d":"Não localizada na pasta de julho. Verificar a emissão.","s":"bad","tag":"Verificar","org":"Receita Federal","resp":"Ascon","f":"—"},{"c":"Licenças e conformidade predial","t":"AVCB — vistoria do Corpo de Bombeiros","d":"Renovação em curso: laudo pago entre janeiro e abril e vistoria paga em agosto de 2026.","s":"warn","tag":"Renovação","org":"Corpo de Bombeiros","resp":"Operações","f":"PDF"},{"c":"Licenças e conformidade predial","t":"Alvará de funcionamento","d":"Taxa de fiscalização de estabelecimento paga, segunda parcela em agosto de 2026.","s":"ok","tag":"Vigente","org":"Prefeitura","resp":"Operações","f":"PDF"},{"c":"Licenças e conformidade predial","t":"PCMSO, PGR e laudos de segurança do trabalho","d":"Laudos mensais de R$ 1.850 e PCMSO pago em abril e maio de 2026.","s":"ok","tag":"Vigente","org":"Medicina do trabalho","resp":"RH","f":"PDF"},{"c":"Licenças e conformidade predial","t":"Manutenção de elevadores e escada rolante","d":"Contrato com a Atlas Schindler, manutenção preventiva mensal de R$ 3.196,96.","s":"ok","tag":"Vigente","org":"Atlas Schindler","resp":"Operações","f":"PDF"},{"c":"Licenças e conformidade predial","t":"Apólices de seguro patrimonial e de RC de eventos","d":"Não localizadas no material. Um imóvel de R$ 12,6 milhões sem apólice identificada.","s":"bad","tag":"Verificar","org":"Seguradora","resp":"Diretoria","f":"—"}]};</script>
+<script>const DATA = {"dre": {"months": ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul"], "receita_bruta": [249737.7, 385516.47, 297682.75, 255185, 675539.18, 611217.84, 551733.96], "deducoes": [-9115.43, -14071.35, -10865.42, -9314.25, -24657.18, -22309.46, -20138.29], "receita_liquida": [240622.27, 371445.12, 286817.33, 245870.75, 650882, 588908.38, 531595.67], "custos_eventos": [-209998.66, -107312.99, -111655.72, -104408.22, -107090.95, -19322.98, -2661.56], "margem_contrib": [30623.61, 264132.13, 175161.61, 141462.53, 543791.05, 569585.4, 528934.11], "pessoal": [-31609.14, -40424.4, -38738.55, -43055.27, -46131.94, -36819.12, -43842.07], "comercial": [-83160, -54488.74, -42541, -43098, -47160, -47000, -28856.26], "ocupacao": [-30991.53, -127461.13, -76698.78, -93743.54, -65219.14, -47786.93, -69219.39], "admin": [-7747.15, -18840.61, -8645.48, -17748.53, -11716.47, -14836.61, -19602.24], "ebitda": [-122884.21, 22917.25, 8537.8, -56182.81, 373563.5, 423142.74, 367414.15], "depreciacao": [-12.56, -215706.4, -47285.4, -47625.01, -47625.01, -47701.32, -48538.87], "rec_fin": [116.99, 15.18, 33.17, 181.56, 60, 265.47, 10632.01], "desp_fin": [-138148.96, 495.88, -269.75, -318.19, -223.64, -177.03, -346.64], "outros": [0, 0, 1608.09, 0, 0, 0, 0], "lair": [-260928.74, -192278.09, -37376.09, -103944.45, 325774.85, 375529.86, 329160.65], "ir_csll": [0, 0, -95559.75, 0, 0, -161935.68, -840.8], "resultado": [-260928.74, -192278.09, -132935.84, -103944.45, 325774.85, 213594.18, 328319.85], "detalhe": {"custos": {"aluguel_conexidades": [0, 0, -83333.33, -83333.33, -83333.33, 0, 0], "eventos": [-16295.73, -28751.22, -12552.29, 2500, -1085.11, -2450, 0], "feiras": [0, 0, -7060, -8242, -15552.5, 0, 0], "loc_equip": [-540.98, -1641.71, -8710.1, -4857.6, -306, -5050, -1440.86], "ecad": [0, -1891.25, 0, 0, 0, 0, 0], "decoracao": [0, -274.8, 0, 0, 0, 0, 0], "serv_pf": [-17190.95, -8633.23, 0, -10475.29, -6186.83, -7974.98, 0], "producao_eventos_proprios_est": [-175971, -66120.78, 0, 0, -627.18, -3848, -1220.7]}, "comercial": {"assessoria_comercial_mkt": [-45000, -45000, -41991, -43098, -45000, -45000, -45000], "publicidade": [-31500, -2000, -400, 0, 0, -2000, -3150], "redes": [-5000, -3293.74, 0, 0, 0, 0, -706.26], "com_visual": [-1660, -4195, -150, 0, -2160, 0, 20000]}, "ocupacao": {"utilidades": [-2468.03, -62957.77, -30661.81, -30050.19, -31120.29, -32612.78, -34713.93], "conservacao": [-3196.19, -5389.74, -8692.06, -17690.09, -3352.06, -4606.41, -3852.05], "limpeza": [-6800, -510, -20000, -20000, -16580, -2453.49, -3484.6], "seguranca": [-13443, -25866.75, 0, 0, 0, 0, 0], "serv_manut": [0, -13489.88, -2295, -11050, -1300, 3380.88, -815.38], "peq_materiais": [-3222.57, -6603.43, -5250.56, -4327.65, -2458.33, -1051.36, -15950.55], "mat_limpeza": [-1768.24, -891.96, -937.01, 65.8, 0, 0, 0], "tributos_iptu": [-93.5, -11751.6, -8862.34, -10691.41, -10408.46, -10443.77, -10402.88]}}, "chaves": ["2026-01", "2026-02", "2026-03", "2026-04", "2026-05", "2026-06", "2026-07"]}, "mix": {"locacao": [217970.8, 246453.42, 225670, 158208, 423425, 275613, 352594.75], "patrocinio": [0, 25000, 25000, 25000, 220000, 178458, 141428.4], "eventos": [25100, 93971.06, 0, 1200, 1150.92, 98.6, 0], "comissionamento": [0, 0, 39881.99, 40972.97, 13396.92, 13728.42, 11735.54], "recup_energia": [6666.9, 20607.99, 6248.8, 29804.03, 16083.27, 66267.32, 9165.6], "nao_tributavel": [0, 32159.38, 29802.55, 2155.44, 0, 30007.38, 32850.17]}, "balanco": {"data": "31/07/2026", "ativo_circ": 970537.13, "disponibilidades": 935268.46, "aplicacoes": 933255.8, "adiant_forn": 34861.03, "trib_comp": 407.64, "imobilizado_bruto": 13388985.43, "edificios": 12631576, "moveis": 600000, "maquinas": 142784.61, "informatica": 14624.82, "depreciacao": -454681.33, "imobilizado_liq": 12934304.1, "total_ativo": 13904841.23, "passivo_circ": 112917.5, "fornecedores": 26774.66, "trabalhistas": 40253.9, "tributarias": 20333.06, "contas_pagar": 25555.88, "afac": 553844.56, "capital_social": 13951564.1, "prejuizos_acum": -713484.93, "pl": 13238079.17}, "receber": [["Assoc. Brasileira de Eng. Química (ABEQ)", "05/08/2026", 44000], ["Sociedade Brasileira de Dermatologia", "05/08/2026", 76000], ["ABHV – Hospitais Veterinários", "10/08/2026", 45000], ["ABHV – Hospitais Veterinários", "10/08/2026", 45000], ["ABEQ", "14/08/2026", 22000], ["SOPATI – Terapia Intensiva", "15/08/2026", 50000], ["CRE Holding", "25/08/2026", 65350], ["Do Carmo Vestuário", "01/08/2026", 750], ["Sociedade Brasileira de Dermatologia", "05/09/2026", 76000], ["AASP – Advogados de SP", "11/09/2026", 18000], ["CRE Holding", "25/09/2026", 65350], ["ABHV – Hospitais Veterinários", "05/10/2026", 50000], ["Sociedade Brasileira de Dermatologia", "10/11/2026", 33000], ["SOPATI – Terapia Intensiva", "15/02/2027", 25000], ["SOPATI – Terapia Intensiva", "15/03/2027", 25000], ["Sociedade Brasileira do Quadril", "15/03/2027", 75000], ["Pedro H. Muratori (casamento)", "08/04/2027", 24000], ["SOPATI – Terapia Intensiva", "15/04/2027", 25000], ["SOPATI – Terapia Intensiva", "15/05/2027", 25000], ["Sociedade Brasileira do Quadril", "15/07/2027", 75000]], "socios": [["FRK Empreendimentos e Participações", 2, 525000, "Integralizado"], ["JRCL Empreendimentos Imobiliários", 1, 262500, "Integralizado"], ["Luiz de Oliveira Rozette Filho", 1, 262500, "Integralizado"], ["RPE Properties Gestão de Ativos", 1, 262500, "Integralizado"], ["RPE Empreendimentos e Participações", 1, 262500, "Integralizado"], ["Guimarães Confiance Administrativo", 1, 262500, "Integralizado"], ["XRBM Empreendimentos e Participações", 1, 262500, "Integralizado"], ["Hotel Toriba", 1, 262500, "Integralizado"], ["Tarundu Empreendimentos Comerciais", 1, 270834, "Integralizado"], ["Fábio Izar / Cesar Augusto F. dos Santos", 1, 259896, "Integralizado"], ["RAMFEJ Engenharia", 1, 262500, "Pendente – chamada abr/mai"]], "caixa_detalhe": [["Aplicação Itaú Crédito Bancário", 556691.39], ["Aplicação Itaú Trust DI", 343980.59], ["Aplic Aut Mais (liquidez diária)", 32583.82], ["Fundo fixo e caixa", 2012.66]], "pagar": [["Energia elétrica (Elektro) — provisão", 50000], ["Folha de pagamento — provisão", 30000], ["Gerente comercial (L&M) — salário + comissão", 27000], ["Vidraçaria São Benedito — 2ª parcela", 17465], ["IPTU + taxa de lixo — parcela 7/11", 10397.65], ["Representação comercial (Jenderson)", 8700], ["Benefícios Flash + Porto Seguro Saúde", 7535.71], ["Demais 38 lançamentos", 33333.24]], "meta": {"competencia": "Julho de 2026", "competencia_curta": "jul/2026", "periodo": "janeiro a julho de 2026", "fonte_contabil": "Pasta Digital 07/2026", "fonte_caixa": "Fluxo de caixa v. 14/08/2026", "balanco_data": "31/07/2026", "gerado_em": "02/09/2026", "resumo_visao": "Sete meses de operação depois da inauguração. A casa virou o jogo em maio: EBITDA positivo em três meses seguidos, caixa em alta e R$ 864 mil já contratados até julho de 2027.", "balanco_sub": "Posição patrimonial em 31 de julho de 2026, conforme balancete da Ascon. R$ 13,9 milhões de ativo, quase tudo no imóvel, contra um passivo circulante de R$ 113 mil.", "receber_hint": "R$ 864.450 em 20 parcelas · posição CondoNow de 03/08/2026", "pagar_mes": "agosto", "pagar_n": 45, "pagar_note": "O saldo aplicado cobre 5,1 meses de compromissos no ritmo de agosto.", "inicio_caixa": "2025-07", "inicio_dre": "2026-01", "fim": "2026-07"}, "alertas": [["trending-up", "emerald", "A rentabilidade mudou de patamar em maio", "EBITDA de R$ 1,16 milhão nos três últimos meses, contra prejuízo operacional de R$ 148 mil no primeiro quadrimestre. Patrocínios (R$ 615 mil no ano) e os congressos de dermatologia e da UVESP explicam o salto. Desde junho a locação sozinha já cobre a casa.", "Bom sinal", "badge-green"], ["shield", "blue", "R$ 933 mil em caixa sem política definida", "São cinco meses de compromissos. Vale deliberar uma reserva mínima operacional (três meses, cerca de R$ 550 mil) e uma regra para o excedente antes de discutir distribuição ou novos aportes.", "Deliberar", "badge-blue"], ["percent", "amber", "R$ 258 mil de IRPJ e CSLL com prejuízo acumulado de R$ 713 mil", "O lucro presumido tributa 32% da receita mesmo com prejuízo contábil e R$ 454 mil de depreciação acumulada. O estudo do lucro real para 2027 precisa estar pronto antes do primeiro DARF de janeiro.", "Estudo até dezembro", "badge-amber"], ["alert-triangle", "red", "Energia paga pelo estacionamento fora das demonstrações", "A contabilidade registra ressalva em nota explicativa. Enquanto a receita do estacionamento compensa a despesa de energia fora do balanço, a DRE subestima as duas pontas e a base tributável fica exposta. O caminho é reconhecer pelo bruto.", "Ressalva contábil", "badge-red"], ["user-plus", "slate", "Um aporte pendente e R$ 553,8 mil de AFAC no passivo", "A chamada de abril e maio (R$ 25 mil por quota) tem uma quota em aberto. Os adiantamentos precisam de alteração contratual para virar capital e sair do passivo não circulante.", "Societário", "badge-slate"]], "recomendacoes": [["Crie a linha de custo direto por evento", "Hoje a conta de custos dos serviços está zerada e o aluguel de R$ 250 mil do Conexidades virou despesa administrativa. Sem essa linha não existe margem por evento, e é ela que sustenta a decisão de preço e de patrocínio."], ["Abra a conta de assessoria e consultoria", "São R$ 558 mil, a maior conta da DRE, misturando gerência comercial, marketing e produção de festas. Pedir à contabilidade quatro centros de custo: comercial, marketing, eventos próprios e administrativo."], ["Separe a receita por linha de negócio", "Locação, patrocínio, eventos próprios e comissionamento têm margens e sazonalidades diferentes. A conta única de locação esconde que o patrocínio já responde por 27% do faturamento."], ["Trate recuperação de despesa como redutora", "Energia, gás e estacionamento repassados somam R$ 260 mil no caixa e inflam a receita e a base do presumido. Devem abater a despesa correspondente ou, se forem exploração do estacionamento, virar receita própria com o custo reconhecido."], ["Marque o que não é recorrente", "Juros de IPCA da compra do imóvel (R$ 137 mil em janeiro), depreciação retroativa (R$ 168 mil extras em fevereiro) e a segurança da inauguração distorcem a comparação mensal. Uma linha de não recorrentes abaixo do EBITDA resolve."], ["Feche um orçamento 2027 por evento", "Com doze meses de histórico e R$ 864 mil contratados, dá para orçar evento a evento e acompanhar realizado contra orçado nesta mesma tela, incluindo o estudo de lucro real."]], "delibs": [{"n": 1, "t": "Aprovação das contas de julho de 2026", "p": "Prestação de contas da Ascon com carta assinada pela diretora financeira. Depende do parecer dos quatro conselheiros fiscais e da homologação dos sócios.", "m": "Pasta Digital 07/2026 · para a próxima reunião"}, {"n": 2, "t": "Política de caixa e reserva operacional", "p": "Definir a reserva mínima (proposta de três meses de custo fixo, cerca de R$ 550 mil), o destino do excedente e a regra para novas chamadas de capital.", "m": "Análise financeira · R$ 933 mil aplicados"}, {"n": 3, "t": "Regime tributário de 2027: lucro real ou presumido", "p": "R$ 258 mil de IRPJ e CSLL em sete meses, com prejuízo contábil acumulado de R$ 713 mil e R$ 65 mil de depreciação por mês. O estudo precisa ser contratado até novembro.", "m": "Decisão obrigatória em janeiro de 2027"}, {"n": 4, "t": "Contraprestação do estacionamento", "p": "Ressalva da contabilidade: energia e água pagas pela Gianluca Pierri ficam fora das demonstrações. Deliberar o reconhecimento pelo bruto, com receita de exploração e despesa de energia.", "m": "Nota explicativa de 07/2026"}, {"n": 5, "t": "Capitalização do AFAC e aporte pendente", "p": "Alteração contratual para converter R$ 553,8 mil de adiantamentos em capital e regularizar a quota com a chamada de abril e maio em aberto.", "m": "Balancete 07/2026 e planilha de sócios"}, {"n": 6, "t": "Reclassificação do plano de contas gerencial", "p": "Autorizar a contabilidade a abrir custos diretos por evento, centros de custo comercial e de marketing e receita por linha de negócio.", "m": "Recomendações da DRE gerencial"}, {"n": 7, "t": "Renovação da CRF do FGTS e do AVCB", "p": "A CRF venceu em 26/08/2026 e a vistoria do AVCB foi paga em agosto. Confirmar a emissão da nova certidão e do laudo antes do congresso da ABHV, em 14 de outubro.", "m": "Certidões da pasta · conformidade"}], "atas": [{"data": "2026-06-30", "tipo": "Reunião ordinária de sócios", "tit": "Reunião de sócios de junho de 2026", "del": ["Ata não recebida. Há despesa de reunião de sócios lançada em 30/06/2026, no valor de R$ 430,02.", "Anexar a ata assinada e a lista de presença."], "pres": "A confirmar", "link": "", "ph": 1}, {"data": "2026-01-10", "tipo": "Reunião extraordinária", "tit": "Inauguração e chamada de capital de 2026", "del": ["Ata não recebida. Aportes de R$ 2,26 milhões em janeiro de 2026 para quitação do imóvel e do mobiliário.", "Anexar a deliberação da chamada e a alteração contratual."], "pres": "A confirmar", "link": "", "ph": 1}], "deals": [{"id": 1, "cli": "Sociedade Brasileira de Dermatologia", "evt": "31º RADESP e 19º Simpósio de Cosmiatria", "data": "2026-11-02", "val": 413000, "st": "fechada", "prob": 100, "resp": "Gerência comercial", "src": "Associação médica", "obs": "Cessão de 02 a 09/11/2026. R$ 185 mil ainda a receber."}, {"id": 2, "cli": "ABHV — Hospitais Veterinários", "evt": "Congresso ABHV", "data": "2026-10-14", "val": 140000, "st": "fechada", "prob": 100, "resp": "Gerência comercial", "src": "Associação", "obs": "14 a 18/10/2026, em três parcelas."}, {"id": 3, "cli": "SOPATI — Terapia Intensiva", "evt": "Congresso SOPATI 2027", "data": "2027-08-31", "val": 150000, "st": "fechada", "prob": 100, "resp": "Gerência comercial", "src": "Associação médica", "obs": "31/08 a 05/09/2027, em cinco parcelas até maio."}, {"id": 4, "cli": "Sociedade Brasileira do Quadril", "evt": "Congresso 2027", "data": "2027-07-15", "val": 270000, "st": "fechada", "prob": 100, "resp": "Gerência comercial", "src": "Associação médica", "obs": "R$ 120 mil recebidos em 2026 e duas parcelas de R$ 75 mil em 2027."}, {"id": 5, "cli": "L'Étape Brasil by Tour de France", "evt": "L'Étape Campos do Jordão 2026", "data": "2026-09-22", "val": 0, "st": "fechada", "prob": 100, "resp": "Diretoria", "src": "Evento esportivo", "obs": "22 a 29/09/2026. Valor a confirmar na planilha de contratos."}, {"id": 6, "cli": "Monte Belo Empreendimentos", "evt": "Evento corporativo", "data": "2026-09-04", "val": 0, "st": "fechada", "prob": 100, "resp": "Gerência comercial", "src": "Corporativo", "obs": "Valor a confirmar."}, {"id": 7, "cli": "Casamento Pedro e Isadora", "evt": "Casamento", "data": "2027-05-08", "val": 24000, "st": "fechada", "prob": 100, "resp": "Gerência comercial", "src": "Social", "obs": "Parcela de R$ 24 mil em abril de 2027 já emitida."}, {"id": 8, "cli": "CRE Holding", "evt": "Experience Day e patrocínio Diamante", "data": "2026-06-01", "val": 130700, "st": "fechada", "prob": 100, "resp": "Diretoria", "src": "Patrocínio", "obs": "Duas parcelas de R$ 65.350 em agosto e setembro."}, {"id": 9, "cli": "Exemplo — congresso médico regional", "evt": "3 dias, 400 pessoas, plenária e 4 salas", "data": "2027-03-15", "val": 180000, "st": "prospect", "prob": 10, "resp": "Gerência comercial", "src": "Convention Bureau", "obs": "Card de exemplo. Substitua pelos prospects da semana.", "ex": 1}, {"id": 10, "cli": "Exemplo — montadora", "evt": "Lançamento com test-drive e jantar, 2 dias", "data": "2026-11-20", "val": 95000, "st": "proposta", "prob": 30, "resp": "Gerência comercial", "src": "Agência", "obs": "Card de exemplo.", "ex": 1}, {"id": 11, "cli": "Exemplo — feira de vinhos", "evt": "Feira aberta ao público, 4 dias", "data": "2027-06-10", "val": 120000, "st": "negociacao", "prob": 60, "resp": "Diretoria", "src": "Indicação de sócio", "obs": "Card de exemplo. Negociando patrocínio e bilheteria.", "ex": 1}, {"id": 12, "cli": "Exemplo — formatura universitária", "evt": "Baile, 800 pessoas", "data": "2026-12-12", "val": 60000, "st": "perdida", "prob": 0, "resp": "Gerência comercial", "src": "Inbound", "obs": "Card de exemplo. Perdida por conflito de data.", "ex": 1}], "docs": [{"c": "Societário", "t": "Contrato social consolidado", "d": "Registro na Junta Comercial concluído via Heracorp, com a segunda parcela paga em 10/08/2026. Razão social anterior: Expo Campos Empreendimentos SPE.", "s": "ok", "tag": "Vigente", "org": "JUCESP", "resp": "Jurídico", "f": "PDF"}, {"c": "Societário", "t": "Acordo de sócios", "d": "Citado na carta de aprovação de contas. Falta anexar a versão assinada.", "s": "bad", "tag": "Anexar", "org": "Sócios", "resp": "Jurídico", "f": "—"}, {"c": "Societário", "t": "Livro de atas das reuniões de sócios", "d": "Nenhuma ata veio no material recebido. Ver a aba de atas e deliberações.", "s": "bad", "tag": "Pendente", "org": "Sócios", "resp": "Secretário da reunião", "f": "—"}, {"c": "Societário", "t": "Controle de aportes e AFAC 2025–2026", "d": "R$ 13,95 milhões de capital integralizado e R$ 553,8 mil de AFAC, na planilha de sócios.", "s": "warn", "tag": "AFAC a capitalizar", "org": "Interno", "resp": "Diretoria financeira", "f": "XLSX"}, {"c": "Prestação de contas mensal", "t": "Pasta Digital 07/2026", "d": "371 páginas com dashboard, fluxo de caixa, extratos, balancete, balanço e DRE. Aprovação do conselho fiscal pendente.", "s": "warn", "tag": "Aguardando conselho", "org": "Ascon", "resp": "Conselho fiscal", "f": "PDF"}, {"c": "Prestação de contas mensal", "t": "Pasta Digital 12/2025", "d": "282 páginas com fluxo de caixa anual, extratos, contas a pagar e a receber e certidões. Emitida ainda como Expo Campos SPE.", "s": "ok", "tag": "Arquivada", "org": "Ascon", "resp": "Conselho fiscal", "f": "PDF"}, {"c": "Prestação de contas mensal", "t": "Pastas de 01/2026 a 06/2026", "d": "Não incluídas no material recebido. Anexar para completar a série do exercício.", "s": "bad", "tag": "Anexar", "org": "Ascon", "resp": "Diretoria financeira", "f": "—"}, {"c": "Contábil e fiscal", "t": "Balancete, balanço e DRE de 31/07/2026", "d": "Ascon Systems, emitido em 20/08/2026, em regime de competência.", "s": "ok", "tag": "Vigente", "org": "Ascon Systems", "resp": "Contabilidade", "f": "PDF"}, {"c": "Contábil e fiscal", "t": "Fluxo de caixa 2026, versão de 14/08", "d": "Razão do Itaú com mais de 1.400 lançamentos, provisão de impostos e projeção até dezembro.", "s": "ok", "tag": "Atualizado", "org": "Interno", "resp": "Diretoria financeira", "f": "XLSX"}, {"c": "Contábil e fiscal", "t": "Fluxo de caixa 2025 com dashboard", "d": "De julho a dezembro de 2025: R$ 11,4 milhões de aportes e R$ 11 milhões investidos no imóvel.", "s": "ok", "tag": "Arquivado", "org": "Interno", "resp": "Diretoria financeira", "f": "XLSX"}, {"c": "Contábil e fiscal", "t": "Provisão trimestral de IRPJ e CSLL", "d": "DARF do terceiro trimestre previsto em R$ 193,7 mil (setembro) e do quarto em R$ 189,8 mil (dezembro).", "s": "warn", "tag": "DARF em setembro", "org": "Receita Federal", "resp": "Ascon", "f": "XLSX"}, {"c": "Contratos de locação e patrocínio", "t": "Sociedade Brasileira de Dermatologia", "d": "Cessão de espaço de 02 a 09/11/2026, no valor de R$ 413 mil. Enviado ao fiscal.", "s": "ok", "tag": "Vigente", "org": "Cliente", "resp": "Comercial", "f": "PDF"}, {"c": "Contratos de locação e patrocínio", "t": "ABHV — Hospitais Veterinários", "d": "Evento de 14 a 18/10/2026, R$ 140 mil em três parcelas.", "s": "ok", "tag": "Vigente", "org": "Cliente", "resp": "Comercial", "f": "PDF"}, {"c": "Contratos de locação e patrocínio", "t": "SOPATI — Terapia Intensiva 2027", "d": "Evento de 31/08 a 05/09/2027, R$ 150 mil em cinco parcelas.", "s": "ok", "tag": "Vigente", "org": "Cliente", "resp": "Comercial", "f": "PDF"}, {"c": "Contratos de locação e patrocínio", "t": "Sociedade Brasileira do Quadril 2027", "d": "R$ 270 mil, com duas parcelas de R$ 75 mil em 2027.", "s": "ok", "tag": "Vigente", "org": "Cliente", "resp": "Comercial", "f": "PDF"}, {"c": "Contratos de locação e patrocínio", "t": "CRE Holding — patrocínio Diamante", "d": "Acordo referente ao pagamento de R$ 250 mil do Monte Carlo, em duas parcelas de R$ 65.350.", "s": "ok", "tag": "Vigente", "org": "Patrocinador", "resp": "Diretoria", "f": "PDF"}, {"c": "Contratos de locação e patrocínio", "t": "Gianluca Pierri Estacionamentos", "d": "Exploração do estacionamento, com repasses de comissionamento e energia. É o objeto da nota explicativa da Ascon.", "s": "warn", "tag": "Revisar cláusulas", "org": "Parceiro", "resp": "Jurídico", "f": "PDF"}, {"c": "Contratos de locação e patrocínio", "t": "Contratos de 2025 e 2026 enviados ao fiscal", "d": "Treze contratos: LTP Brasil, Porsche, TCE-SP, APEPREM, UVESP, Pub Cambio Beer, ABEQ, AASP, Mantiqueira Moto, Monte Carlo e outros.", "s": "ok", "tag": "Arquivados", "org": "Clientes", "resp": "Comercial", "f": "PDF"}, {"c": "Certidões e regularidade", "t": "CRF — regularidade do FGTS", "d": "Validade de 28/07/2026 a 26/08/2026. Precisa de nova emissão.", "s": "bad", "tag": "Vencida em 26/08", "org": "Caixa", "resp": "Ascon", "f": "PDF"}, {"c": "Certidões e regularidade", "t": "CNDT — débitos trabalhistas", "d": "Certidão nº 66504968/2026, válida até 30/01/2027.", "s": "ok", "tag": "Válida até 30/01/27", "org": "TST", "resp": "Ascon", "f": "PDF"}, {"c": "Certidões e regularidade", "t": "Certidão negativa municipal nº 28671", "d": "Prefeitura de Campos do Jordão, emitida em 03/08/2026, com validade de 30 dias.", "s": "bad", "tag": "Vence em 02/09", "org": "Prefeitura", "resp": "Ascon", "f": "PDF"}, {"c": "Certidões e regularidade", "t": "Certidões judiciais do TRF3 e do TJSP", "d": "Cível federal e estadual, emitidas em 03/08/2026, com nada consta.", "s": "ok", "tag": "Emitidas em 03/08", "org": "Justiça", "resp": "Ascon", "f": "PDF"}, {"c": "Certidões e regularidade", "t": "Certidão de protesto", "d": "Tabelião de Campos do Jordão, sem protestos em cinco anos, emitida em 04/08/2026.", "s": "ok", "tag": "Emitida em 04/08", "org": "Cartório", "resp": "Ascon", "f": "PDF"}, {"c": "Certidões e regularidade", "t": "CND federal (Receita e PGFN)", "d": "Não localizada na pasta de julho. Verificar a emissão.", "s": "bad", "tag": "Verificar", "org": "Receita Federal", "resp": "Ascon", "f": "—"}, {"c": "Licenças e conformidade predial", "t": "AVCB — vistoria do Corpo de Bombeiros", "d": "Renovação em curso: laudo pago entre janeiro e abril e vistoria paga em agosto de 2026.", "s": "warn", "tag": "Renovação", "org": "Corpo de Bombeiros", "resp": "Operações", "f": "PDF"}, {"c": "Licenças e conformidade predial", "t": "Alvará de funcionamento", "d": "Taxa de fiscalização de estabelecimento paga, segunda parcela em agosto de 2026.", "s": "ok", "tag": "Vigente", "org": "Prefeitura", "resp": "Operações", "f": "PDF"}, {"c": "Licenças e conformidade predial", "t": "PCMSO, PGR e laudos de segurança do trabalho", "d": "Laudos mensais de R$ 1.850 e PCMSO pago em abril e maio de 2026.", "s": "ok", "tag": "Vigente", "org": "Medicina do trabalho", "resp": "RH", "f": "PDF"}, {"c": "Licenças e conformidade predial", "t": "Manutenção de elevadores e escada rolante", "d": "Contrato com a Atlas Schindler, manutenção preventiva mensal de R$ 3.196,96.", "s": "ok", "tag": "Vigente", "org": "Atlas Schindler", "resp": "Operações", "f": "PDF"}, {"c": "Licenças e conformidade predial", "t": "Apólices de seguro patrimonial e de RC de eventos", "d": "Não localizadas no material. Um imóvel de R$ 12,6 milhões sem apólice identificada.", "s": "bad", "tag": "Verificar", "org": "Seguradora", "resp": "Diretoria", "f": "—"}], "serie_caixa": [{"k": "2025-07", "locacao": 0, "eventos": 0, "outras": 0, "repasses": 0, "rendimento": 0, "gerais": 0, "pessoal": 0, "impostos": 0, "investimento": 631576.08, "aporte": 631576.08, "saldo": 0.0}, {"k": "2025-08", "locacao": 0, "eventos": 0, "outras": 0, "repasses": 0, "rendimento": 0, "gerais": 254631.52, "pessoal": 0, "impostos": 0, "investimento": 25388.51, "aporte": 2640000, "saldo": 2359979.97}, {"k": "2025-09", "locacao": 115000, "eventos": 0, "outras": 0, "repasses": 0, "rendimento": 0, "gerais": 99029.85, "pessoal": 11426.52, "impostos": 0, "investimento": 4038955.59, "aporte": 2100000.01, "saldo": 425568.02}, {"k": "2025-10", "locacao": 39897, "eventos": 0, "outras": 1998.15, "repasses": 81445.55, "rendimento": 0, "gerais": 168259.09, "pessoal": 17788.42, "impostos": 0, "investimento": 2063829.4, "aporte": 1899991.67, "saldo": 199023.48}, {"k": "2025-11", "locacao": 218000, "eventos": 0, "outras": 5139.25, "repasses": 82648.26, "rendimento": 0, "gerais": 370830.4, "pessoal": 49651.52, "impostos": 0, "investimento": 1000000, "aporte": 2166663.34, "saldo": 1250992.41}, {"k": "2025-12", "locacao": 213000, "eventos": 0, "outras": 0, "repasses": 55867.5, "rendimento": 0, "gerais": 188576.18, "pessoal": 54302.9, "impostos": 0, "investimento": 3198853.29, "aporte": 1924999, "saldo": 3126.54}, {"k": "2026-01", "locacao": 151583.3, "eventos": 25100, "outras": 2998, "repasses": 73054.4, "rendimento": 35.53, "gerais": 163536.6, "pessoal": 52596.48, "impostos": 28222.25, "investimento": 1836750.36, "aporte": 2264166, "saldo": 439174.75}, {"k": "2026-02", "locacao": 242605.93, "eventos": 126730.44, "outras": 603.4, "repasses": 49455.48, "rendimento": 3.55, "gerais": 432451.51, "pessoal": 50804.89, "impostos": 9311.6, "investimento": 400000, "aporte": 264168, "saldo": 230173.55}, {"k": "2026-03", "locacao": 224498.8, "eventos": 29802.55, "outras": 1686.09, "repasses": 58085.62, "rendimento": 8.75, "gerais": 307932.86, "pessoal": 59796.46, "impostos": 170312.65, "investimento": 100000, "aporte": 270000, "saldo": 176213.39}, {"k": "2026-04", "locacao": 172557.03, "eventos": 1200, "outras": 117.27, "repasses": 81427.97, "rendimento": 15.36, "gerais": 246108.66, "pessoal": 62519.56, "impostos": 39108.77, "investimento": 140753.68, "aporte": 222326.85, "saldo": 165367.2}, {"k": "2026-05", "locacao": 607583.27, "eventos": 693.6, "outras": 1167.76, "repasses": 66094.55, "rendimento": 4.03, "gerais": 224942.48, "pessoal": 56676.97, "impostos": 14090.18, "investimento": 100000, "aporte": 97673.15, "saldo": 542873.93}, {"k": "2026-06", "locacao": 514071, "eventos": 0, "outras": 27945.92, "repasses": 69200.92, "rendimento": 254.78, "gerais": 93799, "pessoal": 76251.03, "impostos": 0, "investimento": 107501.71, "aporte": 0, "saldo": 876794.81}, {"k": "2026-07", "locacao": 498883.79, "eventos": 0, "outras": 15252.36, "repasses": 37850.17, "rendimento": 10569.81, "gerais": 197093.83, "pessoal": 67560.64, "impostos": 181441.03, "investimento": 100000, "aporte": 40000, "saldo": 933255.44}]};</script>
 <script>/* ============ helpers ============ */
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -577,7 +605,76 @@ let userAtas = [];
 let userDocs = [];
 let pipeUpdated = null;
 let carregadoEm = null;
-let dreView = 'cfo', fluxoYear = '2026', dq = '', df = 'all';
+let dreView = 'cfo', dq = '', df = 'all';
+let periodo = null;   // {ini:'2026-01', fim:'2026-07'}
+
+/* ---- período: chaves, rótulos e recortes ---- */
+const MES3 = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+const rotulo = (k, comAno) => MES3[+k.slice(5) - 1] + (comAno ? '/' + k.slice(2, 4) : '');
+const rotuloLongo = k => MES3[+k.slice(5) - 1].toLowerCase() + '/' + k.slice(0, 4);
+function chavesCaixa() { return DB.serie_caixa.map(m => m.k); }
+function chavesTodas() { return [...new Set([...chavesCaixa(), ...(DB.dre.chaves || [])])].sort(); }
+function limites() { const t = chavesTodas(); return { min: t[0], max: t[t.length - 1] }; }
+function periodoAtual() {
+  const l = limites();
+  if (!periodo) return { ini: l.min, fim: l.max };
+  return { ini: periodo.ini < l.min ? l.min : periodo.ini, fim: periodo.fim > l.max ? l.max : periodo.fim };
+}
+const dentro = k => { const p = periodoAtual(); return k >= p.ini && k <= p.fim; };
+function idxDre() { return (DB.dre.chaves || []).map((k, i) => dentro(k) ? i : -1).filter(i => i >= 0); }
+function serieCaixaFiltrada() { return DB.serie_caixa.filter(m => dentro(m.k)); }
+const multiAno = ks => new Set(ks.map(k => k.slice(0, 4))).size > 1;
+function fatiar(obj, idx) {
+  const o = {};
+  for (const [k, v] of Object.entries(obj)) {
+    if (Array.isArray(v)) o[k] = idx.map(i => v[i]);
+    else if (v && typeof v === 'object') o[k] = fatiar(v, idx);
+    else o[k] = v;
+  }
+  return o;
+}
+function dreFiltrada() {
+  const idx = idxDre();
+  const d = fatiar(DB.dre, idx);
+  d.chaves = idx.map(i => DB.dre.chaves[i]);
+  d.months = d.chaves.map(k => rotulo(k, multiAno(d.chaves)));
+  return d;
+}
+function coberturaDre() {
+  const p = periodoAtual(), ch = DB.dre.chaves || [];
+  const dentroCh = ch.filter(k => k >= p.ini && k <= p.fim);
+  return { p, ch, dentroCh, parcial: dentroCh.length > 0 && ch.length > 0 && (p.ini < ch[0] || p.fim > ch[ch.length - 1]) };
+}
+function faixa(el, texto, comLink) {
+  const box = $(el);
+  if (!texto) { box.classList.add('hidden'); box.innerHTML = ''; return; }
+  box.classList.remove('hidden');
+  box.innerHTML = '<div class="rounded-xl border border-amber-200 bg-amber-50 p-4 flex gap-3">' +
+    '<i data-feather="info" class="w-4 h-4 text-amber-600 shrink-0 mt-0.5"></i>' +
+    '<p class="text-sm text-amber-900 leading-relaxed">' + texto +
+    (comLink ? ' <button class="ir-fluxo underline font-medium">Ver o fluxo de caixa do período completo.</button>' : '') + '</p></div>';
+  const b = box.querySelector('.ir-fluxo');
+  if (b) b.addEventListener('click', () => go('fluxo'));
+  icons();
+}
+function avisoDre() {
+  const c = coberturaDre();
+  if (!c.parcial) return '';
+  return 'O período escolhido vai de ' + rotuloLongo(c.p.ini) + ' a ' + rotuloLongo(c.p.fim) +
+    ', mas as demonstrações de resultado só existem a partir de ' + rotuloLongo(c.ch[0]) +
+    ', quando a casa entrou em operação. Os valores desta tela cobrem ' + rotuloLongo(c.dentroCh[0]) + ' a ' + rotuloLongo(c.dentroCh[c.dentroCh.length - 1]) + '.';
+}
+function textoPeriodo() {
+  const p = periodoAtual(), l = limites();
+  if (p.ini === l.min && p.fim === l.max) return 'Todo o histórico';
+  if (p.ini === p.fim) return rotuloLongo(p.ini);
+  const anoIni = p.ini.slice(0, 4), anoFim = p.fim.slice(0, 4);
+  if (anoIni === anoFim) {
+    const doAno = chavesTodas().filter(k => k.slice(0, 4) === anoIni);
+    if (p.ini === doAno[0] && p.fim === doAno[doAno.length - 1]) return anoIni;
+  }
+  return rotuloLongo(p.ini) + ' a ' + rotuloLongo(p.fim);
+}
 
 /* ============ navegação ============ */
 const TITLES = { visao: 'Visão geral', dre: 'DRE gerencial', balanco: 'Balanço e caixa', fluxo: 'Fluxo de caixa', pipeline: 'Pipeline comercial', governanca: 'Atas e deliberações', docs: 'Central de documentos', atualizacoes: 'Atualizações' };
@@ -600,20 +697,26 @@ $$('#nav .nav-item').forEach(a => a.addEventListener('click', () => go(a.dataset
 
 /* ============ 1. visão geral ============ */
 function renderVisao() {
-  const d = DB.dre, M = d.months;
+  const d = dreFiltrada(), M = d.months, temDre = M.length > 0;
+  const caixaF = serieCaixaFiltrada();
   const rb = sum(d.receita_bruta), rl = sum(d.receita_liquida), eb = sum(d.ebitda), res = sum(d.resultado);
   $('#visao-sub').textContent = DB.meta.resumo_visao;
-  $('#crumb-sub').textContent = DB.meta.periodo;
+  $('#crumb-sub').textContent = textoPeriodo();
   $('#side-comp').textContent = DB.meta.competencia.toLowerCase();
   $('#stamp-cont').innerHTML = '<i data-feather="check-circle" class="w-3 h-3"></i>' + esc(DB.meta.fonte_contabil);
 
+  faixa('#aviso-visao', avisoDre(), true);
+  const efetivo = temDre ? (d.chaves.length === 1 ? rotuloLongo(d.chaves[0]) : rotuloLongo(d.chaves[0]) + ' a ' + rotuloLongo(d.chaves[d.chaves.length - 1])) : '';
+  $('#hint-overview').textContent = 'Competência · R$ mil' + (temDre ? ' · ' + efetivo : '');
+  $('#hint-mix').textContent = 'Caixa' + (temDre ? ' · ' + efetivo : '');
+  const semDre = 'Sem DRE neste período';
   $('#kpis').innerHTML = [
-    kpiCard('Receita bruta', fmtK(rb), 'Locação de espaços, patrocínio e eventos'),
-    kpiCard('EBITDA', fmtK(eb), 'Margem de ' + pct(eb, rl) + ' sobre a receita líquida', 'text-emerald-600'),
-    kpiCard('Resultado líquido', fmtK(res), 'Depois de depreciação, juros e IRPJ/CSLL'),
-    kpiCard('Caixa em ' + DB.meta.balanco_data.slice(0, 5), fmtK(DB.balanco.aplicacoes), 'Todo aplicado no Itaú', 'text-emerald-600'),
+    kpiCard('Receita bruta', temDre ? fmtK(rb) : '—', temDre ? 'Locação de espaços, patrocínio e eventos' : semDre),
+    kpiCard('EBITDA', temDre ? fmtK(eb) : '—', temDre ? 'Margem de ' + pct(eb, rl) + ' sobre a receita líquida' : semDre, 'text-emerald-600'),
+    kpiCard('Resultado líquido', temDre ? fmtK(res) : '—', temDre ? 'Depois de depreciação, juros e IRPJ/CSLL' : semDre),
+    kpiCard('Caixa em ' + DB.meta.balanco_data.slice(0, 5), fmtK(DB.balanco.aplicacoes), 'Posição do último balancete', 'text-emerald-600'),
     kpiCard('Contratado a receber', fmtK(sum(DB.receber.map(r => r[2]))), DB.receber.length + ' parcelas em contrato'),
-    kpiCard('Aportes do exercício', fmtK(sum(DB.caixa.aporte)), 'R$ 553,8 mil ainda como AFAC')
+    kpiCard('Aportes no período', fmtK(sum(caixaF.map(m => m.aporte))), caixaF.length + (caixaF.length === 1 ? ' mês de caixa' : ' meses de caixa'))
   ].join('');
 
   mk('ch-overview', {
@@ -632,7 +735,7 @@ function renderVisao() {
     }
   });
 
-  const mx = DB.mix;
+  const mx = fatiar(DB.mix, idxDre());
   const items = [
     ['Locação de espaços', sum(mx.locacao), C.blue],
     ['Patrocínio', sum(mx.patrocinio), C.emerald],
@@ -676,15 +779,21 @@ const NM = {
   mat_limpeza: 'Material de limpeza', tributos_iptu: 'IPTU e taxas'
 };
 function renderDre() {
-  const d = DB.dre, M = d.months, rl = sum(d.receita_liquida), rb = sum(d.receita_bruta), n = M.length;
+  const d = dreFiltrada(), M = d.months, n = M.length;
+  faixa('#aviso-dre', n ? avisoDre() : '', true);
+  $('#dre-vazio').classList.toggle('hidden', n > 0);
+  $('#dre-conteudo').classList.toggle('hidden', n === 0);
+  if (!n) { icons(); return; }
+  const rl = sum(d.receita_liquida), rb = sum(d.receita_bruta);
   const mc = sum(d.margem_contrib);
   const fixo = (sum(d.pessoal) + sum(d.ocupacao) + sum(d.admin)) / n;
-  const e2 = d.ebitda[n - 2] + d.ebitda[n - 1], r2 = d.receita_liquida[n - 2] + d.receita_liquida[n - 1];
+  const ult = Math.min(2, n);
+  const e2 = sum(d.ebitda.slice(n - ult)), r2 = sum(d.receita_liquida.slice(n - ult));
   const trib = -(sum(d.deducoes) + sum(d.ir_csll));
   $('#dre-kpis').innerHTML = [
     kpiCard('Margem de contribuição', fmtK(mc), pct(mc, rl) + ' da receita líquida, depois dos custos diretos de evento'),
     kpiCard('Custo de manter a casa', fmtK(Math.abs(fixo)) + '/mês', 'Pessoal, ocupação e administrativo, média do período'),
-    kpiCard('Margem EBITDA nos dois últimos meses', pct(e2, r2), 'Já sem eventos próprios e sem o aluguel do Conexidades', 'text-emerald-600'),
+    kpiCard(ult === 1 ? 'Margem EBITDA do mês' : 'Margem EBITDA nos dois últimos meses', pct(e2, r2), 'Últimos meses do período escolhido', 'text-emerald-600'),
     kpiCard('Carga tributária efetiva', pct(trib, rb), 'PIS, COFINS, IRPJ e CSLL sobre a receita bruta')
   ].join('');
 
@@ -692,7 +801,7 @@ function renderDre() {
     cfo: 'Reclassificação gerencial sobre a DRE contábil da ' + DB.meta.fonte_contabil + '. Os custos diretos de evento reúnem o aluguel do imóvel do Conexidades, buffet, decoração, locação de equipamentos, ECAD e serviços de pessoa física ligados a eventos. O excedente de assessoria e consultoria em janeiro e fevereiro (R$ 242 mil acima da média mensal de R$ 45 mil) foi tratado como produção do Baile de Gala e do Carnaval — é uma estimativa, e a contabilidade precisa abrir esses valores por centro de custo. Os totais de EBITDA e de resultado batem com o contábil.',
     contabil: 'Transcrição da DRE emitida pela Ascon Systems, conforme a ' + DB.meta.fonte_contabil + ', em regime de competência.'
   };
-  const totalLabel = M[0] + '–' + M[n - 1];
+  const totalLabel = n === 1 ? 'Total' : M[0] + '–' + M[n - 1];
 
   function row(label, arr, cls, opt) {
     opt = opt || {};
@@ -836,28 +945,36 @@ function renderBalanco() {
 
 /* ============ 4. fluxo ============ */
 function renderFluxo() {
-  const c = fluxoYear === '2026' ? DB.caixa : DB.c25, n = c.months.length;
-  const opIn = c.months.map((_, i) => (c.eventos ? c.eventos[i] : 0) + c.locacao[i] + c.outras[i] + c.repasses[i] + (c.rendimento ? c.rendimento[i] : 0));
-  const opOut = c.months.map((_, i) => (c.impostos ? c.impostos[i] : 0) + c.pessoal[i] + c.gerais[i]);
+  const S = serieCaixaFiltrada(), n = S.length;
+  const ks = S.map(m => m.k), ma = multiAno(ks);
+  const meses = ks.map(k => rotulo(k, ma));
+  const col = f => S.map(m => m[f]);
+  const opIn = S.map(m => m.locacao + m.eventos + m.outras + m.repasses + m.rendimento);
+  const opOut = S.map(m => m.impostos + m.pessoal + m.gerais);
   const op = opIn.map((v, i) => v - opOut[i]);
-  const inv = c.investimento.map(v => -v), fin = c.aporte;
+  const inv = col('investimento').map(v => -v), fin = col('aporte');
   const net = op.map((v, i) => v + inv[i] + fin[i]);
-  let saldo = [], s = 0;
-  net.forEach(v => { s += v; saldo.push(s); });
-  if (c.saldo) saldo = c.saldo;
+  const saldo = col('saldo');
+  $('#period-label2').textContent = textoPeriodo();
+  if (!n) {
+    $('#fx-kpis').innerHTML = '<div class="card card-body sm:col-span-2 xl:col-span-4"><div class="kpi-label">Período sem movimento</div><div class="kpi-value">—</div><div class="kpi-sub">A série de caixa vai de julho de 2025 até o último fechamento.</div></div>';
+    $('#fx-three').innerHTML = ''; $('#t-fluxo').innerHTML = '';
+    if (CH['ch-fluxo']) { CH['ch-fluxo'].destroy(); delete CH['ch-fluxo']; }
+    return;
+  }
 
   $('#fx-kpis').innerHTML = [
     kpiCard('Entradas operacionais', fmtK(sum(opIn)), 'Locação, eventos, repasses e rendimentos'),
     kpiCard('Saídas operacionais', fmtK(-sum(opOut)), 'Despesas gerais, pessoal e impostos'),
     kpiCard('Geração operacional', fmtK(sum(op)), 'Caixa gerado pela operação', sum(op) > 0 ? 'text-emerald-600' : 'text-red-600'),
-    kpiCard('Saldo final', fmtK(saldo[n - 1]), 'Conta corrente e aplicações')
+    kpiCard('Saldo final', fmtK(saldo[n - 1]), 'Conta corrente e aplicações em ' + rotuloLongo(ks[n - 1]))
   ].join('');
-  $('#fx-title').textContent = fluxoYear === '2026' ? 'Entradas, saídas e saldo em 2026' : 'Entradas, saídas e saldo de julho a dezembro de 2025';
+  $('#fx-title').textContent = 'Entradas, saídas e saldo · ' + textoPeriodo().toLowerCase();
 
   mk('ch-fluxo', {
     type: 'bar',
     data: {
-      labels: c.months, datasets: [
+      labels: meses, datasets: [
         { type: 'bar', label: 'Operacional', data: op.map(v => v / 1000), backgroundColor: C.emerald, stack: 'a' },
         { type: 'bar', label: 'Investimento', data: inv.map(v => v / 1000), backgroundColor: C.light, stack: 'a' },
         { type: 'bar', label: 'Aportes dos sócios', data: fin.map(v => v / 1000), backgroundColor: C.blue, stack: 'a' },
@@ -887,19 +1004,77 @@ function renderFluxo() {
     arr.map(v => '<td class="num' + (v < 0 ? ' neg' : '') + '">' + fmt(v) + '</td>').join('') +
     '<td class="num font-semibold">' + fmt(sum(arr)) + '</td></tr>';
   const G = t => '<tr class="row-group"><td colspan="' + (n + 2) + '">' + t + '</td></tr>';
-  let h = '<thead><tr><th></th>' + c.months.map(m => '<th class="num">' + m + '</th>').join('') + '<th class="num">Total</th></tr></thead><tbody>';
-  h += G('Fluxo operacional') + R('Locações', c.locacao) + (c.eventos ? R('Eventos e bilheteria', c.eventos) : '') +
-    R('Repasses e recuperações', c.repasses) + R('Outras receitas', c.outras) + (c.rendimento ? R('Rendimento de aplicações', c.rendimento) : '') +
-    R('(–) Despesas gerais', c.gerais.map(v => -v)) + R('(–) Pessoal', c.pessoal.map(v => -v)) +
-    (c.impostos ? R('(–) Impostos', c.impostos.map(v => -v)) : '') + R('Geração operacional', op, 'row-sub');
+  let h = '<thead><tr><th></th>' + meses.map(m => '<th class="num">' + m + '</th>').join('') + '<th class="num">Total</th></tr></thead><tbody>';
+  h += G('Fluxo operacional') + R('Locações', col('locacao')) + R('Eventos e bilheteria', col('eventos')) +
+    R('Repasses e recuperações', col('repasses')) + R('Outras receitas', col('outras')) + R('Rendimento de aplicações', col('rendimento')) +
+    R('(–) Despesas gerais', col('gerais').map(v => -v)) + R('(–) Pessoal', col('pessoal').map(v => -v)) +
+    R('(–) Impostos', col('impostos').map(v => -v)) + R('Geração operacional', op, 'row-sub');
   h += G('Fluxo de investimento') + R('(–) Imóvel, mobiliário e equipamentos', inv, 'row-sub');
   h += G('Fluxo de financiamento') + R('Aportes dos sócios', fin, 'row-sub');
   h += R('Variação de caixa', net, 'row-total') + R('Saldo final', saldo);
   $('#t-fluxo').innerHTML = h + '</tbody>';
 }
-$$('#fluxo-seg button').forEach(b => b.addEventListener('click', () => {
-  $$('#fluxo-seg button').forEach(x => x.classList.remove('on')); b.classList.add('on'); fluxoYear = b.dataset.v; renderFluxo();
-}));
+
+/* ============ filtro de período ============ */
+function presets() {
+  const l = limites(), t = chavesTodas(), anos = [...new Set(t.map(k => k.slice(0, 4)))].sort().reverse();
+  const ult = k => t[Math.max(0, t.length - k)];
+  const p = [['Todo o histórico (desde ' + rotuloLongo(l.min) + ')', l.min, l.max]];
+  anos.forEach(a => p.push([a, t.find(k => k.slice(0, 4) === a), [...t].reverse().find(k => k.slice(0, 4) === a)]));
+  p.push(['Últimos 3 meses', ult(3), l.max], ['Últimos 6 meses', ult(6), l.max], ['Último mês', l.max, l.max]);
+  return p;
+}
+function abrirPeriodo() {
+  const t = chavesTodas(), p = periodoAtual();
+  const opts = sel => t.map(k => '<option value="' + k + '"' + (k === p[sel] ? ' selected' : '') + '>' + rotuloLongo(k) + '</option>').join('');
+  $('#p-ini').innerHTML = opts('ini');
+  $('#p-fim').innerHTML = opts('fim');
+  $('#p-presets').innerHTML = presets().map(x =>
+    '<button class="pp btn btn-ghost btn-sm' + (x[1] === p.ini && x[2] === p.fim ? ' !bg-blue-600 !text-white !border-blue-600' : '') +
+    '" data-i="' + x[1] + '" data-f="' + x[2] + '">' + x[0] + '</button>').join('');
+  $$('#p-presets .pp').forEach(b => b.addEventListener('click', () => {
+    $('#p-ini').value = b.dataset.i; $('#p-fim').value = b.dataset.f; avisoPeriodo();
+    $$('#p-presets .pp').forEach(x => x.classList.remove('!bg-blue-600', '!text-white', '!border-blue-600'));
+    b.classList.add('!bg-blue-600', '!text-white', '!border-blue-600');
+  }));
+  avisoPeriodo();
+  $('#modal-period').classList.remove('hidden');
+}
+function avisoPeriodo() {
+  const i = $('#p-ini').value, f = $('#p-fim').value;
+  const temDre = (DB.dre.chaves || []).some(k => k >= i && k <= f);
+  const ch = DB.dre.chaves || [];
+  const parcial = temDre && (i < ch[0] || f > ch[ch.length - 1]);
+  $('#p-aviso').textContent = i > f
+    ? 'A data inicial está depois da final. Ajuste antes de aplicar.'
+    : !temDre
+      ? 'Esse período não tem DRE: as demonstrações começam em ' + rotuloLongo(ch[0] || '2026-01') + '. O fluxo de caixa funciona normalmente.'
+      : parcial
+        ? 'O fluxo de caixa cobre o período inteiro. A visão geral e a DRE mostram de ' + rotuloLongo(ch.filter(k => k >= i && k <= f)[0]) + ' em diante, porque as demonstrações começam em ' + rotuloLongo(ch[0]) + '.'
+        : 'Vale para a visão geral, a DRE e o fluxo de caixa. O balanço continua sendo a posição da última data fechada.';
+}
+const fecharPeriodo = () => $('#modal-period').classList.add('hidden');
+$('#btn-period').addEventListener('click', abrirPeriodo);
+$('#btn-period2').addEventListener('click', abrirPeriodo);
+$('#p-close').addEventListener('click', fecharPeriodo);
+$('#p-cancel').addEventListener('click', fecharPeriodo);
+$('#p-ini').addEventListener('change', avisoPeriodo);
+$('#p-fim').addEventListener('change', avisoPeriodo);
+$('#p-save').addEventListener('click', () => {
+  const ini = $('#p-ini').value, fim = $('#p-fim').value;
+  if (ini > fim) { toast('A data inicial está depois da final', 'alert-circle'); return; }
+  const l = limites();
+  periodo = (ini === l.min && fim === l.max) ? null : { ini, fim };
+  fecharPeriodo();
+  renderVisao(); renderDre(); renderFluxo(); rotulosPeriodo();
+  toast('Período: ' + textoPeriodo(), 'calendar');
+});
+function rotulosPeriodo() {
+  const t = textoPeriodo();
+  $('#period-label').textContent = t;
+  $('#period-label2').textContent = t;
+  $('#crumb-sub').textContent = t;
+}
 
 /* ============ 5. pipeline ============ */
 const STAGES = [
@@ -1159,7 +1334,7 @@ const ROTINA_ATA = [
 ];
 const SCHEMA = [
   ['dre', 'DRE gerencial e contábil, com o detalhe por conta', 'Aba DRE gerencial e o gráfico da visão geral'],
-  ['caixa e c25', 'Fluxo de caixa mensal por linha', 'Aba Fluxo de caixa'],
+  ['serie_caixa', 'Série mensal de caixa, um objeto por mês, com a chave AAAA-MM', 'Aba Fluxo de caixa e filtro de período'],
   ['mix', 'Receita por linha de negócio, em regime de caixa', 'Rosca “De onde vem a receita”'],
   ['balanco e caixa_detalhe', 'Balancete e composição das aplicações', 'Aba Balanço e caixa'],
   ['receber e pagar', 'Parcelas contratadas e compromissos do mês', 'Aba Balanço e caixa'],
@@ -1218,7 +1393,7 @@ function salvar() {
 $('#btn-save').addEventListener('click', salvar);
 $('#btn-save2').addEventListener('click', salvar);
 
-const CHAVES_DADOS = ['dre', 'caixa', 'c25', 'mix', 'balanco', 'receber', 'socios', 'caixa_detalhe', 'pagar', 'alertas', 'recomendacoes', 'delibs', 'docs', 'atas', 'meta', 'deals'];
+const CHAVES_DADOS = ['dre', 'serie_caixa', 'mix', 'balanco', 'receber', 'socios', 'caixa_detalhe', 'pagar', 'alertas', 'recomendacoes', 'delibs', 'docs', 'atas', 'meta', 'deals'];
 function aplicar(json) {
   const dados = json.dados || json;
   let trocadas = [];
@@ -1256,9 +1431,10 @@ $('#load-file').addEventListener('change', e => {
 function renderTudo() {
   renderVisao(); renderDre(); renderBalanco(); renderFluxo();
   renderPipe(); renderDelibs(); renderAtas(); renderDocs(); renderUpdates();
+  rotulosPeriodo();
 }
-$$('#modal-deal, #modal-ata, #modal-doc').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.add('hidden'); }));
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeDeal(); closeAta(); closeDoc(); closeNav(); } });
+$$('#modal-deal, #modal-ata, #modal-doc, #modal-period').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.add('hidden'); }));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeDeal(); closeAta(); closeDoc(); closeNav(); fecharPeriodo(); } });
 renderTudo();
 const hash = location.hash.replace('#', '');
 if (TITLES[hash]) go(hash);
