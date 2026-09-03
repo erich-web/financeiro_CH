@@ -18,15 +18,15 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
   @layer components {
     /* cartões */
     .card       { @apply bg-white border border-slate-200 rounded-xl; }
-    .card-body  { @apply p-5 sm:p-6; }
-    .card-head  { @apply flex items-start justify-between gap-4 mb-5; }
+    .card-body  { @apply p-4 sm:p-6; }
+    .card-head  { @apply flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-4 mb-4 sm:mb-5; }
     .card-title { @apply text-[15px] font-semibold text-slate-900 leading-tight; }
-    .card-hint  { @apply text-xs text-slate-500 text-right shrink-0 max-w-[45%]; }
+    .card-hint  { @apply text-xs text-slate-500 sm:text-right shrink-0 sm:max-w-[45%]; }
     .card-note  { @apply text-xs leading-relaxed text-slate-500 mt-4 pt-4 border-t border-slate-100; }
 
     /* indicadores */
     .kpi-label  { @apply text-xs font-medium text-slate-500; }
-    .kpi-value  { @apply text-2xl font-bold text-slate-900 tabular-nums mt-1.5; }
+    .kpi-value  { @apply text-xl sm:text-2xl font-bold text-slate-900 tabular-nums mt-1.5 break-words; }
     .kpi-sub    { @apply text-xs text-slate-500 mt-1.5 leading-snug; }
 
     /* badges */
@@ -39,6 +39,8 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
 
     /* tabelas */
     .tbl                 { @apply w-full text-sm border-collapse; }
+    .tbl.wide            { @apply min-w-[780px]; }
+    .scroll-x            { @apply overflow-x-auto; }
     .tbl th              { @apply text-[11px] font-semibold uppercase tracking-wide text-slate-500 text-left py-2.5 px-3 border-b border-slate-200 whitespace-nowrap bg-white; }
     .tbl th.num          { @apply text-right; }
     .tbl td              { @apply py-2.5 px-3 border-b border-slate-100 text-slate-700 align-middle; }
@@ -70,9 +72,9 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
     .seg button  { @apply px-3 py-1.5 text-xs font-medium text-slate-600 rounded-md transition-colors; }
     .seg button.on { @apply bg-blue-600 text-white; }
 
-    .page { @apply hidden px-5 sm:px-8 py-7 max-w-[1500px]; }
+    .page { @apply hidden px-4 sm:px-8 py-6 sm:py-7 max-w-[1500px]; }
     .page.active { @apply block; }
-    .page-title { @apply text-2xl font-bold text-slate-900 tracking-tight; }
+    .page-title { @apply text-xl sm:text-2xl font-bold text-slate-900 tracking-tight; }
     .page-sub   { @apply text-sm text-slate-500 mt-1.5 max-w-3xl leading-relaxed; }
     .modal      { @apply hidden fixed inset-0 z-50 bg-slate-900/50 p-4 overflow-y-auto; }
   }
@@ -82,6 +84,11 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
   .chart-box { position: relative; height: 300px; }
   .chart-box.short { height: 220px; }
   .chart-box.tall { height: 360px; }
+  @media (max-width: 640px) {
+    .chart-box { height: 230px; }
+    .chart-box.short { height: 190px; }
+    .chart-box.tall { height: 280px; }
+  }
   ::-webkit-scrollbar { width: 10px; height: 10px; }
   ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; border: 3px solid #f8fafc; }
   @media print { aside, .no-print { display: none !important; } .page { display: block !important; break-after: page; } }
@@ -89,17 +96,20 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased">
 
-<div class="flex min-h-screen">
+<div id="backdrop" class="fixed inset-0 z-40 bg-slate-900/50 hidden lg:hidden no-print"></div>
+
+<div class="min-h-screen lg:pl-64">
 
   <!-- ================= SIDEBAR ================= -->
-  <aside class="w-64 shrink-0 bg-white border-r border-slate-200 flex flex-col sticky top-0 h-screen no-print">
+  <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 flex flex-col h-screen -translate-x-full lg:translate-x-0 transition-transform duration-200 no-print">
     <div class="px-5 py-5 border-b border-slate-200">
       <div class="flex items-center gap-3">
         <div class="w-9 h-9 rounded-lg bg-blue-600 text-white grid place-items-center font-bold text-sm shrink-0">CH</div>
-        <div class="min-w-0">
+        <div class="min-w-0 flex-1">
           <div class="font-semibold text-slate-900 leading-tight truncate">Campos Hall</div>
           <div class="text-xs text-slate-500 truncate">Painel de governança</div>
         </div>
+        <button id="btn-close-nav" class="lg:hidden text-slate-400 hover:text-slate-700 shrink-0"><i data-feather="x" class="w-5 h-5"></i></button>
       </div>
     </div>
 
@@ -123,17 +133,20 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
   </aside>
 
   <!-- ================= MAIN ================= -->
-  <main class="flex-1 min-w-0">
-    <header class="sticky top-0 z-30 h-16 bg-white/90 backdrop-blur border-b border-slate-200 flex items-center justify-between gap-4 px-5 sm:px-8 no-print">
-      <div class="min-w-0">
-        <div id="crumb" class="font-semibold text-slate-900 truncate">Visão geral</div>
-        <div id="crumb-sub" class="text-xs text-slate-500"></div>
+  <main class="min-w-0">
+    <header class="sticky top-0 z-30 h-16 bg-white/90 backdrop-blur border-b border-slate-200 flex items-center justify-between gap-3 px-4 sm:px-8 no-print">
+      <div class="flex items-center gap-3 min-w-0">
+        <button id="btn-menu" class="lg:hidden w-9 h-9 -ml-1 rounded-lg border border-slate-200 grid place-items-center text-slate-600 shrink-0" aria-label="Abrir menu"><i data-feather="menu" class="w-4 h-4"></i></button>
+        <div class="min-w-0">
+          <div id="crumb" class="font-semibold text-slate-900 truncate">Visão geral</div>
+          <div id="crumb-sub" class="text-xs text-slate-500 truncate"></div>
+        </div>
       </div>
       <div class="flex items-center gap-2 shrink-0">
-        <span id="stamp-cont" class="badge badge-slate hidden md:inline-flex"></span>
-        <span id="pipe-stamp" class="badge badge-amber hidden lg:inline-flex"></span>
-        <button id="btn-save" class="btn btn-ghost btn-sm" title="Baixar o arquivo de trabalho"><i data-feather="download" class="w-3.5 h-3.5"></i>Salvar</button>
-        <label for="load-file" class="btn btn-ghost btn-sm" title="Carregar arquivo de dados ou de trabalho"><i data-feather="upload" class="w-3.5 h-3.5"></i>Carregar</label>
+        <span id="stamp-cont" class="badge badge-slate hidden xl:inline-flex"></span>
+        <span id="pipe-stamp" class="badge badge-amber hidden 2xl:inline-flex"></span>
+        <button id="btn-save" class="btn btn-ghost btn-sm" title="Baixar o arquivo de trabalho"><i data-feather="download" class="w-3.5 h-3.5"></i><span class="hidden sm:inline">Salvar</span></button>
+        <label for="load-file" class="btn btn-ghost btn-sm" title="Carregar arquivo de dados ou de trabalho"><i data-feather="upload" class="w-3.5 h-3.5"></i><span class="hidden sm:inline">Carregar</span></label>
         <input type="file" id="load-file" accept="application/json" class="hidden">
       </div>
     </header>
@@ -144,7 +157,7 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
         <h1 class="page-title">O ano até aqui</h1>
         <p class="page-sub" id="visao-sub"></p>
       </div>
-      <div id="kpis" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6 gap-4"></div>
+      <div id="kpis" class="grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6 gap-3 sm:gap-4"></div>
       <div class="grid grid-cols-1 xl:grid-cols-3 gap-5 mt-5">
         <div class="card card-body xl:col-span-2">
           <div class="card-head"><h2 class="card-title">Receita líquida e EBITDA</h2><span class="card-hint">Competência · R$ mil</span></div>
@@ -164,7 +177,7 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
         </div>
         <div class="card">
           <div class="card-body pb-0"><div class="card-head"><h2 class="card-title">Quadro societário</h2><span class="card-hint">Aportes de 2026</span></div></div>
-          <div class="px-2 pb-2"><table class="tbl" id="t-socios"></table></div>
+          <div class="px-2 pb-2 scroll-x"><table class="tbl" id="t-socios"></table></div>
           <p class="px-6 pb-5 text-xs text-slate-500 leading-relaxed">Chamada de R$ 25 mil por quota em abril e maio; uma quota segue em aberto. Quotas inferidas pelos aportes — confirmar no contrato social.</p>
         </div>
       </div>
@@ -182,12 +195,12 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
           <button data-v="contabil">Visão contábil</button>
         </div>
       </div>
-      <div id="dre-kpis" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4"></div>
+      <div id="dre-kpis" class="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4"></div>
       <div class="card mt-5">
         <div class="card-body pb-3">
           <div class="card-head mb-0"><h2 class="card-title" id="dre-title">Demonstração do resultado</h2><span class="card-hint">R$ · clique nas linhas com seta para abrir o detalhe</span></div>
         </div>
-        <div class="overflow-x-auto px-2"><table class="tbl" id="dre-table"></table></div>
+        <div class="scroll-x px-2"><table class="tbl wide" id="dre-table"></table></div>
         <p class="px-6 py-5 text-xs text-slate-500 leading-relaxed border-t border-slate-100 mt-2" id="dre-note"></p>
       </div>
       <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 mt-5">
@@ -211,17 +224,17 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
       <div class="grid grid-cols-1 xl:grid-cols-2 gap-5">
         <div class="card">
           <div class="card-body pb-0"><div class="card-head"><h2 class="card-title">Ativo</h2><span class="card-hint" id="b-ativo"></span></div></div>
-          <div class="px-2 pb-4"><table class="tbl" id="t-ativo"></table></div>
+          <div class="px-2 pb-4 scroll-x"><table class="tbl" id="t-ativo"></table></div>
         </div>
         <div class="card">
           <div class="card-body pb-0"><div class="card-head"><h2 class="card-title">Passivo e patrimônio líquido</h2><span class="card-hint" id="b-passivo"></span></div></div>
-          <div class="px-2 pb-4"><table class="tbl" id="t-passivo"></table></div>
+          <div class="px-2 pb-4 scroll-x"><table class="tbl" id="t-passivo"></table></div>
         </div>
       </div>
       <div class="grid grid-cols-1 xl:grid-cols-3 gap-5 mt-5">
         <div class="card">
           <div class="card-body pb-0"><div class="card-head"><h2 class="card-title">Onde está o caixa</h2><span class="card-hint" id="caixa-data"></span></div></div>
-          <div class="px-2"><table class="tbl" id="t-caixa"></table></div>
+          <div class="px-2 scroll-x"><table class="tbl" id="t-caixa"></table></div>
           <p class="px-6 py-5 text-xs text-slate-500 leading-relaxed">Rendimento de R$ 10,6 mil em julho, primeiro mês com as aplicações Trust DI e Crédito Bancário ativas.</p>
         </div>
         <div class="card card-body xl:col-span-2">
@@ -232,11 +245,11 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
       <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 mt-5">
         <div class="card">
           <div class="card-body pb-0"><div class="card-head"><h2 class="card-title">Parcelas a receber</h2><span class="card-hint">Por vencimento</span></div></div>
-          <div class="px-2 pb-4 max-h-[420px] overflow-y-auto"><table class="tbl" id="t-receber"></table></div>
+          <div class="px-2 pb-4 max-h-[420px] overflow-auto"><table class="tbl" id="t-receber"></table></div>
         </div>
         <div class="card">
           <div class="card-body pb-0"><div class="card-head"><h2 class="card-title" id="pagar-title">Contas a pagar</h2><span class="card-hint" id="pagar-hint"></span></div></div>
-          <div class="px-2"><table class="tbl" id="t-pagar"></table></div>
+          <div class="px-2 scroll-x"><table class="tbl" id="t-pagar"></table></div>
           <p class="px-6 py-5 text-xs text-slate-500 leading-relaxed" id="pagar-note"></p>
         </div>
       </div>
@@ -254,7 +267,7 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
           <button data-v="2025">2º semestre de 2025</button>
         </div>
       </div>
-      <div id="fx-kpis" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4"></div>
+      <div id="fx-kpis" class="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4"></div>
       <div class="grid grid-cols-1 xl:grid-cols-3 gap-5 mt-5">
         <div class="card card-body xl:col-span-2">
           <div class="card-head"><h2 class="card-title" id="fx-title">Entradas, saídas e saldo</h2><span class="card-hint">R$ mil</span></div>
@@ -268,7 +281,7 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
       </div>
       <div class="card mt-5">
         <div class="card-body pb-3"><div class="card-head mb-0"><h2 class="card-title">Detalhe mensal</h2><span class="card-hint">R$ · conforme planilha de fluxo de caixa</span></div></div>
-        <div class="overflow-x-auto px-2 pb-4"><table class="tbl" id="t-fluxo"></table></div>
+        <div class="scroll-x px-2 pb-4"><table class="tbl wide" id="t-fluxo"></table></div>
       </div>
     </section>
 
@@ -281,7 +294,7 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
         </div>
         <button id="btn-new" class="btn btn-primary"><i data-feather="plus" class="w-4 h-4"></i>Nova oportunidade</button>
       </div>
-      <div id="pipe-kpis" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4"></div>
+      <div id="pipe-kpis" class="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4"></div>
       <div class="card card-body mt-5">
         <div class="card-head"><h2 class="card-title">Valor por etapa</h2><span class="card-hint">R$ mil</span></div>
         <div class="chart-box short"><canvas id="ch-funnel"></canvas></div>
@@ -361,7 +374,7 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
         <p class="page-sub">O painel tem dois ciclos: um mensal, com o fechamento contábil e a planilha de caixa, e um a cada reunião de sócios, com a ata e o andamento das matérias.</p>
       </div>
 
-      <div id="up-kpis" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4"></div>
+      <div id="up-kpis" class="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4"></div>
 
       <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 mt-5">
         <div class="card card-body">
@@ -387,7 +400,7 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
 
       <div class="card card-body mt-5">
         <div class="card-head"><h2 class="card-title">O que muda a cada arquivo de dados</h2><span class="card-hint">Para quem for gerar o JSON</span></div>
-        <div class="overflow-x-auto"><table class="tbl" id="t-schema"></table></div>
+        <div class="scroll-x"><table class="tbl" id="t-schema"></table></div>
         <p class="card-note">Um arquivo pode trazer só uma parte dessas chaves. O painel substitui apenas o que vier no arquivo e mantém o resto como está, então dá para atualizar só o fluxo de caixa em uma semana e o balanço na outra.</p>
       </div>
     </section>
@@ -396,7 +409,7 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
 
 <!-- ============ MODAIS ============ -->
 <div id="modal-deal" class="modal">
-  <div class="card w-full max-w-2xl mx-auto my-8 p-6">
+  <div class="card w-full max-w-2xl mx-auto my-4 sm:my-8 p-4 sm:p-6">
     <div class="flex items-center justify-between mb-5">
       <h3 class="text-lg font-semibold text-slate-900" id="m-title">Nova oportunidade</h3>
       <button id="m-close" class="text-slate-400 hover:text-slate-700"><i data-feather="x" class="w-5 h-5"></i></button>
@@ -412,7 +425,7 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
       <div><label class="field-label">Origem</label><input class="field" id="m-src" placeholder="Convention Bureau, indicação, inbound"></div>
       <div class="sm:col-span-2"><label class="field-label">Observações</label><textarea class="field h-20" id="m-obs"></textarea></div>
     </div>
-    <div class="flex justify-end gap-2 mt-6">
+    <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 mt-6">
       <button class="btn btn-ghost" id="m-cancel">Cancelar</button>
       <button class="btn btn-primary" id="m-save">Salvar oportunidade</button>
     </div>
@@ -420,7 +433,7 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
 </div>
 
 <div id="modal-ata" class="modal">
-  <div class="card w-full max-w-2xl mx-auto my-8 p-6">
+  <div class="card w-full max-w-2xl mx-auto my-4 sm:my-8 p-4 sm:p-6">
     <div class="flex items-center justify-between mb-5">
       <h3 class="text-lg font-semibold text-slate-900">Registrar ata</h3>
       <button id="a-close" class="text-slate-400 hover:text-slate-700"><i data-feather="x" class="w-5 h-5"></i></button>
@@ -440,7 +453,7 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
         <p class="text-xs text-slate-400 mt-1.5">Até 4 MB. O arquivo é guardado dentro do painel e vai junto no arquivo de trabalho.</p>
       </div>
     </div>
-    <div class="flex justify-end gap-2 mt-6">
+    <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 mt-6">
       <button class="btn btn-ghost" id="a-cancel">Cancelar</button>
       <button class="btn btn-primary" id="a-save">Salvar ata</button>
     </div>
@@ -448,7 +461,7 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
 </div>
 
 <div id="modal-doc" class="modal">
-  <div class="card w-full max-w-2xl mx-auto my-8 p-6">
+  <div class="card w-full max-w-2xl mx-auto my-4 sm:my-8 p-4 sm:p-6">
     <div class="flex items-center justify-between mb-5">
       <h3 class="text-lg font-semibold text-slate-900">Enviar documento</h3>
       <button id="dm-close" class="text-slate-400 hover:text-slate-700"><i data-feather="x" class="w-5 h-5"></i></button>
@@ -470,7 +483,7 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
         <p class="text-xs text-slate-400 mt-1.5">Até 4 MB. Para a pasta digital completa, que costuma passar disso, use o link externo.</p>
       </div>
     </div>
-    <div class="flex justify-end gap-2 mt-6">
+    <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 mt-6">
       <button class="btn btn-ghost" id="dm-cancel">Cancelar</button>
       <button class="btn btn-primary" id="dm-save">Salvar documento</button>
     </div>
@@ -568,11 +581,19 @@ let dreView = 'cfo', fluxoYear = '2026', dq = '', df = 'all';
 
 /* ============ navegação ============ */
 const TITLES = { visao: 'Visão geral', dre: 'DRE gerencial', balanco: 'Balanço e caixa', fluxo: 'Fluxo de caixa', pipeline: 'Pipeline comercial', governanca: 'Atas e deliberações', docs: 'Central de documentos', atualizacoes: 'Atualizações' };
+const sidebar = () => $('#sidebar'), backdrop = () => $('#backdrop');
+function openNav() { sidebar().classList.remove('-translate-x-full'); backdrop().classList.remove('hidden'); }
+function closeNav() { sidebar().classList.add('-translate-x-full'); backdrop().classList.add('hidden'); }
+$('#btn-menu').addEventListener('click', openNav);
+$('#btn-close-nav').addEventListener('click', closeNav);
+$('#backdrop').addEventListener('click', closeNav);
+
 function go(p) {
   $$('.page').forEach(s => s.classList.toggle('active', s.id === p));
   $$('#nav .nav-item').forEach(a => a.classList.toggle('active', a.dataset.p === p));
   $('#crumb').textContent = TITLES[p];
-  history.replaceState(null, '', '#' + p);
+  closeNav();
+  try { history.replaceState(null, '', '#' + p); } catch (e) {}
   window.scrollTo({ top: 0 });
 }
 $$('#nav .nav-item').forEach(a => a.addEventListener('click', () => go(a.dataset.p)));
@@ -994,7 +1015,7 @@ function renderDelibs() {
       '<span class="badge ' + ST_BADGE[v.st] + '">' + ST_NAME[v.st] + '</span></div>' +
       '<p class="text-sm text-slate-600 mt-1.5 leading-relaxed">' + esc(d.p) + '</p>' +
       '<p class="text-xs text-slate-400 mt-2">' + esc(d.m) + '</p>' +
-      '<div class="flex flex-wrap items-center gap-3 mt-4">' +
+      '<div class="flex flex-wrap items-center gap-x-3 gap-y-2 mt-4">' +
       '<div class="flex gap-1">' + Array.from({ length: 11 }, (_, i) =>
         '<span class="w-4 h-4 rounded ' + (i < v.y ? 'bg-emerald-500' : i < v.y + v.n ? 'bg-red-400' : 'bg-slate-200') + '"></span>').join('') + '</div>' +
       '<span class="text-xs text-slate-500">' + v.y + ' a favor · ' + v.n + ' contra · ' + (11 - v.y - v.n) + ' sem voto</span>' +
@@ -1036,9 +1057,9 @@ function renderAtas() {
         : a.ph ? '<span class="badge badge-amber">Ata pendente</span>' : '<span class="badge badge-blue">Registrada</span>') + '</div>' +
       '<h3 class="text-sm font-semibold text-slate-900 mt-1">' + esc(a.tit) + '</h3>' +
       (a.del && a.del.length ? '<ul class="mt-2 space-y-1">' + a.del.map(x => '<li class="text-sm text-slate-600 flex gap-2"><span class="mt-1.5 w-1 h-1 rounded-full bg-slate-300 shrink-0"></span>' + esc(x) + '</li>').join('') + '</ul>' : '') +
-      '<div class="flex items-center gap-2 mt-3 text-xs text-slate-400">Presentes: ' + esc(a.pres || '—') +
+      '<div class="flex flex-wrap items-center gap-x-2 gap-y-1 mt-3 text-xs text-slate-400">Presentes: ' + esc(a.pres || '—') +
       (anexo ? ' · ' + anexo : '') +
-      (a.base ? '' : ' <button class="rm ml-auto text-slate-400 hover:text-red-500" data-id="' + a.uid + '"><i data-feather="trash-2" class="w-3.5 h-3.5"></i></button>') +
+      (a.base ? '' : ' <button class="rm sm:ml-auto text-slate-400 hover:text-red-500" data-id="' + a.uid + '"><i data-feather="trash-2" class="w-3.5 h-3.5"></i></button>') +
       '</div></div></div>';
   }).join('');
   $$('#atas .rm').forEach(b => b.addEventListener('click', () => {
@@ -1237,7 +1258,7 @@ function renderTudo() {
   renderPipe(); renderDelibs(); renderAtas(); renderDocs(); renderUpdates();
 }
 $$('#modal-deal, #modal-ata, #modal-doc').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.add('hidden'); }));
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeDeal(); closeAta(); closeDoc(); } });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeDeal(); closeAta(); closeDoc(); closeNav(); } });
 renderTudo();
 const hash = location.hash.replace('#', '');
 if (TITLES[hash]) go(hash);
