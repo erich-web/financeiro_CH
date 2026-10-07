@@ -148,8 +148,8 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
         <span id="stamp-cont" class="badge badge-slate hidden xl:inline-flex"></span>
         <span id="pipe-stamp" class="badge badge-amber hidden 2xl:inline-flex"></span>
         <button id="btn-save" class="btn btn-ghost btn-sm" title="Baixar o arquivo de trabalho"><i data-feather="download" class="w-3.5 h-3.5"></i><span class="hidden sm:inline">Salvar</span></button>
-        <label for="load-file" class="btn btn-ghost btn-sm" title="Carregar arquivo de dados ou de trabalho"><i data-feather="upload" class="w-3.5 h-3.5"></i><span class="hidden sm:inline">Carregar</span></label>
-        <input type="file" id="load-file" accept="application/json" class="hidden">
+        <label for="load-file" class="btn btn-ghost btn-sm" title="Carregar o arquivo de dados do painel, ou anexar um documento de qualquer tipo"><i data-feather="upload" class="w-3.5 h-3.5"></i><span class="hidden sm:inline">Carregar</span></label>
+        <input type="file" id="load-file" class="hidden">
       </div>
     </header>
 
@@ -458,8 +458,8 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
       <div><label class="field-label">Link externo (opcional)</label><input class="field" id="a-link" placeholder="Endereço no Drive, se houver"></div>
       <div class="sm:col-span-2">
         <label class="field-label">Ata assinada (PDF)</label>
-        <input class="field" id="a-file" type="file" accept=".pdf,.doc,.docx,image/*">
-        <p class="text-xs text-slate-400 mt-1.5">Até 4 MB. O arquivo é guardado dentro do painel e vai junto no arquivo de trabalho.</p>
+        <input class="field" id="a-file" type="file">
+        <p class="text-xs text-slate-400 mt-1.5">Qualquer tipo de arquivo, até 4 MB. Fica guardado dentro do painel e vai junto no arquivo de trabalho. Acima disso, use o campo de link.</p>
       </div>
     </div>
     <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 mt-6">
@@ -489,7 +489,8 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
       <div class="sm:col-span-2">
         <label class="field-label">Arquivo</label>
         <input class="field" id="dm-file" type="file">
-        <p class="text-xs text-slate-400 mt-1.5">Até 4 MB. Para a pasta digital completa, que costuma passar disso, use o link externo.</p>
+        <p id="dm-aviso" class="hidden text-xs text-blue-700 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 mt-2 leading-relaxed"></p>
+        <p class="text-xs text-slate-400 mt-1.5">Qualquer tipo de arquivo, até 4 MB. A pasta digital completa passa disso, então para ela use o campo de link externo.</p>
       </div>
     </div>
     <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 mt-6">
@@ -575,9 +576,9 @@ const kpiCard = (label, value, sub, accent) => '<div class="card card-body">' +
 
 /* anexos: guardados como data URL dentro do próprio painel */
 const MAX_MB = 4;
-function lerArquivo(input) {
+function lerArquivo(input) { return lerArquivoDireto(input.files && input.files[0]); }
+function lerArquivoDireto(f) {
   return new Promise(resolve => {
-    const f = input.files && input.files[0];
     if (!f) return resolve(null);
     if (f.size > MAX_MB * 1024 * 1024) {
       toast('Arquivo acima de ' + MAX_MB + ' MB. Use o link externo.', 'alert-circle');
@@ -1319,23 +1320,46 @@ $$('#doc-seg button').forEach(b => b.addEventListener('click', () => {
   $$('#doc-seg button').forEach(x => x.classList.remove('on')); b.classList.add('on'); df = b.dataset.f; renderDocs();
 }));
 const closeDoc = () => $('#modal-doc').classList.add('hidden');
-$('#btn-doc').addEventListener('click', () => {
+let docPendente = null;
+function abrirDoc() {
   const cats = [...new Set(todosDocs().map(d => d.c))];
   $('#dm-c').innerHTML = cats.map(c => '<option>' + esc(c) + '</option>').join('') + '<option>Outros</option>';
-  $('#modal-doc').classList.remove('hidden'); $('#dm-t').focus();
-});
+  $('#modal-doc').classList.remove('hidden');
+}
+function nomeAviso() {
+  const box = $('#dm-aviso');
+  if (!docPendente) { box.classList.add('hidden'); box.textContent = ''; return; }
+  box.classList.remove('hidden');
+  box.textContent = 'Arquivo escolhido: ' + docPendente.name +
+    ' (' + (docPendente.size / 1048576).toFixed(2).replace('.', ',') + ' MB).' +
+    (docPendente.size > MAX_MB * 1024 * 1024
+      ? ' Passa de ' + MAX_MB + ' MB, então ele não será guardado no painel — preencha o campo de link.'
+      : ' Para trocar, use o campo de arquivo abaixo.');
+}
+function anexarComoDocumento(f, motivo) {
+  docPendente = f;
+  abrirDoc();
+  $('#dm-t').value = f.name.replace(/\.[^.]+$/, '');
+  nomeAviso();
+  $('#dm-t').focus();
+  toast(motivo ? motivo + ' — anexando como documento' : 'Anexando como documento', 'upload');
+}
+$('#btn-doc').addEventListener('click', () => { docPendente = null; nomeAviso(); abrirDoc(); $('#dm-t').focus(); });
 $('#dm-cancel').addEventListener('click', closeDoc);
 $('#dm-close').addEventListener('click', closeDoc);
 $('#dm-save').addEventListener('click', async () => {
   const t = $('#dm-t').value.trim();
   if (!t) { toast('Informe o título do documento', 'alert-circle'); return; }
-  const arq = await lerArquivo($('#dm-file'));
+  const arq = ($('#dm-file').files && $('#dm-file').files[0])
+    ? await lerArquivo($('#dm-file'))
+    : (docPendente ? await lerArquivoDireto(docPendente) : null);
   userDocs.push({
     uid: 'd' + Date.now(), c: $('#dm-c').value, t, d: $('#dm-d').value.trim() || 'Enviado pelo painel em ' + hoje() + '.',
     s: $('#dm-s').value, tag: $('#dm-tag').value.trim() || 'Enviado', org: $('#dm-org').value.trim() || 'Interno',
     resp: $('#dm-resp').value.trim() || 'Diretoria', f: 'PDF', link: $('#dm-link').value.trim(), arq
   });
   ['#dm-t', '#dm-d', '#dm-tag', '#dm-org', '#dm-resp', '#dm-link', '#dm-file'].forEach(s => $(s).value = '');
+  docPendente = null; nomeAviso();
   closeDoc(); renderDocs(); renderUpdates(); toast('Documento adicionado');
 });
 
@@ -1437,10 +1461,12 @@ function aplicar(json) {
 }
 $('#load-file').addEventListener('change', e => {
   const f = e.target.files[0]; if (!f) return;
+  const ehJson = /\.json$/i.test(f.name) || f.type === 'application/json';
+  if (!ehJson) { anexarComoDocumento(f); e.target.value = ''; return; }
   const r = new FileReader();
   r.onload = () => {
     try { aplicar(JSON.parse(r.result)); }
-    catch (err) { toast('Arquivo inválido', 'alert-circle'); }
+    catch (err) { anexarComoDocumento(f, 'Não consegui ler como arquivo de dados do painel'); }
     e.target.value = '';
   };
   r.readAsText(f);
