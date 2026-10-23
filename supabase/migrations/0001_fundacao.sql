@@ -103,7 +103,7 @@ create table pessoa_papeis (
 -- precisa dizer isso em vez de apresentar um percentual errado com
 -- aparência de certo.
 create or replace function capital_total()
-returns numeric language sql stable
+returns numeric language sql stable set search_path = public
 as $$ select coalesce(sum(participacao), 0) from socios where ativo $$;
 
 -- ---------------------------------------------------------------------
@@ -173,7 +173,7 @@ create unique index fechamentos_publicado_uniq
   on fechamentos (periodo) where estado = 'publicado';
 
 create or replace function fechamento_imutavel()
-returns trigger language plpgsql as $$
+returns trigger language plpgsql set search_path = public as $$
 begin
   if old.estado = 'publicado' and new.dados is distinct from old.dados then
     raise exception
@@ -298,7 +298,7 @@ returns table (
   favor numeric, contra numeric, abstencao numeric, nao_votou numeric,
   exigido numeric, atingido boolean, capital numeric, base_completa boolean
 )
-language sql stable as $$
+language sql stable set search_path = public as $$
   with m as (select quorum_exigido from materias where id = p_materia),
        v as (
          select

@@ -52,9 +52,30 @@ rodar "$PGBIN/psql -h $PGDIR -p $PORTA -U $USUARIO -d postgres -q \
   -c 'drop database if exists $BANCO' -c 'create database $BANCO'" >/dev/null
 
 # Stubs do que o Supabase fornece e o Postgres puro não tem.
+#
+# Os papéis anon e authenticated, e os privilégios padrão, imitam o que o
+# Supabase faz em todo projeto: qualquer tabela ou visão criada no schema
+# public nasce com SELECT, INSERT, UPDATE e DELETE concedidos a anon e a
+# authenticated. A proteção fica inteira por conta da RLS — e é por isso
+# que o teste precisa reproduzir essas concessões, senão um vazamento que
+# existe no Supabase passa despercebido aqui.
 cat > "$PGDIR/stubs.sql" <<'SQL'
+do $$ begin
+  if not exists (select 1 from pg_roles where rolname = 'anon') then
+    create role anon nologin;
+  end if;
+  if not exists (select 1 from pg_roles where rolname = 'authenticated') then
+    create role authenticated nologin;
+  end if;
+end $$;
+grant usage on schema public to anon, authenticated;
+alter default privileges in schema public grant all on tables    to anon, authenticated;
+alter default privileges in schema public grant all on sequences to anon, authenticated;
+alter default privileges in schema public grant execute on functions to anon, authenticated;
+
 create schema if not exists auth;
 create schema if not exists storage;
+grant usage on schema auth to anon, authenticated;
 create or replace function auth.jwt() returns jsonb language sql stable as $$
   select coalesce(nullif(current_setting('teste.jwt', true), ''), '{}')::jsonb
 $$;

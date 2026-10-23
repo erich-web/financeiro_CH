@@ -42,8 +42,9 @@ passado: quem quiser o histórico ainda o acha. Ver "O que ainda falta".
       0004_aplicar_proposta.sql  aplicação atômica de proposta do chat
       0005_carga_fechamento.sql  o painel de hoje, migrado para o banco
       0006_views_telas.sql       visões das telas de pendência, voto e comentário
+      0007_endurecimento.sql     a chave anônima perde todo privilégio no schema
     functions/chat/index.ts      Edge Function do assistente
-    testes/                      46 testes de SQL e 100 de navegador
+    testes/                      53 testes de SQL e 100 de navegador
     testar.sh                    roda tudo, sem rede e sem tocar em projeto real
 
 ## Decisões que valem saber
@@ -71,6 +72,13 @@ quebraria todo o código de gráficos que já funciona.
 **Fechamento publicado é imutável.** Correção gera versão nova do mesmo
 período; a anterior fica no histórico. É o que permite ao sócio confiar
 que o número visto na reunião continua lá.
+
+**Toda visão é `security_invoker`.** No Postgres, uma visão roda por padrão
+com os privilégios do dono, e o dono passa por cima da RLS. Sem a opção,
+`v_fechamento_vigente` entregaria o DRE inteiro à chave anônima. O teste
+`0005_vazamento.sql` provou o vazamento antes da correção e hoje confere,
+de forma estrutural, que nenhuma visão do schema roda sem a opção — uma
+visão nova criada sem ela deixa a bateria vermelha.
 
 **A auditoria é legível por qualquer sócio, de propósito.** Quando uma
 pessoa opera o painel inteiro, o registro só controla alguma coisa se os

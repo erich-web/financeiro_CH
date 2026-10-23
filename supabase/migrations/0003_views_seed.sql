@@ -2,13 +2,18 @@
 -- Migração 0003: visões de apoio e carga inicial
 -- =====================================================================
 
+-- security_invoker: a visão roda com os privilégios de quem consulta, e a
+-- RLS das tabelas por baixo vale. Sem isso, a visão roda como o dono e
+-- devolve tudo a qualquer um — inclusive à chave anônima. Ver o teste
+-- 0005_vazamento.sql, que provou o vazamento antes desta correção.
+
 -- ---------------------------------------------------------------------
 -- Quem sou eu
 -- Primeira chamada do painel depois do login. Decide o que a tela mostra,
 -- inclusive se o botão do chat aparece. A decisão de exibir é conforto;
 -- a de permitir é da RLS, que não depende desta visão.
 -- ---------------------------------------------------------------------
-create or replace view v_eu as
+create or replace view v_eu with (security_invoker = true) as
 select
   p.id, p.nome, p.email,
   coalesce(array_agg(distinct pp.papel) filter (where pp.papel is not null), '{}') as papeis,
@@ -30,7 +35,7 @@ group by p.id, p.nome, p.email;
 -- ---------------------------------------------------------------------
 -- Quadro societário com representantes
 -- ---------------------------------------------------------------------
-create or replace view v_socios as
+create or replace view v_socios with (security_invoker = true) as
 select
   s.id, s.nome, s.quotas, s.capital, s.participacao, s.integralizado, s.ativo,
   s.observacao,
@@ -42,7 +47,7 @@ from socios s;
 -- ---------------------------------------------------------------------
 -- Fechamento vigente de cada período
 -- ---------------------------------------------------------------------
-create or replace view v_fechamento_vigente as
+create or replace view v_fechamento_vigente with (security_invoker = true) as
 select distinct on (periodo)
   id, periodo, versao, estado, dados, publicado_em, parecer_conselho
 from fechamentos
@@ -52,7 +57,7 @@ order by periodo desc, versao desc;
 -- ---------------------------------------------------------------------
 -- Matérias com apuração já calculada
 -- ---------------------------------------------------------------------
-create or replace view v_materias as
+create or replace view v_materias with (security_invoker = true) as
 select m.*, q.rotulo as quorum_rotulo,
        a.favor, a.contra, a.abstencao, a.nao_votou,
        a.atingido, a.capital, a.base_completa
@@ -63,7 +68,7 @@ left join lateral apurar_materia(m.id) a on true;
 -- ---------------------------------------------------------------------
 -- Pendências com nome do dono
 -- ---------------------------------------------------------------------
-create or replace view v_pendencias as
+create or replace view v_pendencias with (security_invoker = true) as
 select pe.*, p.nome as dono_nome, r.nome as resolvido_nome
 from pendencias pe
 left join pessoas p on p.id = pe.dono_id
