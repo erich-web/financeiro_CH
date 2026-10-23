@@ -13,3 +13,5 @@ build/cfg.json
 build/data_atual.json
 build/index.preview.html
 supabase/migrations/0005_carga_fechamento.sql
+# E-mails pessoais dos sócios — aplicada direto no banco, nunca commitada.
+supabase/migrations/0008_pessoas.sql
