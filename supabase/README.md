@@ -41,8 +41,9 @@ passado: quem quiser o histórico ainda o acha. Ver "O que ainda falta".
       0003_views_seed.sql        visões de apoio e quadro societário
       0004_aplicar_proposta.sql  aplicação atômica de proposta do chat
       0005_carga_fechamento.sql  o painel de hoje, migrado para o banco
+      0006_views_telas.sql       visões das telas de pendência, voto e comentário
     functions/chat/index.ts      Edge Function do assistente
-    testes/                      20 testes de SQL e 49 de navegador
+    testes/                      46 testes de SQL e 100 de navegador
     testar.sh                    roda tudo, sem rede e sem tocar em projeto real
 
 ## Decisões que valem saber
@@ -153,7 +154,7 @@ provar nada.
   (Tarundu e Fábio/Cesar).
 - O painel ainda mostra quatro conselheiros fiscais; a cláusula 6.12 fala
   de três efetivos mais suplentes.
-- Fluxo de fechamento mensal pela tela (hoje o estado existe no banco, mas
-  quem muda é a diretoria por SQL ou pelo chat).
-- Telas de pendência, comentário e votação: as tabelas, as regras e os
-  testes estão prontos; falta a interface.
+- Fluxo visual de fechamento mensal: hoje a diretoria muda o estado por
+  SQL ou pelo assistente, não por uma tela.
+- Resumo mensal por e-mail aos sócios quando um fechamento é publicado.
+- Rastreabilidade de cada número até a página do documento de origem.

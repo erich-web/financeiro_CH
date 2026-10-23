@@ -1,0 +1,486 @@
+<script>
+/* =====================================================================
+   Pendências, comentários e votação
+
+   As três telas que transformam o painel de relatório em ferramenta: o
+   sócio resolve, comenta e vota de onde estiver, e a apuração aparece
+   calculada sobre percentual de capital, como manda o acordo.
+
+   Toda escrita passa pela RLS. Se a tela mostra um botão que a pessoa não
+   poderia usar, o banco recusa — a permissão não depende do que a
+   interface decidiu esconder.
+   ===================================================================== */
+
+/* ---------------------------------------------------------------------
+   Datas e rótulos
+   --------------------------------------------------------------------- */
+const diaBR = iso => {
+  if (!iso) return '—';
+  const [a, m, d] = String(iso).slice(0, 10).split('-');
+  return d && m && a ? `${d}/${m}/${a}` : '—';
+};
+
+const diasAte = iso => {
+  if (!iso) return null;
+  const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+  const alvo = new Date(String(iso).slice(0, 10) + 'T00:00:00');
+  return Math.round((alvo - hoje) / 86400000);
+};
+
+function prazoTexto(iso) {
+  const d = diasAte(iso);
+  if (d === null) return { txt: 'sem prazo', cls: 'badge-slate' };
+  if (d < 0) return { txt: Math.abs(d) + (Math.abs(d) === 1 ? ' dia em atraso' : ' dias em atraso'), cls: 'badge-red' };
+  if (d === 0) return { txt: 'vence hoje', cls: 'badge-amber' };
+  if (d <= 7) return { txt: 'em ' + d + (d === 1 ? ' dia' : ' dias'), cls: 'badge-amber' };
+  return { txt: diaBR(iso), cls: 'badge-slate' };
+}
+
+const quando = iso => {
+  if (!iso) return '';
+  const min = Math.round((Date.now() - new Date(iso)) / 60000);
+  if (min < 1) return 'agora';
+  if (min < 60) return min + ' min';
+  if (min < 1440) return Math.round(min / 60) + ' h';
+  const dias = Math.round(min / 1440);
+  return dias < 30 ? dias + (dias === 1 ? ' dia' : ' dias') : diaBR(iso);
+};
+
+const podeAdministrar = () => !!(EU && (EU.e_diretoria || EU.e_admin));
+
+/* =====================================================================
+   Comentários
+   ===================================================================== */
+function comentariosDe(aba, item) {
+  return (DB.comentarios || [])
+    .filter(c => c.ancora_aba === aba && String(c.ancora_item || '') === String(item || ''))
+    .sort((a, b) => new Date(a.criado_em) - new Date(b.criado_em));
+}
+
+function htmlThread(aba, item) {
+  const cs = comentariosDe(aba, item);
+  const linhas = cs.map(c => `
+    <div class="flex gap-2.5">
+      <div class="w-6 h-6 rounded-full bg-slate-100 text-slate-600 grid place-items-center text-[10px] font-semibold shrink-0 mt-0.5">
+        ${esc((c.autor_nome || '?').trim().charAt(0).toUpperCase())}
+      </div>
+      <div class="min-w-0 flex-1">
+        <div class="text-xs">
+          <span class="font-medium text-slate-900">${esc(c.autor_nome || '—')}</span>
+          <span class="text-slate-400 ml-1.5">${esc(quando(c.criado_em))}</span>
+        </div>
+        <div class="text-sm text-slate-700 leading-relaxed mt-0.5 whitespace-pre-wrap">${esc(c.texto)}</div>
+      </div>
+    </div>`).join('');
+
+  return `
+    <div class="mt-4 pt-4 border-t border-slate-100">
+      <div class="space-y-3">${linhas || '<p class="text-xs text-slate-400">Nenhum comentário ainda.</p>'}</div>
+      <form class="mt-3 flex items-end gap-2" data-coment="${esc(aba)}|${esc(item || '')}">
+        <textarea rows="1" class="field resize-none py-1.5 text-sm" placeholder="Comentar…"></textarea>
+        <button type="submit" class="btn btn-ghost btn-sm shrink-0">Enviar</button>
+      </form>
+    </div>`;
+}
+
+function ligarFormsComentario(raiz) {
+  (raiz || document).querySelectorAll('form[data-coment]').forEach(f => {
+    if (f.dataset.ligado) return;
+    f.dataset.ligado = '1';
+    f.addEventListener('submit', async ev => {
+      ev.preventDefault();
+      const ta = f.querySelector('textarea');
+      const texto = ta.value.trim();
+      if (!texto) return;
+      const [aba, item] = f.dataset.coment.split('|');
+      const btn = f.querySelector('button');
+      btn.disabled = true;
+      try {
+        await api.comentar(aba, item || null, texto, null);
+        ta.value = '';
+        await recarregar();
+      } catch (e) {
+        toast('Não consegui comentar: ' + (e.message || e), 'alert-circle');
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  });
+}
+
+function renderFeedComentarios() {
+  const alvo = $('#coment-feed');
+  if (!alvo) return;
+
+  const cs = [...(DB.comentarios || [])]
+    .sort((a, b) => new Date(b.criado_em) - new Date(a.criado_em))
+    .slice(0, 12);
+
+  if (!cs.length) {
+    alvo.innerHTML = '<p class="text-sm text-slate-400 leading-relaxed">Ainda não há comentários. Quem tiver dúvida sobre um número pode deixá-la aqui em vez de guardar para a reunião.</p>';
+    return;
+  }
+
+  const ondeFica = c => {
+    if (c.ancora_aba === 'pendencias') {
+      const p = (DB.pendencias || []).find(x => x.id === c.ancora_item);
+      return p ? 'pendência · ' + p.titulo : 'pendência';
+    }
+    if (c.ancora_aba === 'materias') {
+      const m = (DB.materias || []).find(x => x.id === c.ancora_item);
+      return m ? 'matéria · ' + m.titulo : 'matéria';
+    }
+    return (typeof TITLES === 'object' && TITLES[c.ancora_aba]) || c.ancora_aba;
+  };
+
+  alvo.innerHTML = cs.map(c => `
+    <div class="text-sm">
+      <div class="flex items-baseline gap-1.5 flex-wrap">
+        <span class="font-medium text-slate-900 text-xs">${esc(c.autor_nome || '—')}</span>
+        <span class="text-[11px] text-slate-400">${esc(quando(c.criado_em))}</span>
+        <span class="text-[11px] text-blue-700 truncate">em ${esc(ondeFica(c))}</span>
+      </div>
+      <div class="text-slate-700 leading-relaxed mt-0.5">${esc(c.texto)}</div>
+    </div>`).join('');
+}
+
+/* =====================================================================
+   Pendências
+   ===================================================================== */
+function renderPendencias() {
+  const todas = (DB.pendencias || []).filter(p => p.estado === 'aberta' || p.estado === 'em_andamento');
+  const atrasadas = todas.filter(p => (diasAte(p.prazo) ?? 99) < 0);
+  const semana = todas.filter(p => { const d = diasAte(p.prazo); return d !== null && d >= 0 && d <= 7; });
+  const valor = todas.reduce((s, p) => s + (Number(p.valor) || 0), 0);
+
+  // crachá no menu: quem abre o painel vê de longe se há coisa vencida
+  const badge = $('#nav-pend-badge');
+  if (badge) {
+    badge.textContent = todas.length || '';
+    badge.className = 'ml-auto badge ' + (atrasadas.length ? 'badge-red' : 'badge-slate') + (todas.length ? '' : ' hidden');
+  }
+
+  const kpi = (rot, val, sub, cor) => `
+    <div class="card card-body">
+      <div class="kpi-label">${esc(rot)}</div>
+      <div class="kpi-value ${cor || ''}">${val}</div>
+      <div class="kpi-sub">${esc(sub)}</div>
+    </div>`;
+
+  if ($('#pend-kpis')) {
+    $('#pend-kpis').innerHTML = [
+      kpi('Em aberto', todas.length, todas.length === 1 ? 'uma pendência' : 'pendências ativas'),
+      kpi('Em atraso', atrasadas.length, atrasadas.length ? 'passaram do prazo' : 'nada vencido', atrasadas.length ? 'text-red-600' : 'text-emerald-600'),
+      kpi('Vencem em 7 dias', semana.length, 'entram na próxima semana', semana.length ? 'text-amber-600' : ''),
+      kpi('Valor envolvido', valor ? fmtK(valor) : '—', 'soma das pendências com valor'),
+    ].join('');
+  }
+
+  const alvo = $('#pend-lista');
+  if (!alvo) return;
+
+  if (!todas.length) {
+    alvo.innerHTML = `
+      <div class="card card-body text-center py-10">
+        <div class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 mb-3 mx-auto">
+          <i data-feather="check" class="w-5 h-5"></i>
+        </div>
+        <p class="text-sm font-semibold text-slate-900">Nenhuma pendência em aberto</p>
+        <p class="text-sm text-slate-500 mt-1.5 leading-relaxed max-w-md mx-auto">
+          Pendências entram pela ata da reunião, pelo fechamento do mês ou pelo assistente.
+        </p>
+      </div>`;
+    icons();
+    return;
+  }
+
+  const ordem = { em_andamento: 0, aberta: 1 };
+  todas.sort((a, b) => {
+    const da = diasAte(a.prazo), db_ = diasAte(b.prazo);
+    if (da === null && db_ !== null) return 1;
+    if (db_ === null && da !== null) return -1;
+    if (da !== db_) return (da ?? 0) - (db_ ?? 0);
+    return (ordem[a.estado] ?? 9) - (ordem[b.estado] ?? 9);
+  });
+
+  alvo.innerHTML = todas.map(p => {
+    const pz = prazoTexto(p.prazo);
+    const meu = EU && p.dono_id === EU.id;
+    const podeResolver = meu || podeAdministrar();
+    const nCom = comentariosDe('pendencias', p.id).length;
+
+    return `
+      <div class="card card-body" data-pend="${esc(p.id)}">
+        <div class="flex items-start justify-between gap-3 flex-wrap">
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="badge ${pz.cls}">${esc(pz.txt)}</span>
+              ${p.estado === 'em_andamento' ? '<span class="badge badge-blue">em andamento</span>' : ''}
+              ${p.origem ? `<span class="text-[11px] text-slate-400">via ${esc(p.origem)}</span>` : ''}
+            </div>
+            <h3 class="text-[15px] font-semibold text-slate-900 leading-snug mt-2">${esc(p.titulo)}</h3>
+            ${p.descricao ? `<p class="text-sm text-slate-600 leading-relaxed mt-1.5">${esc(p.descricao)}</p>` : ''}
+            <div class="flex items-center gap-4 mt-3 text-xs text-slate-500 flex-wrap">
+              <span><span class="text-slate-400">dono</span> ${esc(p.dono_nome || 'ninguém ainda')}${meu ? ' <span class="text-blue-700 font-medium">(você)</span>' : ''}</span>
+              ${p.prazo ? `<span><span class="text-slate-400">prazo</span> ${esc(diaBR(p.prazo))}</span>` : ''}
+              ${p.valor ? `<span><span class="text-slate-400">valor</span> ${esc(fmtK(Number(p.valor)))}</span>` : ''}
+            </div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <button class="btn btn-ghost btn-sm" data-acao="comentar" title="Comentários">
+              <i data-feather="message-circle" class="w-3.5 h-3.5"></i>${nCom || ''}
+            </button>
+            ${podeResolver ? '<button class="btn btn-primary btn-sm" data-acao="resolver"><i data-feather="check" class="w-3.5 h-3.5"></i>Resolver</button>' : ''}
+          </div>
+        </div>
+        <div class="hidden" data-thread>${htmlThread('pendencias', p.id)}</div>
+      </div>`;
+  }).join('');
+
+  alvo.querySelectorAll('[data-pend]').forEach(card => {
+    const id = card.dataset.pend;
+    card.querySelector('[data-acao="comentar"]')?.addEventListener('click', () => {
+      const t = card.querySelector('[data-thread]');
+      t.classList.toggle('hidden');
+      if (!t.classList.contains('hidden')) {
+        ligarFormsComentario(t);
+        t.querySelector('textarea')?.focus();
+      }
+    });
+    card.querySelector('[data-acao="resolver"]')?.addEventListener('click', () => resolver(card, id));
+  });
+
+  icons();
+}
+
+async function resolver(card, id) {
+  const p = (DB.pendencias || []).find(x => x.id === id);
+  const como = prompt('Como foi resolvida?\n\n' + (p ? p.titulo : ''), '');
+  if (como === null) return;
+
+  const btn = card.querySelector('[data-acao="resolver"]');
+  btn.disabled = true;
+  try {
+    await api.resolverPendencia(id, como.trim() || null);
+    await recarregar();
+    toast('Pendência resolvida');
+  } catch (e) {
+    btn.disabled = false;
+    toast('Não consegui resolver: ' + (e.message || e), 'alert-circle');
+  }
+}
+
+/* ---- nova pendência (diretoria) ---- */
+function abrirModalPend() {
+  const sel = $('#pd-dono');
+  if (sel) {
+    const pes = DB.pessoas_lista || [];
+    sel.innerHTML = '<option value="">— sem dono —</option>' +
+      pes.map(p => `<option value="${esc(p.id)}">${esc(p.nome)}</option>`).join('');
+  }
+  $('#pd-titulo').value = ''; $('#pd-desc').value = '';
+  $('#pd-prazo').value = ''; $('#pd-valor').value = '';
+  $('#pd-erro').classList.add('hidden');
+  $('#modal-pend').classList.remove('hidden');
+  $('#modal-pend').classList.add('flex');
+  $('#pd-titulo').focus();
+}
+
+function fecharModalPend() {
+  $('#modal-pend').classList.add('hidden');
+  $('#modal-pend').classList.remove('flex');
+}
+
+async function salvarPend() {
+  const titulo = $('#pd-titulo').value.trim();
+  const erro = $('#pd-erro');
+  if (!titulo) {
+    erro.textContent = 'A pendência precisa de um título.';
+    erro.classList.remove('hidden');
+    return;
+  }
+  const btn = $('#pd-save');
+  btn.disabled = true;
+  try {
+    await api.criarPendencia({
+      titulo,
+      descricao: $('#pd-desc').value.trim() || null,
+      dono_id: $('#pd-dono').value || null,
+      prazo: $('#pd-prazo').value || null,
+      valor: $('#pd-valor').value ? Number($('#pd-valor').value) : null,
+    });
+    fecharModalPend();
+    await recarregar();
+    toast('Pendência criada');
+  } catch (e) {
+    erro.textContent = 'Não consegui criar: ' + (e.message || e);
+    erro.classList.remove('hidden');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+/* =====================================================================
+   Matérias em votação
+   ===================================================================== */
+function renderMaterias() {
+  const alvo = $('#materias');
+  if (!alvo) return;
+
+  const abertas = (DB.materias || []).filter(m => m.estado === 'em_votacao');
+  const fechadas = (DB.materias || [])
+    .filter(m => m.estado === 'aprovada' || m.estado === 'rejeitada')
+    .slice(0, 3);
+
+  if (!abertas.length && !fechadas.length) {
+    alvo.innerHTML = '';
+    return;
+  }
+
+  alvo.innerHTML = [...abertas.map(cardMateria), ...fechadas.map(cardMateria)].join('');
+
+  alvo.querySelectorAll('[data-materia]').forEach(card => {
+    const id = card.dataset.materia;
+    card.querySelectorAll('[data-voto]').forEach(b => {
+      b.addEventListener('click', () => votar(card, id, b.dataset.socio, b.dataset.voto));
+    });
+    card.querySelector('[data-acao="comentar"]')?.addEventListener('click', () => {
+      const t = card.querySelector('[data-thread]');
+      t.classList.toggle('hidden');
+      if (!t.classList.contains('hidden')) ligarFormsComentario(t);
+    });
+  });
+
+  icons();
+}
+
+function cardMateria(m) {
+  const favor = Number(m.favor || 0), contra = Number(m.contra || 0);
+  const abst = Number(m.abstencao || 0), falta = Number(m.nao_votou || 0);
+  const exigido = Number(m.quorum_exigido || 0);
+  const pc = v => (v * 100).toFixed(2).replace('.', ',') + '%';
+  const emVotacao = m.estado === 'em_votacao';
+
+  const meusVotos = (DB.votos || []).filter(v => v.materia_id === m.id);
+  const repr = (EU?.representa_ids || []);
+  const faltaVotar = repr.filter(sid => !meusVotos.some(v => v.socio_id === sid));
+  const jaVotei = repr.filter(sid => meusVotos.some(v => v.socio_id === sid));
+
+  const nomeQuotista = sid => (DB.quadro || []).find(s => s.id === sid)?.nome || 'quotista';
+  const rotuloVoto = { favor: 'a favor', contra: 'contra', abstencao: 'abstenção' };
+
+  const botoes = emVotacao && faltaVotar.length ? `
+    <div class="mt-4 pt-4 border-t border-slate-100 space-y-3">
+      ${faltaVotar.map(sid => `
+        <div class="flex items-center justify-between gap-3 flex-wrap">
+          <span class="text-xs text-slate-600 min-w-0 truncate">
+            Seu voto por <span class="font-medium text-slate-900">${esc(nomeQuotista(sid))}</span>
+          </span>
+          <div class="flex gap-1.5 shrink-0">
+            <button class="btn btn-primary btn-sm" data-voto="favor" data-socio="${esc(sid)}">A favor</button>
+            <button class="btn btn-ghost btn-sm" data-voto="contra" data-socio="${esc(sid)}">Contra</button>
+            <button class="btn btn-ghost btn-sm" data-voto="abstencao" data-socio="${esc(sid)}">Abster</button>
+          </div>
+        </div>`).join('')}
+      <p class="text-[11px] text-slate-400 leading-relaxed">
+        Voto nominal e aberto, como manda o acordo. Uma vez dado, não se altera.
+      </p>
+    </div>` : '';
+
+  const meus = jaVotei.length ? `
+    <div class="mt-3 flex flex-wrap gap-1.5">
+      ${jaVotei.map(sid => {
+        const v = meusVotos.find(x => x.socio_id === sid);
+        const cls = v.voto === 'favor' ? 'badge-green' : v.voto === 'contra' ? 'badge-red' : 'badge-slate';
+        return `<span class="badge ${cls}">${esc(nomeQuotista(sid))}: ${esc(rotuloVoto[v.voto])}</span>`;
+      }).join('')}
+    </div>` : '';
+
+  const nominal = meusVotos.length ? `
+    <details class="mt-3">
+      <summary class="text-xs text-blue-700 cursor-pointer">Ver os ${meusVotos.length} votos registrados</summary>
+      <div class="mt-2 space-y-1">
+        ${meusVotos.map(v => `
+          <div class="flex items-baseline justify-between gap-2 text-xs">
+            <span class="text-slate-600 truncate">${esc(v.socio_nome)}</span>
+            <span class="text-slate-400 shrink-0">${esc(pc(Number(v.peso)))} · ${esc(rotuloVoto[v.voto])}${v.via !== 'painel' ? ' (' + esc(v.via.replace('_', ' ')) + ')' : ''}</span>
+          </div>`).join('')}
+      </div>
+    </details>` : '';
+
+  const aviso = m.base_completa === false ? `
+    <p class="text-[11px] text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-2 mt-3 leading-relaxed">
+      As participações cadastradas somam ${esc(pc(Number(m.capital || 0)))} em vez de 100%.
+      Esta apuração está sobre base incompleta.
+    </p>` : '';
+
+  const selo = emVotacao
+    ? (m.atingido ? '<span class="badge badge-green">quórum atingido</span>' : '<span class="badge badge-blue">em votação</span>')
+    : m.estado === 'aprovada' ? '<span class="badge badge-green">aprovada</span>'
+      : '<span class="badge badge-red">rejeitada</span>';
+
+  return `
+    <div class="card card-body" data-materia="${esc(m.id)}">
+      <div class="flex items-start justify-between gap-3 flex-wrap">
+        <div class="min-w-0 flex-1">
+          <div class="flex items-center gap-2 flex-wrap">
+            ${selo}
+            ${m.clausula ? `<span class="badge badge-slate">cláusula ${esc(m.clausula)}</span>` : ''}
+            <span class="text-[11px] text-slate-500">${esc(m.quorum_rotulo || pc(exigido))} · exige ${esc(pc(exigido))} do capital</span>
+          </div>
+          <h3 class="text-[15px] font-semibold text-slate-900 leading-snug mt-2">${esc(m.titulo)}</h3>
+          ${m.descricao ? `<p class="text-sm text-slate-600 leading-relaxed mt-1.5">${esc(m.descricao)}</p>` : ''}
+        </div>
+        <button class="btn btn-ghost btn-sm shrink-0" data-acao="comentar" title="Comentários">
+          <i data-feather="message-circle" class="w-3.5 h-3.5"></i>${comentariosDe('materias', m.id).length || ''}
+        </button>
+      </div>
+
+      <div class="mt-4">
+        <div class="flex h-2.5 rounded-full overflow-hidden bg-slate-100 relative">
+          <div class="bg-emerald-500" style="width:${(favor * 100).toFixed(3)}%"></div>
+          <div class="bg-red-400" style="width:${(contra * 100).toFixed(3)}%"></div>
+          <div class="bg-slate-300" style="width:${(abst * 100).toFixed(3)}%"></div>
+          <div class="absolute top-[-3px] bottom-[-3px] w-0.5 bg-slate-900"
+               style="left:${(exigido * 100).toFixed(3)}%" title="quórum exigido: ${esc(pc(exigido))}"></div>
+        </div>
+        <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2.5 text-xs">
+          <span class="text-emerald-700">a favor ${esc(pc(favor))}</span>
+          <span class="text-red-600">contra ${esc(pc(contra))}</span>
+          <span class="text-slate-500">abstenção ${esc(pc(abst))}</span>
+          <span class="text-slate-400">não votou ${esc(pc(falta))}</span>
+          ${m.prazo && emVotacao ? `<span class="text-slate-400 ml-auto">${esc(prazoTexto(m.prazo).txt)}</span>` : ''}
+        </div>
+      </div>
+
+      ${aviso}${meus}${botoes}${nominal}
+      <div class="hidden" data-thread>${htmlThread('materias', m.id)}</div>
+    </div>`;
+}
+
+async function votar(card, materiaId, socioId, voto) {
+  const nome = (DB.quadro || []).find(s => s.id === socioId)?.nome || 'essa quotista';
+  const rot = { favor: 'A FAVOR', contra: 'CONTRA', abstencao: 'ABSTENÇÃO' }[voto];
+  if (!confirm(`Votar ${rot} por ${nome}?\n\nVoto nominal e definitivo: não dá para alterar depois.`)) return;
+
+  card.querySelectorAll('[data-voto]').forEach(b => b.disabled = true);
+  try {
+    await api.votar(materiaId, socioId, voto, null);
+    await recarregar();
+    toast('Voto registrado');
+  } catch (e) {
+    card.querySelectorAll('[data-voto]').forEach(b => b.disabled = false);
+    toast('Não consegui votar: ' + (e.message || e), 'alert-circle');
+  }
+}
+
+/* =====================================================================
+   Ligações de interface
+   ===================================================================== */
+document.addEventListener('DOMContentLoaded', () => {
+  $('#btn-pend')?.addEventListener('click', abrirModalPend);
+  $('#pd-cancel')?.addEventListener('click', fecharModalPend);
+  $('#pd-save')?.addEventListener('click', salvarPend);
+  $('#modal-pend')?.addEventListener('click', e => { if (e.target.id === 'modal-pend') fecharModalPend(); });
+});
+</script>

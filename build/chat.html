@@ -157,11 +157,7 @@ async function decidir(el, id, publicar) {
       const { data, error } = await sb.rpc('aplicar_proposta', { p_proposta: id });
       if (error) throw error;
 
-      // Recarrega do banco em vez de remendar o objeto em memória: o que
-      // a tela mostra passa a ser o que ficou gravado, não o que eu
-      // esperava que ficasse.
-      DB = await montarDB();
-      renderTudo();
+      await recarregar();
 
       el.querySelector('[data-acao="publicar"]').remove();
       el.querySelector('[data-acao="descartar"]').remove();

@@ -54,7 +54,10 @@ def main() -> int:
     for chave, valor in (('__SUPABASE_URL__', cfg['url']), ('__SUPABASE_ANON_KEY__', cfg['anon'])):
         api = api.replace(chave, valor)
 
-    saida = '\n'.join([head, ler('gate.html'), api, ler('chat.html'), ler('tail.html')])
+    saida = '\n'.join([
+        head, ler('gate.html'), api,
+        ler('governanca.html'), ler('chat.html'), ler('tail.html'),
+    ])
 
     # Conferências que já custaram tempo quando falharam calado
     erros = []

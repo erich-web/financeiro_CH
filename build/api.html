@@ -84,9 +84,22 @@ const api = {
   },
 
   async comentarios() {
-    const { data, error } = await sb.from('comentarios')
-      .select('*, autor:pessoas!comentarios_autor_id_fkey(nome)')
-      .order('criado_em', { ascending: true });
+    const { data, error } = await sb.from('v_comentarios')
+      .select('*').order('criado_em', { ascending: true });
+    if (error) throw error;
+    return data ?? [];
+  },
+
+  async votos() {
+    const { data, error } = await sb.from('v_votos')
+      .select('*').order('criado_em', { ascending: true });
+    if (error) throw error;
+    return data ?? [];
+  },
+
+  async pessoas() {
+    const { data, error } = await sb.from('pessoas')
+      .select('id,nome,email').eq('ativo', true).order('nome');
     if (error) throw error;
     return data ?? [];
   },
@@ -127,6 +140,14 @@ const api = {
     return data;
   },
 
+  async criarPendencia(campos) {
+    const { data, error } = await sb.from('pendencias')
+      .insert({ ...campos, origem: 'painel', criado_por: EU.id })
+      .select('*').single();
+    if (error) throw error;
+    return data;
+  },
+
   async resolverPendencia(id, resolucao) {
     const { error } = await sb.from('pendencias').update({
       estado: 'resolvida', resolucao,
@@ -158,9 +179,10 @@ const api = {
    sem reescrever nenhum gráfico.
    --------------------------------------------------------------------- */
 async function montarDB() {
-  const [fech, pend, mat, com, quadro, quoruns, docs] = await Promise.all([
+  const [fech, pend, mat, com, quadro, quoruns, docs, votos, pessoas] = await Promise.all([
     api.fechamentoVigente(), api.pendencias(), api.materias(),
     api.comentarios(), api.quadro(), api.quoruns(), api.documentos(),
+    api.votos(), api.pessoas(),
   ]);
 
   if (!fech) {
@@ -184,14 +206,39 @@ async function montarDB() {
     ]);
   }
 
-  base.pendencias  = pend;
-  base.materias    = mat;
-  base.comentarios = com;
-  base.quadro      = quadro;
-  base.quoruns     = quoruns;
+  base.pendencias    = pend;
+  base.materias      = mat;
+  base.comentarios   = com;
+  base.quadro        = quadro;
+  base.quoruns       = quoruns;
+  base.votos         = votos;
+  base.pessoas_lista = pessoas;
   if (Array.isArray(docs) && docs.length) base.docs_db = docs;
   base._fech = { periodo: fech.periodo, versao: fech.versao, publicado_em: fech.publicado_em };
   return base;
+}
+
+/* ---------------------------------------------------------------------
+   Recarga
+
+   Depois de qualquer escrita, o painel volta a ler do banco em vez de
+   remendar o objeto em memória: o que a tela mostra passa a ser o que
+   ficou gravado, não o que eu esperava que ficasse.
+   --------------------------------------------------------------------- */
+async function recarregar() {
+  DB = await montarDB();
+  renderTudo();
+}
+
+/* ---------------------------------------------------------------------
+   Botões que só existem para quem pode usá-los
+
+   Esconder é conforto; o que impede é a RLS. Um botão escondido não é
+   controle de acesso — e um botão visível por engano não vira permissão.
+   --------------------------------------------------------------------- */
+function ajustarPermissoes() {
+  const podeAdm = !!(EU && (EU.e_diretoria || EU.e_admin));
+  gEl('btn-pend')?.classList.toggle('hidden', !podeAdm);
 }
 
 /* ---------------------------------------------------------------------
@@ -291,6 +338,7 @@ async function entrarNoPainel() {
   DB = await montarDB();
   abrirPainel();
   chipUsuario();
+  ajustarPermissoes();
   avisoBase();
   bootPainel();
   if (typeof iniciarChat === 'function') iniciarChat();

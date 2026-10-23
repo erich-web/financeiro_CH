@@ -78,16 +78,66 @@ const FECHAMENTO = {
 };
 
 const QUADRO = [
-  { nome: 'FRK Empreendimentos e Participações', quotas: 2, capital: 525000, participacao: 0.166364044, integralizado: true, observacao: null, ativo: true },
-  { nome: 'Hotel Toriba', quotas: 1, capital: 262500, participacao: 0.083182021, integralizado: true, observacao: null, ativo: true },
-  { nome: 'RAMFEJ Engenharia', quotas: 1, capital: 262500, participacao: 0.083182021, integralizado: false, observacao: 'Pendente – chamada abr/mai', ativo: true },
+  { id: 's1', nome: 'FRK Empreendimentos e Participações', quotas: 2, capital: 525000, participacao: 0.166364044, integralizado: true, observacao: null, ativo: true },
+  { id: 's2', nome: 'Hotel Toriba', quotas: 1, capital: 262500, participacao: 0.083182021, integralizado: true, observacao: null, ativo: true },
+  { id: 's3', nome: 'RAMFEJ Engenharia', quotas: 1, capital: 262500, participacao: 0.083182021, integralizado: false, observacao: 'Pendente – chamada abr/mai', ativo: true },
+];
+
+/* Datas relativas: prazo fixo no fixture envelhece e o teste passa a
+   medir o calendário em vez do código. */
+const emDias = n => {
+  const d = new Date(); d.setHours(12, 0, 0, 0);
+  d.setDate(d.getDate() + n);
+  return d.toISOString().slice(0, 10);
+};
+
+const PENDENCIAS = [
+  { id: 'pd1', titulo: 'DARF de IRPJ e CSLL', descricao: null, dono_id: 'p1',
+    dono_nome: 'Erich Progin', prazo: emDias(-5), estado: 'aberta',
+    origem: 'fechamento', periodo: '2026-10', valor: 182193.33, criado_em: emDias(-20) },
+  { id: 'pd2', titulo: 'Assinar contrato do estacionamento', descricao: 'Minuta revisada.',
+    dono_id: 'p9', dono_nome: 'Outra Pessoa', prazo: emDias(3), estado: 'em_andamento',
+    origem: 'ata', periodo: null, valor: null, criado_em: emDias(-10) },
+  { id: 'pd3', titulo: 'Rever rateio de energia', descricao: null, dono_id: null,
+    dono_nome: null, prazo: null, estado: 'aberta', origem: null,
+    periodo: null, valor: null, criado_em: emDias(-3) },
+];
+
+const MATERIAS = [
+  { id: 'm1', titulo: 'Compra do imóvel vizinho', descricao: 'Terreno ao lado do salão.',
+    clausula: '5.6.2', quorum_exigido: 0.75, quorum_rotulo: 'Setenta e cinco por cento',
+    estado: 'em_votacao', abertura: emDias(-2), prazo: emDias(5),
+    favor: 0.166364044, contra: 0, abstencao: 0, nao_votou: 0.833635956,
+    atingido: false, capital: 1, base_completa: true },
+];
+
+const VOTOS = [
+  { id: 'v1', materia_id: 'm1', socio_id: 's1', pessoa_id: 'p1', voto: 'favor',
+    via: 'painel', peso: 0.166364044, justificativa: null, criado_em: emDias(-1),
+    socio_nome: 'FRK Empreendimentos e Participações', pessoa_nome: 'Erich Progin' },
+];
+
+const COMENTARIOS = [
+  { id: 'c1', autor_id: 'p1', ancora_aba: 'pendencias', ancora_item: 'pd1',
+    periodo: null, texto: 'Vai exigir resgate da aplicação.', pai_id: null,
+    resolvido: false, criado_em: emDias(-1), autor_nome: 'Erich Progin', meu: true },
+  { id: 'c2', autor_id: 'p9', ancora_aba: 'dre', ancora_item: null,
+    periodo: '2026-02', texto: 'Por que a depreciação pulou em fevereiro?', pai_id: null,
+    resolvido: false, criado_em: emDias(-2), autor_nome: 'Outra Pessoa', meu: false },
+];
+
+const PESSOAS = [
+  { id: 'p1', nome: 'Erich Progin', email: 'erich@gruporpe.com.br' },
+  { id: 'p9', nome: 'Outra Pessoa', email: 'outra@teste.com' },
 ];
 
 const TABELAS = {
   v_fechamento_vigente: [FECHAMENTO],
-  v_pendencias: [],
-  v_materias: [],
-  comentarios: [],
+  v_pendencias: PENDENCIAS,
+  v_materias: MATERIAS,
+  v_comentarios: COMENTARIOS,
+  v_votos: VOTOS,
+  pessoas: PESSOAS,
   v_socios: QUADRO,
   quoruns_acordo: [{ clausula: '5.6.2', fracao: 0.75, rotulo: 'Setenta e cinco por cento' }],
   documentos: [],
@@ -265,8 +315,9 @@ secao('5. Diretoria entra e vê o painel com o chat');
     id: 'p1', nome: 'Erich Progin', email: 'erich@gruporpe.com.br',
     papeis: ['admin', 'diretoria'], e_diretoria: true, e_conselho: false,
     e_admin: true, e_socio: true,
-    representa: ['RPE Empreendimentos e Participações', 'RPE Properties Gestão de Ativos'],
-    peso_total: 0.166364042, capital_total: 1, base_completa: true,
+    representa: ['FRK Empreendimentos e Participações', 'Hotel Toriba'],
+    representa_ids: ['s1', 's2'],
+    peso_total: 0.249546065, capital_total: 1, base_completa: true,
   };
   const cli = clienteFalso({ sessao: { user: { email: EU_DIR.email } }, eu: EU_DIR });
   const { w, erros, rendersQuebrados } = montar(cli);
@@ -304,8 +355,8 @@ secao('6. Sócio entra, mas sem o chat');
   const EU_SOCIO = {
     id: 'p2', nome: 'Luiz de Oliveira Rozette Filho', email: 'luiz@teste.com',
     papeis: [], e_diretoria: false, e_conselho: false, e_admin: false, e_socio: true,
-    representa: ['Hotel Toriba'], peso_total: 0.083182021,
-    capital_total: 1, base_completa: true,
+    representa: ['Hotel Toriba'], representa_ids: ['s2'],
+    peso_total: 0.083182021, capital_total: 1, base_completa: true,
   };
   const { w } = montar(clienteFalso({ sessao: { user: { email: EU_SOCIO.email } }, eu: EU_SOCIO }));
   await esperar(150);
@@ -325,7 +376,7 @@ secao('7. Base de capital incompleta gera aviso');
   const EU = {
     id: 'p3', nome: 'Teste', email: 't@t.com', papeis: ['diretoria'],
     e_diretoria: true, e_conselho: false, e_admin: false, e_socio: false,
-    representa: [], peso_total: 0, capital_total: 0.8318, base_completa: false,
+    representa: [], representa_ids: [], peso_total: 0, capital_total: 0.8318, base_completa: false,
   };
   const { w } = montar(clienteFalso({ sessao: { user: { email: EU.email } }, eu: EU }));
   await esperar(150);
@@ -366,7 +417,7 @@ secao('9. Seção quebrada degrada sozinha');
   const EU = {
     id: 'p4', nome: 'Teste', email: 't@t.com', papeis: ['diretoria'],
     e_diretoria: true, e_conselho: false, e_admin: false, e_socio: false,
-    representa: [], peso_total: 0, capital_total: 1, base_completa: true,
+    representa: [], representa_ids: [], peso_total: 0, capital_total: 1, base_completa: true,
   };
   const { w } = montar(clienteFalso({ sessao: { user: { email: EU.email } }, eu: EU }));
   await esperar(150);
@@ -379,6 +430,171 @@ secao('9. Seção quebrada degrada sozinha');
   ok(w.__charts.length > 0, 'as outras seções desenharam');
 
   TABELAS.v_fechamento_vigente = [FECHAMENTO];   // devolve o fixture
+}
+
+
+/* ---------------------------------------------------------------------
+   Ajudantes das telas de governança
+   --------------------------------------------------------------------- */
+const EU_DIRETORIA = {
+  id: 'p1', nome: 'Erich Progin', email: 'erich@gruporpe.com.br',
+  papeis: ['admin', 'diretoria'], e_diretoria: true, e_conselho: false,
+  e_admin: true, e_socio: true,
+  representa: ['FRK Empreendimentos e Participações', 'Hotel Toriba'],
+  representa_ids: ['s1', 's2'],
+  peso_total: 0.249546065, capital_total: 1, base_completa: true,
+};
+
+const EU_SO_SOCIO = {
+  id: 'p9', nome: 'Outra Pessoa', email: 'outra@teste.com',
+  papeis: [], e_diretoria: false, e_conselho: false, e_admin: false, e_socio: true,
+  representa: ['Hotel Toriba'], representa_ids: ['s2'],
+  peso_total: 0.083182021, capital_total: 1, base_completa: true,
+};
+
+async function abrirComo(eu) {
+  const r = montar(clienteFalso({ sessao: { user: { email: eu.email } }, eu }));
+  await esperar(160);
+  return r;
+}
+
+const cardPend = (w, id) => w.document.querySelector(`[data-pend="${id}"]`);
+
+/* =====================================================================
+   10. Pendências
+   ===================================================================== */
+secao('10. Pendências: prazo, dono e quem pode resolver');
+{
+  const { w, rendersQuebrados } = await abrirComo(EU_DIRETORIA);
+  ok(rendersQuebrados.length === 0,
+     'nenhuma seção quebrou' + (rendersQuebrados.length ? ': ' + rendersQuebrados[0].slice(0, 120) : ''));
+
+  const kpis = w.document.getElementById('pend-kpis').textContent;
+  ok(/Em aberto\s*3/.test(kpis.replace(/\s+/g, ' ')), 'conta 3 em aberto');
+  ok(/Em atraso\s*1/.test(kpis.replace(/\s+/g, ' ')), 'conta 1 em atraso');
+  ok(kpis.includes('182,19 mil') || kpis.includes('182 mil'), 'soma o valor envolvido');
+
+  const badge = w.document.getElementById('nav-pend-badge');
+  ok(badge.textContent === '3', 'o crachá do menu mostra 3');
+  ok(badge.className.includes('badge-red'), 'crachá vermelho porque há coisa vencida');
+  ok(!badge.className.includes('hidden'), 'crachá visível');
+
+  const c1 = cardPend(w, 'pd1');
+  ok(!!c1, 'a pendência vencida aparece');
+  ok(c1.textContent.includes('5 dias em atraso'), 'diz quantos dias de atraso');
+  ok(c1.textContent.includes('(você)'), 'marca que o dono é quem está olhando');
+
+  const c2 = cardPend(w, 'pd2');
+  ok(c2.textContent.includes('em 3 dias'), 'prazo próximo em dias, não em data');
+  ok(c2.textContent.includes('em andamento'), 'mostra o estado');
+
+  ok(cardPend(w, 'pd3').textContent.includes('sem prazo'), 'pendência sem prazo é dita assim');
+  ok(cardPend(w, 'pd3').textContent.includes('ninguém ainda'), 'pendência sem dono é dita assim');
+
+  // ordem: a vencida primeiro
+  const ordem = [...w.document.querySelectorAll('[data-pend]')].map(e => e.dataset.pend);
+  ok(ordem[0] === 'pd1', 'a vencida vem primeiro');
+  ok(ordem[2] === 'pd3', 'a sem prazo vai para o fim');
+
+  ok(!!c1.querySelector('[data-acao="resolver"]'), 'diretoria pode resolver a própria');
+  ok(!!c2.querySelector('[data-acao="resolver"]'), 'diretoria pode resolver a de outro');
+  ok(!w.document.getElementById('btn-pend').classList.contains('hidden'), 'botão de nova pendência visível');
+}
+
+secao('10b. O sócio comum só resolve a própria');
+{
+  const { w } = await abrirComo(EU_SO_SOCIO);
+
+  ok(!cardPend(w, 'pd1').querySelector('[data-acao="resolver"]'),
+     'não resolve pendência de outro');
+  ok(!!cardPend(w, 'pd2').querySelector('[data-acao="resolver"]'),
+     'resolve a própria');
+  ok(cardPend(w, 'pd2').textContent.includes('(você)'), 'reconhece que é dele');
+  ok(w.document.getElementById('btn-pend').classList.contains('hidden'),
+     'não vê o botão de criar pendência');
+  ok(w.document.getElementById('nav-pend-badge').textContent === '3',
+     'mas vê todas as pendências');
+}
+
+/* =====================================================================
+   11. Votação
+   ===================================================================== */
+secao('11. Votação: quórum, voto por quotista e voto já dado');
+{
+  const { w } = await abrirComo(EU_DIRETORIA);
+  const card = w.document.querySelector('[data-materia="m1"]');
+  ok(!!card, 'a matéria em votação aparece na governança');
+
+  const txt = card.textContent.replace(/\s+/g, ' ');
+  ok(txt.includes('cláusula 5.6.2'), 'mostra a cláusula do acordo');
+  ok(txt.includes('exige 75,00% do capital'), 'mostra o quórum exigido em capital');
+  ok(txt.includes('a favor 16,64%'), 'apura o favor em percentual de capital');
+  ok(txt.includes('não votou 83,36%'), 'mostra quanto falta votar');
+  ok(!txt.includes('quórum atingido'), '16,64% não atinge 75%');
+
+  const marca = card.querySelector('[title^="quórum exigido"]');
+  ok(!!marca && marca.getAttribute('style').includes('left:75.000%'),
+     'a marca do quórum fica em 75%');
+
+  // s1 já votou, s2 não
+  const linhas = card.querySelectorAll('[data-voto="favor"]');
+  ok(linhas.length === 1, 'só uma quotista pendente de voto');
+  ok(linhas[0].dataset.socio === 's2', 'e é justamente a que não votou');
+  ok(txt.includes('FRK Empreendimentos e Participações: a favor'),
+     'mostra o voto que já foi dado');
+  ok(txt.includes('Ver os 1 votos registrados'), 'oferece a lista nominal');
+  ok(card.textContent.includes('não se altera'), 'avisa que o voto é definitivo');
+}
+
+secao('11b. Quem não representa quotista não vê botão de voto');
+{
+  const { w } = await abrirComo(EU_SO_SOCIO);
+  const card = w.document.querySelector('[data-materia="m1"]');
+  const bs = card.querySelectorAll('[data-voto]');
+  ok(bs.length === 3, 'o sócio de uma quotista vê um conjunto de botões');
+  ok([...bs].every(b => b.dataset.socio === 's2'), 'e só pela quotista que representa');
+
+  const EU_NAO_SOCIO = {
+    id: 'p7', nome: 'Conselheiro', email: 'cf@teste.com', papeis: ['conselho_fiscal'],
+    e_diretoria: false, e_conselho: true, e_admin: false, e_socio: false,
+    representa: [], representa_ids: [], peso_total: 0, capital_total: 1, base_completa: true,
+  };
+  const r2 = await abrirComo(EU_NAO_SOCIO);
+  const card2 = r2.w.document.querySelector('[data-materia="m1"]');
+  ok(card2.querySelectorAll('[data-voto]').length === 0,
+     'conselheiro sem quota não recebe botão de voto');
+  ok(card2.textContent.includes('a favor 16,64%'), 'mas acompanha a apuração');
+}
+
+/* =====================================================================
+   12. Comentários
+   ===================================================================== */
+secao('12. Comentários');
+{
+  const { w } = await abrirComo(EU_DIRETORIA);
+
+  const feed = w.document.getElementById('coment-feed').textContent.replace(/\s+/g, ' ');
+  ok(feed.includes('Vai exigir resgate da aplicação'), 'o comentário da pendência aparece no feed');
+  ok(feed.includes('depreciação pulou em fevereiro'), 'o comentário do DRE também');
+  ok(feed.includes('em pendência · DARF de IRPJ e CSLL'), 'diz em qual pendência foi feito');
+  ok(feed.includes('em DRE gerencial'), 'traduz a aba pelo nome que o menu usa');
+
+  const i1 = feed.indexOf('resgate da aplicação'), i2 = feed.indexOf('depreciação pulou');
+  ok(i1 >= 0 && i2 >= 0 && i1 < i2, 'o mais recente vem primeiro');
+
+  const c1 = cardPend(w, 'pd1');
+  ok(c1.querySelector('[data-acao="comentar"]').textContent.trim() === '1',
+     'o cartão mostra o número de comentários');
+
+  const thread = c1.querySelector('[data-thread]');
+  ok(thread.classList.contains('hidden'), 'a conversa começa fechada');
+  c1.querySelector('[data-acao="comentar"]').dispatchEvent(new w.Event('click', { bubbles: true }));
+  ok(!thread.classList.contains('hidden'), 'abre ao clicar');
+  ok(thread.textContent.includes('Vai exigir resgate'), 'e mostra o comentário da pendência');
+  ok(!!thread.querySelector('form[data-coment]'), 'com campo para responder');
+
+  const semCom = cardPend(w, 'pd3').querySelector('[data-thread]');
+  ok(semCom.textContent.includes('Nenhum comentário ainda'), 'pendência sem comentário diz isso');
 }
 
 /* ===================================================================== */

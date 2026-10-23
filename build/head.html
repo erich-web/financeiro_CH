@@ -119,6 +119,7 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
       <a class="nav-item" data-p="fluxo"><i data-feather="trending-up" class="w-4 h-4 shrink-0"></i>Fluxo de caixa</a>
       <a class="nav-item" data-p="pipeline"><i data-feather="target" class="w-4 h-4 shrink-0"></i>Pipeline comercial</a>
       <a class="nav-item" data-p="governanca"><i data-feather="users" class="w-4 h-4 shrink-0"></i>Atas e deliberações</a>
+      <a class="nav-item" data-p="pendencias"><i data-feather="check-square" class="w-4 h-4 shrink-0"></i>Pendências<span id="nav-pend-badge" class="ml-auto badge badge-slate hidden"></span></a>
       <a class="nav-item" data-p="docs"><i data-feather="folder" class="w-4 h-4 shrink-0"></i>Central de documentos</a>
       <a class="nav-item" data-p="estacionamento"><i data-feather="truck" class="w-4 h-4 shrink-0"></i>Extra contábil · estacionamento</a>
       <a class="nav-item" data-p="atualizacoes"><i data-feather="refresh-cw" class="w-4 h-4 shrink-0"></i>Atualizações</a>
@@ -323,7 +324,10 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
         <button id="btn-ata" class="btn btn-primary"><i data-feather="file-plus" class="w-4 h-4"></i>Registrar ata</button>
       </div>
       <div class="grid grid-cols-1 xl:grid-cols-3 gap-5">
-        <div class="xl:col-span-2 space-y-4" id="delibs"></div>
+        <div class="xl:col-span-2 space-y-4">
+          <div id="materias" class="space-y-4"></div>
+          <div id="delibs" class="space-y-4"></div>
+        </div>
         <div class="space-y-5">
           <div class="card card-body">
             <div class="card-head"><h2 class="card-title">Conselho fiscal</h2><span class="card-hint">Contas de julho</span></div>
@@ -353,6 +357,27 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
     </section>
 
     <!-- ============ 7. DOCUMENTOS ============ -->
+    <section class="page" id="pendencias">
+      <div class="mb-7 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 class="page-title">Pendências e comentários</h1>
+          <p class="page-sub">O que está em aberto, com dono e prazo. Resolver e comentar acontece aqui, no painel, em vez de se perder numa troca de e-mails.</p>
+        </div>
+        <button id="btn-pend" class="btn btn-primary hidden"><i data-feather="plus" class="w-4 h-4"></i>Nova pendência</button>
+      </div>
+      <div id="pend-kpis" class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6"></div>
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-5">
+        <div class="xl:col-span-2 space-y-4" id="pend-lista"></div>
+        <div class="space-y-5">
+          <div class="card card-body">
+            <div class="card-head"><h2 class="card-title">Comentários recentes</h2>
+              <span class="card-hint">De todas as abas</span></div>
+            <div id="coment-feed" class="space-y-3.5"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="page" id="docs">
       <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
@@ -560,6 +585,41 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
     <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 mt-6">
       <button class="btn btn-ghost" id="p-cancel">Cancelar</button>
       <button class="btn btn-primary" id="p-save">Aplicar período</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-pend" class="modal">
+  <div class="card card-body w-full max-w-lg mx-auto my-8">
+    <h2 class="card-title mb-5">Nova pendência</h2>
+    <div class="space-y-4">
+      <div>
+        <label class="field-label" for="pd-titulo">O que precisa ser feito</label>
+        <input class="field" id="pd-titulo" placeholder="Ex.: DARF de IRPJ e CSLL de outubro">
+      </div>
+      <div>
+        <label class="field-label" for="pd-desc">Detalhe (opcional)</label>
+        <textarea class="field resize-none" id="pd-desc" rows="3"></textarea>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div>
+          <label class="field-label" for="pd-dono">Dono</label>
+          <select class="field" id="pd-dono"></select>
+        </div>
+        <div>
+          <label class="field-label" for="pd-prazo">Prazo</label>
+          <input class="field" id="pd-prazo" type="date">
+        </div>
+        <div>
+          <label class="field-label" for="pd-valor">Valor (R$)</label>
+          <input class="field" id="pd-valor" type="number" step="0.01" placeholder="opcional">
+        </div>
+      </div>
+    </div>
+    <p id="pd-erro" class="hidden text-xs text-red-600 mt-3"></p>
+    <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 mt-6">
+      <button class="btn btn-ghost" id="pd-cancel">Cancelar</button>
+      <button class="btn btn-primary" id="pd-save">Criar pendência</button>
     </div>
   </div>
 </div>

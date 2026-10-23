@@ -39,7 +39,12 @@ if ! "$PGBIN/pg_isready" -h "$PGDIR" -p "$PORTA" >/dev/null 2>&1; then
   sleep 2
 fi
 
+# Migrações: notices caladas, senão o "create ... if not exists" enche a tela.
 psql_() { rodar "PGOPTIONS='--client-min-messages=warning' $PGBIN/psql -h $PGDIR -p $PORTA -U $USUARIO -d $BANCO -v ON_ERROR_STOP=1 $*"; }
+
+# Testes: notices visíveis — é nelas que vêm os valores apurados, e um
+# teste que só diz "passou" sem mostrar o número não prova grande coisa.
+psql_teste() { rodar "$PGBIN/psql -h $PGDIR -p $PORTA -U $USUARIO -d $BANCO -v ON_ERROR_STOP=1 $*"; }
 
 # ---------------------------------------------------------------------
 echo "== banco limpo =="
@@ -84,7 +89,9 @@ for t in supabase/testes/*.sql; do
   fi
   echo
   echo "== $(basename "$t") =="
-  if ! psql_ "-f $RAIZ/$t" 2>&1 | grep -aE "NOTICE|^-- |=====|ERROR" | sed 's/^NOTICE:  /     /;s/^psql:[^ ]* //'; then
+  if ! psql_teste "-f $RAIZ/$t" 2>&1 \
+       | grep -aE "NOTICE|^-- |=====|ERROR" \
+       | sed 's/^psql:[^ ]*: //;s/^NOTICE:  /     /'; then
     falhou=1
   fi
 done

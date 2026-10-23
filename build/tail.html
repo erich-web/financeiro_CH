@@ -157,7 +157,7 @@ function textoPeriodo() {
 }
 
 /* ============ navegação ============ */
-const TITLES = { visao: 'Visão geral', dre: 'DRE gerencial', balanco: 'Balanço e caixa', fluxo: 'Fluxo de caixa', pipeline: 'Pipeline comercial', governanca: 'Atas e deliberações', docs: 'Central de documentos', estacionamento: 'Extra contábil — estacionamento', atualizacoes: 'Atualizações' };
+const TITLES = { visao: 'Visão geral', dre: 'DRE gerencial', balanco: 'Balanço e caixa', fluxo: 'Fluxo de caixa', pipeline: 'Pipeline comercial', governanca: 'Atas e deliberações', pendencias: 'Pendências', docs: 'Central de documentos', estacionamento: 'Extra contábil — estacionamento', atualizacoes: 'Atualizações' };
 const sidebar = () => $('#sidebar'), backdrop = () => $('#backdrop');
 function openNav() { sidebar().classList.remove('-translate-x-full'); backdrop().classList.remove('hidden'); }
 function closeNav() { sidebar().classList.add('-translate-x-full'); backdrop().classList.add('hidden'); }
@@ -1066,6 +1066,8 @@ function renderTudo() {
     ['Visão geral', renderVisao], ['DRE gerencial', renderDre],
     ['Balanço e caixa', renderBalanco], ['Fluxo de caixa', renderFluxo],
     ['Pipeline comercial', renderPipe], ['Atas e deliberações', renderDelibs],
+    ['Matérias em votação', renderMaterias], ['Pendências', renderPendencias],
+    ['Comentários', renderFeedComentarios],
     ['Atas', renderAtas], ['Central de documentos', renderDocs],
     ['Estacionamento', renderEstacionamento], ['Atualizações', renderUpdates],
     ['Rótulos de período', rotulosPeriodo],
