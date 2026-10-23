@@ -1,0 +1,15 @@
+node_modules/
+package.json
+package-lock.json
+
+# Credenciais do projeto: ficam fora para o arquivo montado não divergir
+# sem alguém perceber.
+build/cfg.json
+
+# ---------------------------------------------------------------------
+# DADOS FINANCEIROS — este repositório é PÚBLICO.
+# Nada que contenha número do Campos Hall entra em commit.
+# ---------------------------------------------------------------------
+build/data_atual.json
+build/index.preview.html
+supabase/migrations/0005_carga_fechamento.sql

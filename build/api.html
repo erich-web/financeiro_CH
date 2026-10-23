@@ -1,0 +1,371 @@
+<script>
+/* =====================================================================
+   Camada de acesso a dados e autenticação
+
+   A URL e a chave anônima abaixo são públicas por natureza: ficam no
+   navegador de quem abre o painel. Não é descuido — o que protege os
+   dados é a RLS no banco, não o sigilo da chave. A chave anônima sem
+   e-mail cadastrado não lê linha nenhuma.
+
+   A chave da API da Anthropic, ao contrário, nunca aparece aqui. Ela
+   vive como secret da Edge Function, e o chat conversa com a função.
+   ===================================================================== */
+
+const CFG = {
+  url:  '__SUPABASE_URL__',
+  anon: '__SUPABASE_ANON_KEY__',
+};
+
+let sb = null;      // cliente Supabase
+let EU = null;      // v_eu: quem está logado, com papéis e representação
+
+/* ---------------------------------------------------------------------
+   Portão
+   --------------------------------------------------------------------- */
+const gEl = id => document.getElementById(id);
+
+function gateEstado(qual) {
+  ['gate-carregando', 'gate-form', 'gate-enviado', 'gate-negado']
+    .forEach(id => gEl(id)?.classList.toggle('hidden', id !== qual));
+  try { feather.replace(); } catch (e) {}
+}
+
+function gateErro(msg) {
+  const e = gEl('gate-erro');
+  if (!e) return;
+  e.textContent = msg;
+  e.classList.toggle('hidden', !msg);
+}
+
+function abrirPainel() {
+  gEl('gate')?.classList.add('hidden');
+  document.documentElement.classList.remove('overflow-hidden');
+}
+
+/* ---------------------------------------------------------------------
+   Consultas
+
+   Cada leitura é um método isolado, para que o painel possa ser testado
+   com um cliente falso sem subir backend.
+   --------------------------------------------------------------------- */
+const api = {
+  async eu() {
+    const { data, error } = await sb.from('v_eu').select('*').maybeSingle();
+    if (error) throw error;
+    return data;
+  },
+
+  async fechamentoVigente() {
+    const { data, error } = await sb
+      .from('v_fechamento_vigente')
+      .select('periodo,versao,dados,publicado_em,parecer_conselho')
+      .order('periodo', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error) throw error;
+    return data;
+  },
+
+  async pendencias() {
+    const { data, error } = await sb.from('v_pendencias')
+      .select('*')
+      .in('estado', ['aberta', 'em_andamento'])
+      .order('prazo', { ascending: true, nullsFirst: false });
+    if (error) throw error;
+    return data ?? [];
+  },
+
+  async materias() {
+    const { data, error } = await sb.from('v_materias')
+      .select('*')
+      .order('criado_em', { ascending: false });
+    if (error) throw error;
+    return data ?? [];
+  },
+
+  async comentarios() {
+    const { data, error } = await sb.from('comentarios')
+      .select('*, autor:pessoas!comentarios_autor_id_fkey(nome)')
+      .order('criado_em', { ascending: true });
+    if (error) throw error;
+    return data ?? [];
+  },
+
+  async quadro() {
+    const { data, error } = await sb.from('v_socios')
+      .select('*').eq('ativo', true).order('participacao', { ascending: false });
+    if (error) throw error;
+    return data ?? [];
+  },
+
+  async quoruns() {
+    const { data, error } = await sb.from('quoruns_acordo').select('*').order('fracao');
+    if (error) throw error;
+    return data ?? [];
+  },
+
+  async documentos() {
+    const { data, error } = await sb.from('documentos')
+      .select('*').order('enviado_em', { ascending: false });
+    if (error) throw error;
+    return data ?? [];
+  },
+
+  async propostasAbertas() {
+    const { data, error } = await sb.from('propostas')
+      .select('*').eq('estado', 'proposta').order('criado_em', { ascending: false });
+    if (error) throw error;
+    return data ?? [];
+  },
+
+  /* ---- escritas ---- */
+  async comentar(aba, item, texto, periodo) {
+    const { data, error } = await sb.from('comentarios')
+      .insert({ autor_id: EU.id, ancora_aba: aba, ancora_item: item, texto, periodo })
+      .select('*').single();
+    if (error) throw error;
+    return data;
+  },
+
+  async resolverPendencia(id, resolucao) {
+    const { error } = await sb.from('pendencias').update({
+      estado: 'resolvida', resolucao,
+      resolvido_por: EU.id, resolvido_em: new Date().toISOString(),
+    }).eq('id', id);
+    if (error) throw error;
+  },
+
+  async votar(materiaId, socioId, voto, justificativa) {
+    const { error } = await sb.from('votos')
+      .insert({ materia_id: materiaId, socio_id: socioId, voto, justificativa });
+    if (error) throw error;
+  },
+
+  async decidirProposta(id, estado, motivo) {
+    const { error } = await sb.from('propostas').update({
+      estado, motivo, decidido_por: EU.id, decidido_em: new Date().toISOString(),
+    }).eq('id', id);
+    if (error) throw error;
+  },
+};
+
+/* ---------------------------------------------------------------------
+   Montagem do DB
+
+   O painel continua lendo um objeto único, no mesmo formato de antes:
+   as demonstrações vêm do fechamento publicado (jsonb) e as entidades de
+   governança, das tabelas vivas. É o que permite trocar a fonte dos dados
+   sem reescrever nenhum gráfico.
+   --------------------------------------------------------------------- */
+async function montarDB() {
+  const [fech, pend, mat, com, quadro, quoruns, docs] = await Promise.all([
+    api.fechamentoVigente(), api.pendencias(), api.materias(),
+    api.comentarios(), api.quadro(), api.quoruns(), api.documentos(),
+  ]);
+
+  if (!fech) {
+    throw new Error(
+      'Nenhum fechamento publicado ainda. A diretoria precisa publicar um período ' +
+      'para o painel ter o que mostrar.'
+    );
+  }
+
+  const base = JSON.parse(JSON.stringify(fech.dados || {}));
+
+  // O quadro societário vem da tabela, não do fechamento: é lá que vivem as
+  // participações que a apuração de quórum usa, e duas fontes para o mesmo
+  // fato acabam divergindo.
+  if (quadro.length) {
+    base.socios = quadro.map(s => [
+      s.nome,
+      s.quotas,
+      Number(s.capital),
+      s.integralizado ? 'Integralizado' : (s.observacao || 'Pendente'),
+    ]);
+  }
+
+  base.pendencias  = pend;
+  base.materias    = mat;
+  base.comentarios = com;
+  base.quadro      = quadro;
+  base.quoruns     = quoruns;
+  if (Array.isArray(docs) && docs.length) base.docs_db = docs;
+  base._fech = { periodo: fech.periodo, versao: fech.versao, publicado_em: fech.publicado_em };
+  return base;
+}
+
+/* ---------------------------------------------------------------------
+   Identificação na barra lateral
+   --------------------------------------------------------------------- */
+function chipUsuario() {
+  if (!EU) return;
+  const aside = gEl('sidebar');
+  if (!aside || gEl('eu-chip')) return;
+
+  const papel = EU.e_admin ? 'Administrador'
+    : EU.e_diretoria ? 'Diretoria'
+    : EU.e_conselho ? 'Conselho fiscal'
+    : EU.e_socio ? 'Sócio' : 'Convidado';
+
+  const n = Array.isArray(EU.representa) ? EU.representa.length : 0;
+  const repr = n === 0 ? '' :
+    `<div class="text-[11px] text-slate-400 mt-0.5 truncate" title="${EU.representa.join(' · ')}">
+       ${n === 1 ? EU.representa[0] : n + ' quotistas'}
+     </div>`;
+
+  const div = document.createElement('div');
+  div.id = 'eu-chip';
+  div.className = 'px-3 py-3 border-t border-slate-200 shrink-0';
+  div.innerHTML = `
+    <div class="flex items-center gap-2.5">
+      <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 grid place-items-center text-xs font-semibold shrink-0">
+        ${(EU.nome || '?').trim().charAt(0).toUpperCase()}
+      </div>
+      <div class="min-w-0 flex-1">
+        <div class="text-xs font-medium text-slate-900 truncate">${EU.nome || EU.email}</div>
+        <div class="text-[11px] text-slate-500 truncate">${papel}</div>
+        ${repr}
+      </div>
+      <button id="btn-sair" class="text-slate-400 hover:text-slate-700 shrink-0" title="Sair">
+        <i data-feather="log-out" class="w-4 h-4"></i>
+      </button>
+    </div>`;
+  aside.appendChild(div);
+  gEl('btn-sair').addEventListener('click', sair);
+  try { feather.replace(); } catch (e) {}
+}
+
+async function sair() {
+  try { await sb?.auth.signOut(); } catch (e) {}
+  location.reload();
+}
+
+/* ---------------------------------------------------------------------
+   Aviso de base de capital incompleta
+
+   Se a soma das participações não fechar em 100%, qualquer apuração de
+   quórum está sobre base errada. Melhor dizer na cara do que apresentar
+   um percentual errado com aparência de certo.
+   --------------------------------------------------------------------- */
+function avisoBase() {
+  if (!EU || EU.base_completa) return;
+  const pct = (Number(EU.capital_total) * 100).toFixed(2).replace('.', ',');
+  const d = document.createElement('div');
+  d.className = 'no-print bg-amber-50 border-b border-amber-200 px-4 sm:px-8 py-2.5 text-xs text-amber-900 leading-relaxed';
+  d.innerHTML = `<strong>Base de capital incompleta.</strong> As participações cadastradas somam ${pct}%
+    em vez de 100%. Enquanto isso, nenhuma apuração de quórum é confiável.`;
+  document.querySelector('.min-h-screen')?.prepend(d);
+}
+
+/* ---------------------------------------------------------------------
+   Falhas
+   --------------------------------------------------------------------- */
+function falhaFatal(msg, detalhe) {
+  gEl('gate')?.classList.remove('hidden');
+  gateEstado('gate-form');
+  gEl('gate-form').innerHTML = `
+    <div class="text-center py-2">
+      <div class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-red-50 text-red-600 mb-3">
+        <i data-feather="alert-circle" class="w-5 h-5"></i>
+      </div>
+      <p class="text-sm font-semibold text-slate-900">${msg}</p>
+      ${detalhe ? `<p class="text-xs text-slate-500 mt-2 leading-relaxed">${detalhe}</p>` : ''}
+      <button class="btn btn-ghost btn-sm mt-5" onclick="location.reload()">Tentar de novo</button>
+    </div>`;
+  try { feather.replace(); } catch (e) {}
+}
+
+/* ---------------------------------------------------------------------
+   Entrada
+   --------------------------------------------------------------------- */
+async function entrarNoPainel() {
+  EU = await api.eu();
+
+  if (!EU) {
+    const { data: { user } } = await sb.auth.getUser();
+    gEl('gate-negado-email').textContent = user?.email || 'Esse e-mail';
+    gateEstado('gate-negado');
+    return;
+  }
+
+  DB = await montarDB();
+  abrirPainel();
+  chipUsuario();
+  avisoBase();
+  bootPainel();
+  if (typeof iniciarChat === 'function') iniciarChat();
+}
+
+async function iniciarPainel() {
+  document.documentElement.classList.add('overflow-hidden');
+
+  if (CFG.url.startsWith('__') || !CFG.url) {
+    falhaFatal('Painel ainda não conectado ao banco',
+      'A URL e a chave do projeto Supabase não foram preenchidas. ' +
+      'Rode o build com as credenciais do projeto.');
+    return;
+  }
+
+  try {
+    sb = window.supabase.createClient(CFG.url, CFG.anon, {
+      auth: { flowType: 'pkce', detectSessionInUrl: true, persistSession: true },
+    });
+  } catch (e) {
+    falhaFatal('Não consegui iniciar a conexão', String(e.message || e));
+    return;
+  }
+
+  // Limpa o ?code= do link mágico da barra de endereço depois da troca,
+  // para o endereço não ficar com o código de uso único à vista.
+  const { data: { session } } = await sb.auth.getSession();
+  if (location.search.includes('code=')) {
+    history.replaceState(null, '', location.pathname + location.hash);
+  }
+
+  if (!session) { gateEstado('gate-form'); return; }
+
+  try {
+    await entrarNoPainel();
+  } catch (e) {
+    falhaFatal('Não consegui carregar os dados', String(e.message || e));
+  }
+}
+
+/* ---------------------------------------------------------------------
+   Formulário
+   --------------------------------------------------------------------- */
+document.addEventListener('DOMContentLoaded', () => {
+  gEl('gate-form')?.addEventListener('submit', async ev => {
+    ev.preventDefault();
+    gateErro('');
+    const email = gEl('gate-email').value.trim().toLowerCase();
+    if (!email) return;
+
+    const btn = gEl('gate-enviar');
+    btn.disabled = true;
+    btn.innerHTML = 'Enviando…';
+
+    const { error } = await sb.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: location.origin + location.pathname },
+    });
+
+    btn.disabled = false;
+    btn.innerHTML = '<i data-feather="mail" class="w-4 h-4"></i> Receber link de acesso';
+    try { feather.replace(); } catch (e) {}
+
+    if (error) {
+      gateErro(error.message.includes('rate')
+        ? 'Muitas tentativas. Espere um minuto e tente de novo.'
+        : 'Não consegui enviar o link: ' + error.message);
+      return;
+    }
+
+    gEl('gate-destino').textContent = email;
+    gateEstado('gate-enviado');
+  });
+
+  gEl('gate-voltar')?.addEventListener('click', () => { gateErro(''); gateEstado('gate-form'); });
+  gEl('gate-sair')?.addEventListener('click', sair);
+});
+</script>

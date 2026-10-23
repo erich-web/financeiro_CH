@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campos Hall — Painel de Governança</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"></script>
+<script>
+tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-serif','system-ui','sans-serif'] } } } };
+</script>
+<style type="text/tailwindcss">
+  @layer components {
+    /* cartões */
+    .card       { @apply bg-white border border-slate-200 rounded-xl; }
+    .card-body  { @apply p-4 sm:p-6; }
+    .card-head  { @apply flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-4 mb-4 sm:mb-5; }
+    .card-title { @apply text-[15px] font-semibold text-slate-900 leading-tight; }
+    .card-hint  { @apply text-xs text-slate-500 sm:text-right shrink-0 sm:max-w-[45%]; }
+    .card-note  { @apply text-xs leading-relaxed text-slate-500 mt-4 pt-4 border-t border-slate-100; }
+
+    /* indicadores */
+    .kpi-label  { @apply text-xs font-medium text-slate-500; }
+    .kpi-value  { @apply text-xl sm:text-2xl font-bold text-slate-900 tabular-nums mt-1.5 break-words; }
+    .kpi-sub    { @apply text-xs text-slate-500 mt-1.5 leading-snug; }
+
+    /* badges */
+    .badge       { @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold whitespace-nowrap; }
+    .badge-blue  { @apply bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-200; }
+    .badge-green { @apply bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200; }
+    .badge-amber { @apply bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-200; }
+    .badge-red   { @apply bg-red-50 text-red-700 ring-1 ring-inset ring-red-200; }
+    .badge-slate { @apply bg-slate-100 text-slate-600 ring-1 ring-inset ring-slate-200; }
+
+    /* tabelas */
+    .tbl                 { @apply w-full text-sm border-collapse; }
+    .tbl.wide            { @apply min-w-[780px]; }
+    .scroll-x            { @apply overflow-x-auto; }
+    .tbl th              { @apply text-[11px] font-semibold uppercase tracking-wide text-slate-500 text-left py-2.5 px-3 border-b border-slate-200 whitespace-nowrap bg-white; }
+    .tbl th.num          { @apply text-right; }
+    .tbl td              { @apply py-2.5 px-3 border-b border-slate-100 text-slate-700 align-middle; }
+    .tbl tbody tr        { @apply transition-colors duration-100; }
+    .tbl tbody tr:hover  { @apply bg-blue-50; }
+    .tbl .num            { @apply text-right tabular-nums whitespace-nowrap; }
+    .tbl .row-group td   { @apply text-[11px] font-semibold uppercase tracking-wide text-blue-700 pt-5 pb-1.5 border-b-0; }
+    .tbl .row-sub td     { @apply font-semibold text-slate-900 bg-slate-50; }
+    .tbl .row-sub:hover td { @apply bg-blue-50; }
+    .tbl .row-total td   { @apply font-bold text-slate-900 border-t-2 border-b-2 border-slate-300; }
+    .tbl .row-detail td  { @apply text-xs text-slate-500 py-1.5; }
+    .tbl .row-detail td:first-child { @apply pl-8; }
+    .tbl .row-open td:first-child   { @apply text-blue-700; }
+    .neg                 { @apply text-red-600; }
+    .pos                 { @apply text-emerald-600; }
+
+    /* navegação */
+    .nav-item        { @apply flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer; }
+    .nav-item.active { @apply bg-blue-600 text-white hover:bg-blue-600 hover:text-white shadow-sm; }
+
+    /* botões e campos */
+    .btn         { @apply inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors cursor-pointer border; }
+    .btn-primary { @apply bg-blue-600 text-white border-blue-600 hover:bg-blue-700; }
+    .btn-ghost   { @apply bg-white text-slate-700 border-slate-200 hover:bg-slate-50; }
+    .btn-sm      { @apply px-2.5 py-1 text-xs rounded-md; }
+    .field       { @apply w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500; }
+    .field-label { @apply block text-xs font-medium text-slate-600 mb-1.5; }
+    .seg         { @apply inline-flex rounded-lg border border-slate-200 bg-white p-0.5; }
+    .seg button  { @apply px-3 py-1.5 text-xs font-medium text-slate-600 rounded-md transition-colors; }
+    .seg button.on { @apply bg-blue-600 text-white; }
+
+    .page { @apply hidden px-4 sm:px-8 py-6 sm:py-7 max-w-[1500px]; }
+    .page.active { @apply block; }
+    .page-title { @apply text-xl sm:text-2xl font-bold text-slate-900 tracking-tight; }
+    .page-sub   { @apply text-sm text-slate-500 mt-1.5 max-w-3xl leading-relaxed; }
+    .modal      { @apply hidden fixed inset-0 z-50 bg-slate-900/50 p-4 overflow-y-auto; }
+  }
+</style>
+<style>
+  html { scroll-behavior: smooth; }
+  .chart-box { position: relative; height: 300px; }
+  .chart-box.short { height: 220px; }
+  .chart-box.tall { height: 360px; }
+  @media (max-width: 640px) {
+    .chart-box { height: 230px; }
+    .chart-box.short { height: 190px; }
+    .chart-box.tall { height: 280px; }
+  }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; border: 3px solid #f8fafc; }
+  @media print { aside, .no-print { display: none !important; } .page { display: block !important; break-after: page; } }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
+
+<div id="backdrop" class="fixed inset-0 z-40 bg-slate-900/50 hidden lg:hidden no-print"></div>
+
+<div class="min-h-screen lg:pl-64">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 flex flex-col h-screen -translate-x-full lg:translate-x-0 transition-transform duration-200 no-print">
+    <div class="px-5 py-5 border-b border-slate-200">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-blue-600 text-white grid place-items-center font-bold text-sm shrink-0">CH</div>
+        <div class="min-w-0 flex-1">
+          <div class="font-semibold text-slate-900 leading-tight truncate">Campos Hall</div>
+          <div class="text-xs text-slate-500 truncate">Painel de governança</div>
+        </div>
+        <button id="btn-close-nav" class="lg:hidden text-slate-400 hover:text-slate-700 shrink-0"><i data-feather="x" class="w-5 h-5"></i></button>
+      </div>
+    </div>
+
+    <nav id="nav" class="flex-1 overflow-y-auto p-3 space-y-1">
+      <a class="nav-item active" data-p="visao"><i data-feather="activity" class="w-4 h-4 shrink-0"></i>Visão geral</a>
+      <a class="nav-item" data-p="dre"><i data-feather="bar-chart-2" class="w-4 h-4 shrink-0"></i>DRE gerencial</a>
+      <a class="nav-item" data-p="balanco"><i data-feather="layers" class="w-4 h-4 shrink-0"></i>Balanço e caixa</a>
+      <a class="nav-item" data-p="fluxo"><i data-feather="trending-up" class="w-4 h-4 shrink-0"></i>Fluxo de caixa</a>
+      <a class="nav-item" data-p="pipeline"><i data-feather="target" class="w-4 h-4 shrink-0"></i>Pipeline comercial</a>
+      <a class="nav-item" data-p="governanca"><i data-feather="users" class="w-4 h-4 shrink-0"></i>Atas e deliberações</a>
+      <a class="nav-item" data-p="docs"><i data-feather="folder" class="w-4 h-4 shrink-0"></i>Central de documentos</a>
+      <a class="nav-item" data-p="estacionamento"><i data-feather="truck" class="w-4 h-4 shrink-0"></i>Extra contábil · estacionamento</a>
+      <a class="nav-item" data-p="atualizacoes"><i data-feather="refresh-cw" class="w-4 h-4 shrink-0"></i>Atualizações</a>
+    </nav>
+
+    <div class="p-5 border-t border-slate-200 text-xs text-slate-500 leading-relaxed">
+      <div class="font-semibold text-slate-700">Campos Hall Ltda</div>
+      CNPJ 61.849.359/0001-22<br>
+      11 sócios · 12 quotas<br>
+      <span class="block mt-2">Dados de <span id="side-comp" class="font-medium text-slate-700"></span>.</span>
+    </div>
+  </aside>
+
+  <!-- ================= MAIN ================= -->
+  <main class="min-w-0">
+    <header class="sticky top-0 z-30 h-16 bg-white/90 backdrop-blur border-b border-slate-200 flex items-center justify-between gap-3 px-4 sm:px-8 no-print">
+      <div class="flex items-center gap-3 min-w-0">
+        <button id="btn-menu" class="lg:hidden w-9 h-9 -ml-1 rounded-lg border border-slate-200 grid place-items-center text-slate-600 shrink-0" aria-label="Abrir menu"><i data-feather="menu" class="w-4 h-4"></i></button>
+        <div class="min-w-0">
+          <div id="crumb" class="font-semibold text-slate-900 truncate">Visão geral</div>
+          <div id="crumb-sub" class="text-xs text-slate-500 truncate"></div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <button id="btn-period" class="btn btn-ghost btn-sm max-w-[52vw] sm:max-w-none" title="Filtrar período">
+          <i data-feather="calendar" class="w-3.5 h-3.5 shrink-0"></i><span id="period-label" class="truncate hidden sm:inline">Período</span>
+        </button>
+        <span id="stamp-cont" class="badge badge-slate hidden xl:inline-flex"></span>
+        <span id="pipe-stamp" class="badge badge-amber hidden 2xl:inline-flex"></span>
+        <button id="btn-save" class="btn btn-ghost btn-sm" title="Baixar o arquivo de trabalho"><i data-feather="download" class="w-3.5 h-3.5"></i><span class="hidden sm:inline">Salvar</span></button>
+        <label for="load-file" class="btn btn-ghost btn-sm" title="Carregar o arquivo de dados do painel, ou anexar um documento de qualquer tipo"><i data-feather="upload" class="w-3.5 h-3.5"></i><span class="hidden sm:inline">Carregar</span></label>
+        <input type="file" id="load-file" class="hidden">
+      </div>
+    </header>
+
+    <!-- ============ 1. VISÃO GERAL ============ -->
+    <section class="page active" id="visao">
+      <div class="mb-7">
+        <h1 class="page-title">O ano até aqui</h1>
+        <p class="page-sub" id="visao-sub"></p>
+      </div>
+      <div id="aviso-visao" class="hidden mb-5"></div>
+      <div id="kpis" class="grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6 gap-3 sm:gap-4"></div>
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-5 mt-5">
+        <div class="card card-body xl:col-span-2">
+          <div class="card-head"><h2 class="card-title">Receita líquida e EBITDA</h2><span class="card-hint" id="hint-overview">Competência · R$ mil</span></div>
+          <div class="chart-box"><canvas id="ch-overview"></canvas></div>
+          <p class="card-note">Janeiro e fevereiro concentram os custos do Baile de Gala e do Carnaval. De março a maio a DRE ainda carrega os R$ 250 mil de aluguel do imóvel do Conexidades. A partir de maio a operação passa a se pagar.</p>
+        </div>
+        <div class="card card-body">
+          <div class="card-head"><h2 class="card-title">De onde vem a receita</h2><span class="card-hint" id="hint-mix">Caixa · acumulado</span></div>
+          <div class="chart-box short"><canvas id="ch-mix"></canvas></div>
+          <div id="mix-legend" class="mt-4 space-y-2"></div>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-5 mt-5">
+        <div class="card card-body xl:col-span-2">
+          <div class="card-head"><h2 class="card-title">O que pede decisão dos sócios</h2><span class="card-hint">Leitura financeira das demonstrações</span></div>
+          <div id="alerts" class="divide-y divide-slate-100"></div>
+        </div>
+        <div class="card">
+          <div class="card-body pb-0"><div class="card-head"><h2 class="card-title">Quadro societário</h2><span class="card-hint">Aportes de 2026</span></div></div>
+          <div class="px-2 pb-2 scroll-x"><table class="tbl" id="t-socios"></table></div>
+          <p class="px-6 pb-5 text-xs text-slate-500 leading-relaxed">Chamada de R$ 25 mil por quota em abril e maio; uma quota segue em aberto. Quotas inferidas pelos aportes — confirmar no contrato social.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 2. DRE ============ -->
+    <section class="page" id="dre">
+      <div class="mb-7 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 class="page-title">DRE gerencial</h1>
+          <p class="page-sub">A contabilidade fecha o resultado corretamente, mas apresenta quase tudo como despesa administrativa. A visão gerencial separa o custo do evento do custo de manter a casa aberta — é isso que permite decidir preço, mix e patrocínio.</p>
+        </div>
+        <div class="seg" id="dre-seg">
+          <button class="on" data-v="cfo">Visão gerencial</button>
+          <button data-v="contabil">Visão contábil</button>
+        </div>
+      </div>
+      <div id="aviso-dre" class="hidden mb-5"></div>
+      <div id="dre-vazio" class="card card-body hidden">
+        <div class="flex gap-3"><i data-feather="calendar" class="w-5 h-5 text-slate-400 shrink-0 mt-0.5"></i>
+        <div><h2 class="card-title">Sem DRE no período escolhido</h2>
+        <p class="text-sm text-slate-600 mt-1 leading-relaxed">As demonstrações de resultado começam em janeiro de 2026, quando a casa entrou em operação. Antes disso só existe movimento de caixa, na aba Fluxo de caixa. Escolha um período que alcance 2026 para ver a DRE.</p></div></div>
+      </div>
+      <div id="dre-conteudo">
+      <div id="dre-kpis" class="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4"></div>
+      <div class="card mt-5">
+        <div class="card-body pb-3">
+          <div class="card-head mb-0"><h2 class="card-title" id="dre-title">Demonstração do resultado</h2><span class="card-hint">R$ · clique nas linhas com seta para abrir o detalhe</span></div>
+        </div>
+        <div class="scroll-x px-2"><table class="tbl wide" id="dre-table"></table></div>
+        <p class="px-6 py-5 text-xs text-slate-500 leading-relaxed border-t border-slate-100 mt-2" id="dre-note"></p>
+      </div>
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 mt-5">
+        <div class="card card-body">
+          <div class="card-head"><h2 class="card-title">Estrutura de custos por mês</h2><span class="card-hint">R$ mil · visão gerencial</span></div>
+          <div class="chart-box"><canvas id="ch-opex"></canvas></div>
+        </div>
+        <div class="card card-body">
+          <div class="card-head"><h2 class="card-title">O que mudar no plano de contas</h2><span class="card-hint">Recomendações à contabilidade</span></div>
+          <div id="recs" class="divide-y divide-slate-100"></div>
+        </div>
+      </div>
+      </div>
+    </section>
+
+    <!-- ============ 3. BALANÇO ============ -->
+    <section class="page" id="balanco">
+      <div class="mb-7">
+        <h1 class="page-title">Balanço e caixa</h1>
+        <p class="page-sub" id="balanco-sub"></p>
+      </div>
+      <div id="aviso-balanco" class="hidden mb-5"></div>
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-5">
+        <div class="card">
+          <div class="card-body pb-0"><div class="card-head"><h2 class="card-title">Ativo</h2><span class="card-hint" id="b-ativo"></span></div></div>
+          <div class="px-2 pb-4 scroll-x"><table class="tbl" id="t-ativo"></table></div>
+        </div>
+        <div class="card">
+          <div class="card-body pb-0"><div class="card-head"><h2 class="card-title">Passivo e patrimônio líquido</h2><span class="card-hint" id="b-passivo"></span></div></div>
+          <div class="px-2 pb-4 scroll-x"><table class="tbl" id="t-passivo"></table></div>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-5 mt-5">
+        <div class="card">
+          <div class="card-body pb-0"><div class="card-head"><h2 class="card-title">Onde está o caixa</h2><span class="card-hint" id="caixa-data"></span></div></div>
+          <div class="px-2 scroll-x"><table class="tbl" id="t-caixa"></table></div>
+          <p class="px-6 py-5 text-xs text-slate-500 leading-relaxed">Rendimento de R$ 10,6 mil em julho, primeiro mês com as aplicações Trust DI e Crédito Bancário ativas.</p>
+        </div>
+        <div class="card card-body xl:col-span-2">
+          <div class="card-head"><h2 class="card-title">Contratado a receber</h2><span class="card-hint" id="rec-hint"></span></div>
+          <div class="chart-box short"><canvas id="ch-receber"></canvas></div>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 mt-5">
+        <div class="card">
+          <div class="card-body pb-0"><div class="card-head"><h2 class="card-title">Parcelas a receber</h2><span class="card-hint">Por vencimento</span></div></div>
+          <div class="px-2 pb-4 max-h-[420px] overflow-auto"><table class="tbl" id="t-receber"></table></div>
+        </div>
+        <div class="card">
+          <div class="card-body pb-0"><div class="card-head"><h2 class="card-title" id="pagar-title">Contas a pagar</h2><span class="card-hint" id="pagar-hint"></span></div></div>
+          <div class="px-2 scroll-x"><table class="tbl" id="t-pagar"></table></div>
+          <p class="px-6 py-5 text-xs text-slate-500 leading-relaxed" id="pagar-note"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 4. FLUXO ============ -->
+    <section class="page" id="fluxo">
+      <div class="mb-7 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 class="page-title">Fluxo de caixa</h1>
+          <p class="page-sub">A planilha atual soma aportes, compra do imóvel e operação em uma única linha de resultado. Aqui os três fluxos aparecem separados — operacional, investimento e financiamento — como pede a DFC. A série vai de julho de 2025 até o último fechamento, sem quebra por exercício.</p>
+        </div>
+        <button id="btn-period2" class="btn btn-ghost"><i data-feather="calendar" class="w-4 h-4"></i><span id="period-label2">Período</span></button>
+      </div>
+      <div id="fx-kpis" class="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4"></div>
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-5 mt-5">
+        <div class="card card-body xl:col-span-2">
+          <div class="card-head"><h2 class="card-title" id="fx-title">Entradas, saídas e saldo</h2><span class="card-hint">R$ mil</span></div>
+          <div class="chart-box tall"><canvas id="ch-fluxo"></canvas></div>
+        </div>
+        <div class="card card-body">
+          <div class="card-head"><h2 class="card-title">Três fluxos</h2><span class="card-hint">Acumulado do período</span></div>
+          <div id="fx-three"></div>
+          <p class="card-note">Operacional reúne locação, eventos, patrocínio e repasses, menos despesas gerais, pessoal e impostos. Investimento é imóvel, mobiliário e equipamentos. Financiamento são os aportes dos sócios.</p>
+        </div>
+      </div>
+      <div class="card mt-5">
+        <div class="card-body pb-3"><div class="card-head mb-0"><h2 class="card-title">Detalhe mensal</h2><span class="card-hint">R$ · conforme planilha de fluxo de caixa</span></div></div>
+        <div class="scroll-x px-2 pb-4"><table class="tbl wide" id="t-fluxo"></table></div>
+      </div>
+    </section>
+
+    <!-- ============ 5. PIPELINE ============ -->
+    <section class="page" id="pipeline">
+      <div class="mb-7 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 class="page-title">Pipeline comercial</h1>
+          <p class="page-sub">Atualização semanal pelo diretor financeiro. Mova as oportunidades entre as etapas, edite valores e use “Salvar” no topo para guardar a posição da semana.</p>
+        </div>
+        <button id="btn-new" class="btn btn-primary"><i data-feather="plus" class="w-4 h-4"></i>Nova oportunidade</button>
+      </div>
+      <div id="pipe-kpis" class="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4"></div>
+      <div class="card card-body mt-5">
+        <div class="card-head"><h2 class="card-title">Valor por etapa</h2><span class="card-hint">R$ mil</span></div>
+        <div class="chart-box short"><canvas id="ch-funnel"></canvas></div>
+      </div>
+      <div id="kanban" class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-5 gap-4 mt-5 items-start"></div>
+      <p class="text-xs text-slate-500 mt-4">Os cards com borda tracejada são exemplos de preenchimento e podem ser apagados. As oportunidades em “Fechadas” vêm dos contratos e recibos já lançados na planilha e na pasta digital.</p>
+    </section>
+
+    <!-- ============ 6. GOVERNANÇA ============ -->
+    <section class="page" id="governanca">
+      <div class="mb-7 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 class="page-title">Atas e deliberações</h1>
+          <p class="page-sub">Depois de cada reunião, registre a ata aqui e anexe o PDF assinado. O arquivo fica dentro do painel e acompanha o arquivo de trabalho quando você clica em “Salvar”.</p>
+        </div>
+        <button id="btn-ata" class="btn btn-primary"><i data-feather="file-plus" class="w-4 h-4"></i>Registrar ata</button>
+      </div>
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-5">
+        <div class="xl:col-span-2 space-y-4" id="delibs"></div>
+        <div class="space-y-5">
+          <div class="card card-body">
+            <div class="card-head"><h2 class="card-title">Conselho fiscal</h2><span class="card-hint">Contas de julho</span></div>
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="kpi-label" id="cf-label">Prestação de contas</div>
+                <div class="text-xl font-bold text-amber-600 mt-1">Aguardando parecer</div>
+              </div>
+              <span class="badge badge-amber">0 de 4</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-3 leading-relaxed" id="cf-note">A carta de aprovação está assinada pela diretora financeira (Tania M. F. L. da Silva, CRC 1SP 167.238/O-9). Faltam as assinaturas dos quatro conselheiros.</p>
+            <div class="flex gap-1.5 mt-4">
+              <span class="h-2 flex-1 rounded-full bg-slate-200"></span><span class="h-2 flex-1 rounded-full bg-slate-200"></span>
+              <span class="h-2 flex-1 rounded-full bg-slate-200"></span><span class="h-2 flex-1 rounded-full bg-slate-200"></span>
+            </div>
+          </div>
+          <div class="card card-body">
+            <div class="card-head"><h2 class="card-title">Ressalva em aberto</h2><span class="card-hint">Nota explicativa</span></div>
+            <p class="text-sm text-slate-600 leading-relaxed">A Ascon registra que, por decisão dos sócios, a energia e a água pagas pela Gianluca Pierri Estacionamentos como contraprestação pela exploração do estacionamento ficam fora das demonstrações. A matéria 4 trata do assunto.</p>
+          </div>
+        </div>
+      </div>
+      <div class="card mt-5">
+        <div class="card-body pb-0"><div class="card-head"><h2 class="card-title">Últimas reuniões</h2><span class="card-hint" id="atas-hint"></span></div></div>
+        <div id="atas" class="px-5 sm:px-6 pb-6 space-y-3"></div>
+      </div>
+    </section>
+
+    <!-- ============ 7. DOCUMENTOS ============ -->
+    <section class="page" id="docs">
+      <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 class="page-title">Central de documentos</h1>
+          <p class="page-sub">Tudo o que o sócio precisa encontrar sem pedir: societário, prestação de contas, contratos, certidões e licenças, com validade e responsável.</p>
+        </div>
+        <button id="btn-doc" class="btn btn-primary"><i data-feather="upload" class="w-4 h-4"></i>Enviar documento</button>
+      </div>
+      <div class="flex flex-wrap items-center gap-3 mb-6">
+        <div class="relative flex-1 min-w-[240px] max-w-md">
+          <i data-feather="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+          <input id="doc-q" class="field pl-9" placeholder="Buscar documento, contraparte ou órgão">
+        </div>
+        <div class="seg" id="doc-seg">
+          <button class="on" data-f="all">Todos</button>
+          <button data-f="ok">Vigentes</button>
+          <button data-f="warn">Atenção</button>
+          <button data-f="bad">Vencidos ou pendentes</button>
+        </div>
+        <span id="doc-count" class="text-xs text-slate-500"></span>
+      </div>
+      <div id="doc-list" class="space-y-8"></div>
+    </section>
+
+    <!-- ============ 8. ESTACIONAMENTO ============ -->
+    <section class="page" id="estacionamento">
+      <div class="mb-7">
+        <h1 class="page-title">Extra contábil — estacionamento</h1>
+        <p class="page-sub">A sublocação do estacionamento rende ao Campos Hall 50% da arrecadação do operador. Por decisão dos sócios, em vez de transferir o dinheiro ele paga contas da casa direto ao fornecedor, por questão tributária. Nada disso passa pelas demonstrações, e é esta a ressalva que a contabilidade registra todo mês.</p>
+      </div>
+
+      <div id="est-aviso" class="hidden mb-5"></div>
+      <div id="est-kpis" class="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4"></div>
+
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-5 mt-5">
+        <div class="card card-body xl:col-span-2">
+          <div class="card-head"><h2 class="card-title">Devido e quitado por mês</h2><span class="card-hint">R$ mil · saldo acumulado na linha</span></div>
+          <div class="chart-box"><canvas id="ch-est"></canvas></div>
+        </div>
+        <div class="card card-body">
+          <div class="card-head"><h2 class="card-title">O que entra nesta conta</h2><span class="card-hint">Mecanismo do acordo</span></div>
+          <div class="text-sm text-slate-600 space-y-3 leading-relaxed">
+            <p>O operador apura a arrecadação do estacionamento e deve metade ao Campos Hall pelo uso do espaço.</p>
+            <p>No lugar do repasse em dinheiro, ele quita contas da casa — energia, água, gás, IPTU, taxa de lixo e serviços prediais — pagando direto ao fornecedor. Cada conta paga abate o que ele devia no mês.</p>
+            <p>A diferença entre o devido e o quitado é o saldo: positivo quando ele ainda deve, negativo quando pagou além e fica com crédito para o mês seguinte.</p>
+            <p>De junho em diante a base passou a ser descrita como <span class="font-medium text-slate-900">aluguel mais luz</span>, e não só aluguel. Vale confirmar no contrato se os 50% seguem calculados sobre a arrecadação bruta.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 mt-5">
+        <div class="card">
+          <div class="card-body pb-0"><div class="card-head"><h2 class="card-title">Resumo por competência</h2><span class="card-hint" id="est-resumo-hint"></span></div></div>
+          <div class="scroll-x px-2 pb-4"><table class="tbl" id="t-est-resumo"></table></div>
+        </div>
+        <div class="card card-body">
+          <div class="card-head"><h2 class="card-title">Por que isso não está na DRE</h2><span class="card-hint">Ligação com as demonstrações</span></div>
+          <div id="est-dre" class="space-y-3"></div>
+        </div>
+      </div>
+
+      <div class="card mt-5">
+        <div class="card-body pb-3"><div class="card-head mb-0"><h2 class="card-title">Contas pagas pelo operador</h2><span class="card-hint" id="est-itens-hint"></span></div></div>
+        <div class="scroll-x px-2 pb-4"><table class="tbl" id="t-est"></table></div>
+        <p class="px-6 pb-5 text-xs text-slate-500 leading-relaxed" id="est-fonte"></p>
+      </div>
+    </section>
+
+    <!-- ============ 9. ATUALIZAÇÕES ============ -->
+    <section class="page" id="atualizacoes">
+      <div class="mb-7">
+        <h1 class="page-title">Atualizações</h1>
+        <p class="page-sub">O painel tem dois ciclos: um mensal, com o fechamento contábil e a planilha de caixa, e um a cada reunião de sócios, com a ata e o andamento das matérias.</p>
+      </div>
+
+      <div id="up-kpis" class="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4"></div>
+
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 mt-5">
+        <div class="card card-body">
+          <div class="card-head"><h2 class="card-title">Fechamento mensal</h2><span class="card-hint">Planilha de caixa e pasta digital</span></div>
+          <ol id="rotina-mes" class="space-y-4"></ol>
+        </div>
+        <div class="space-y-5">
+          <div class="card card-body">
+            <div class="card-head"><h2 class="card-title">Depois de cada reunião</h2><span class="card-hint">Ata e deliberações</span></div>
+            <ol id="rotina-ata" class="space-y-4"></ol>
+          </div>
+          <div class="card card-body">
+            <div class="card-head"><h2 class="card-title">Arquivo de trabalho</h2><span class="card-hint">Pipeline, votos, atas e documentos</span></div>
+            <p class="text-sm text-slate-600 leading-relaxed">Tudo o que é editado no painel — oportunidades, votos das matérias, atas e documentos enviados — vive na memória do navegador enquanto a página está aberta. “Salvar” baixa um arquivo com esse conteúdo, incluindo os anexos, e “Carregar” devolve tudo ao painel.</p>
+            <div class="flex flex-wrap gap-2 mt-4">
+              <button id="btn-save2" class="btn btn-primary"><i data-feather="download" class="w-4 h-4"></i>Salvar arquivo de trabalho</button>
+              <label for="load-file" class="btn btn-ghost"><i data-feather="upload" class="w-4 h-4"></i>Carregar arquivo</label>
+            </div>
+            <div id="up-log" class="mt-5"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card card-body mt-5">
+        <div class="card-head"><h2 class="card-title">O que muda a cada arquivo de dados</h2><span class="card-hint">Para quem for gerar o JSON</span></div>
+        <div class="scroll-x"><table class="tbl" id="t-schema"></table></div>
+        <p class="card-note">Um arquivo pode trazer só uma parte dessas chaves. O painel substitui apenas o que vier no arquivo e mantém o resto como está, então dá para atualizar só o fluxo de caixa em uma semana e o balanço na outra.</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ============ MODAIS ============ -->
+<div id="modal-deal" class="modal">
+  <div class="card w-full max-w-2xl mx-auto my-4 sm:my-8 p-4 sm:p-6">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="text-lg font-semibold text-slate-900" id="m-title">Nova oportunidade</h3>
+      <button id="m-close" class="text-slate-400 hover:text-slate-700"><i data-feather="x" class="w-5 h-5"></i></button>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="sm:col-span-2"><label class="field-label">Cliente ou contraparte</label><input class="field" id="m-cli"></div>
+      <div class="sm:col-span-2"><label class="field-label">Evento</label><input class="field" id="m-evt" placeholder="Congresso anual, 3 dias, 600 pessoas"></div>
+      <div><label class="field-label">Data prevista</label><input class="field" id="m-data" type="date"></div>
+      <div><label class="field-label">Valor (R$)</label><input class="field" id="m-val" type="number" min="0" step="1000"></div>
+      <div><label class="field-label">Etapa</label><select class="field" id="m-st"></select></div>
+      <div><label class="field-label">Probabilidade (%)</label><input class="field" id="m-prob" type="number" min="0" max="100" step="5"></div>
+      <div><label class="field-label">Responsável</label><input class="field" id="m-resp" placeholder="Gerência comercial"></div>
+      <div><label class="field-label">Origem</label><input class="field" id="m-src" placeholder="Convention Bureau, indicação, inbound"></div>
+      <div class="sm:col-span-2"><label class="field-label">Observações</label><textarea class="field h-20" id="m-obs"></textarea></div>
+    </div>
+    <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 mt-6">
+      <button class="btn btn-ghost" id="m-cancel">Cancelar</button>
+      <button class="btn btn-primary" id="m-save">Salvar oportunidade</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-ata" class="modal">
+  <div class="card w-full max-w-2xl mx-auto my-4 sm:my-8 p-4 sm:p-6">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="text-lg font-semibold text-slate-900">Registrar ata</h3>
+      <button id="a-close" class="text-slate-400 hover:text-slate-700"><i data-feather="x" class="w-5 h-5"></i></button>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div><label class="field-label">Data da reunião</label><input class="field" id="a-data" type="date"></div>
+      <div><label class="field-label">Tipo</label><select class="field" id="a-tipo">
+        <option>Reunião ordinária de sócios</option><option>Reunião extraordinária</option><option>Conselho fiscal</option><option>Diretoria</option>
+      </select></div>
+      <div class="sm:col-span-2"><label class="field-label">Título</label><input class="field" id="a-tit" placeholder="Reunião de sócios de setembro de 2026"></div>
+      <div class="sm:col-span-2"><label class="field-label">Deliberações (uma por linha)</label><textarea class="field h-24" id="a-del"></textarea></div>
+      <div><label class="field-label">Presentes</label><input class="field" id="a-pres" placeholder="9 de 11 sócios"></div>
+      <div><label class="field-label">Link externo (opcional)</label><input class="field" id="a-link" placeholder="Endereço no Drive, se houver"></div>
+      <div class="sm:col-span-2">
+        <label class="field-label">Ata assinada (PDF)</label>
+        <input class="field" id="a-file" type="file">
+        <p class="text-xs text-slate-400 mt-1.5">Qualquer tipo de arquivo, até 4 MB. Fica guardado dentro do painel e vai junto no arquivo de trabalho. Acima disso, use o campo de link.</p>
+      </div>
+    </div>
+    <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 mt-6">
+      <button class="btn btn-ghost" id="a-cancel">Cancelar</button>
+      <button class="btn btn-primary" id="a-save">Salvar ata</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-doc" class="modal">
+  <div class="card w-full max-w-2xl mx-auto my-4 sm:my-8 p-4 sm:p-6">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="text-lg font-semibold text-slate-900">Enviar documento</h3>
+      <button id="dm-close" class="text-slate-400 hover:text-slate-700"><i data-feather="x" class="w-5 h-5"></i></button>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="sm:col-span-2"><label class="field-label">Título</label><input class="field" id="dm-t" placeholder="Pasta Digital 08/2026"></div>
+      <div><label class="field-label">Categoria</label><select class="field" id="dm-c"></select></div>
+      <div><label class="field-label">Situação</label><select class="field" id="dm-s">
+        <option value="ok">Vigente</option><option value="warn">Atenção</option><option value="bad">Vencido ou pendente</option>
+      </select></div>
+      <div class="sm:col-span-2"><label class="field-label">Descrição</label><textarea class="field h-20" id="dm-d"></textarea></div>
+      <div><label class="field-label">Etiqueta</label><input class="field" id="dm-tag" placeholder="Vigente, Aguardando conselho, Vence em 30/09"></div>
+      <div><label class="field-label">Órgão ou contraparte</label><input class="field" id="dm-org" placeholder="Ascon, JUCESP, Cliente"></div>
+      <div><label class="field-label">Responsável</label><input class="field" id="dm-resp" placeholder="Diretoria financeira"></div>
+      <div><label class="field-label">Link externo (opcional)</label><input class="field" id="dm-link"></div>
+      <div class="sm:col-span-2">
+        <label class="field-label">Arquivo</label>
+        <input class="field" id="dm-file" type="file">
+        <p id="dm-aviso" class="hidden text-xs text-blue-700 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 mt-2 leading-relaxed"></p>
+        <p class="text-xs text-slate-400 mt-1.5">Qualquer tipo de arquivo, até 4 MB. A pasta digital completa passa disso, então para ela use o campo de link externo.</p>
+      </div>
+    </div>
+    <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 mt-6">
+      <button class="btn btn-ghost" id="dm-cancel">Cancelar</button>
+      <button class="btn btn-primary" id="dm-save">Salvar documento</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-period" class="modal">
+  <div class="card w-full max-w-lg mx-auto my-4 sm:my-8 p-4 sm:p-6">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="text-lg font-semibold text-slate-900">Período</h3>
+      <button id="p-close" class="text-slate-400 hover:text-slate-700"><i data-feather="x" class="w-5 h-5"></i></button>
+    </div>
+    <div id="p-presets" class="flex flex-wrap gap-2 mb-5"></div>
+    <div class="grid grid-cols-2 gap-4">
+      <div><label class="field-label">De</label><select class="field" id="p-ini"></select></div>
+      <div><label class="field-label">Até</label><select class="field" id="p-fim"></select></div>
+    </div>
+    <p id="p-aviso" class="text-xs text-slate-500 mt-3 leading-relaxed"></p>
+    <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 mt-6">
+      <button class="btn btn-ghost" id="p-cancel">Cancelar</button>
+      <button class="btn btn-primary" id="p-save">Aplicar período</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="fixed bottom-6 right-6 z-[60] hidden items-center gap-2 rounded-lg bg-slate-900 text-white text-sm px-4 py-2.5 shadow-lg"></div>

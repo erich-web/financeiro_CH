@@ -1,0 +1,308 @@
+<script>
+/* =====================================================================
+   Chat da diretoria
+
+   Fala com a Edge Function, nunca com a API da Anthropic direto: a chave
+   não existe neste arquivo. E não escreve no painel — o que volta da
+   conversa é proposta, que só entra no ar quando alguém clica em
+   publicar, e aí pela função aplicar_proposta, que é atômica.
+   ===================================================================== */
+
+let chatHist = [];
+let chatOcupado = false;
+
+const cEl = id => document.getElementById(id);
+
+/* ---------------------------------------------------------------------
+   Contexto: onde a pessoa está quando pede a mudança
+   --------------------------------------------------------------------- */
+function chatContexto() {
+  const pg = document.querySelector('.page.active');
+  const aba = pg
+    ? ((typeof TITLES === 'object' && TITLES[pg.id]) || pg.id)
+    : null;
+
+  let per = null;
+  try {
+    if (typeof periodo !== 'undefined' && periodo) per = periodo.ini + ' a ' + periodo.fim;
+    else if (typeof periodoAtual === 'function') {
+      const p = periodoAtual(); per = p.ini + ' a ' + p.fim;
+    }
+  } catch (e) {}
+
+  return { aba, periodo: per };
+}
+
+function chatAtualizaCtx() {
+  const c = chatContexto();
+  const el = cEl('chat-ctx');
+  if (el) el.textContent = [c.aba, c.periodo].filter(Boolean).join(' · ') || '—';
+}
+
+/* ---------------------------------------------------------------------
+   Bolhas
+   --------------------------------------------------------------------- */
+function chatBolha(quem, texto) {
+  const d = document.createElement('div');
+  if (quem === 'eu') {
+    d.className = 'ml-8 rounded-xl rounded-br-sm bg-blue-600 text-white text-sm px-3.5 py-2.5 leading-relaxed whitespace-pre-wrap';
+  } else if (quem === 'erro') {
+    d.className = 'mr-4 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm px-3.5 py-2.5 leading-relaxed';
+  } else {
+    d.className = 'mr-4 rounded-xl rounded-bl-sm bg-slate-100 text-slate-800 text-sm px-3.5 py-2.5 leading-relaxed whitespace-pre-wrap';
+  }
+  d.textContent = texto;
+  cEl('chat-msgs').appendChild(d);
+  chatFim();
+  return d;
+}
+
+function chatPensando() {
+  const d = document.createElement('div');
+  d.id = 'chat-pensando';
+  d.className = 'mr-4 flex items-center gap-2 text-slate-400 text-sm px-1 py-1';
+  d.innerHTML = '<div class="w-3.5 h-3.5 border-2 border-slate-200 border-t-slate-400 rounded-full animate-spin"></div> lendo o painel…';
+  cEl('chat-msgs').appendChild(d);
+  chatFim();
+}
+
+const chatFim = () => { const m = cEl('chat-msgs'); if (m) m.scrollTop = m.scrollHeight; };
+
+/* ---------------------------------------------------------------------
+   Prévia da proposta
+   --------------------------------------------------------------------- */
+const ROTULO_TABELA = {
+  fechamento_dados: 'Demonstrações',
+  pendencias: 'Pendência',
+  materias: 'Matéria',
+  documentos: 'Documento',
+};
+
+function valorLegivel(v) {
+  if (v === null || v === undefined || v === '') return '—';
+  if (typeof v === 'number') return v.toLocaleString('pt-BR', { maximumFractionDigits: 2 });
+  if (typeof v === 'object') return JSON.stringify(v);
+  const n = Number(v);
+  return (!isNaN(n) && String(v).trim() !== '' && Math.abs(n) >= 1000)
+    ? n.toLocaleString('pt-BR', { maximumFractionDigits: 2 })
+    : String(v);
+}
+
+function chatProposta(p) {
+  const d = p.diff || {};
+  const antes = d.antes || {};
+  const depois = d.depois || {};
+  const campos = [...new Set([...Object.keys(depois), ...Object.keys(antes)])];
+
+  const linhas = campos.map(k => `
+    <tr>
+      <td class="py-1.5 pr-2 text-[11px] text-slate-500 align-top break-all">${esc(k)}</td>
+      <td class="py-1.5 px-2 text-xs text-slate-400 line-through tabular-nums text-right align-top">${esc(valorLegivel(antes[k]))}</td>
+      <td class="py-1.5 pl-2 text-xs font-semibold text-slate-900 tabular-nums text-right align-top">${esc(valorLegivel(depois[k]))}</td>
+    </tr>`).join('');
+
+  const novo = d.tabela !== 'fechamento_dados' && !d.id;
+  const nota = d.tabela === 'fechamento_dados'
+    ? 'Publicar gera uma versão nova do período. A atual fica no histórico, intacta.'
+    : novo ? 'Publicar cria um registro novo.' : 'Publicar altera o registro existente.';
+
+  const el = document.createElement('div');
+  el.className = 'mr-4 rounded-xl border border-blue-200 bg-blue-50/50 overflow-hidden';
+  el.dataset.proposta = p.id;
+  el.innerHTML = `
+    <div class="px-3.5 pt-3 pb-2.5">
+      <div class="flex items-start gap-2">
+        <span class="badge badge-blue shrink-0">${esc(ROTULO_TABELA[d.tabela] || d.tabela || 'Mudança')}</span>
+        <p class="text-sm font-semibold text-slate-900 leading-snug">${esc(p.resumo || 'Mudança proposta')}</p>
+      </div>
+    </div>
+    <div class="px-3.5 pb-2">
+      <table class="w-full border-collapse">
+        <thead>
+          <tr>
+            <th class="text-[10px] font-semibold uppercase tracking-wide text-slate-400 text-left pb-1">Campo</th>
+            <th class="text-[10px] font-semibold uppercase tracking-wide text-slate-400 text-right pb-1 px-2">Antes</th>
+            <th class="text-[10px] font-semibold uppercase tracking-wide text-slate-400 text-right pb-1">Depois</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-blue-100">${linhas}</tbody>
+      </table>
+      <p class="text-[11px] text-slate-500 mt-2.5 leading-relaxed">${esc(nota)}</p>
+    </div>
+    <div class="flex gap-2 px-3.5 py-2.5 bg-white border-t border-blue-100">
+      <button class="btn btn-primary btn-sm" data-acao="publicar">
+        <i data-feather="check" class="w-3.5 h-3.5"></i> Publicar
+      </button>
+      <button class="btn btn-ghost btn-sm" data-acao="descartar">Descartar</button>
+      <span class="ml-auto self-center text-[11px] text-slate-400" data-estado></span>
+    </div>`;
+
+  el.querySelector('[data-acao="publicar"]').addEventListener('click', () => decidir(el, p.id, true));
+  el.querySelector('[data-acao="descartar"]').addEventListener('click', () => decidir(el, p.id, false));
+
+  cEl('chat-msgs').appendChild(el);
+  try { feather.replace(); } catch (e) {}
+  chatFim();
+  return el;
+}
+
+async function decidir(el, id, publicar) {
+  const botoes = el.querySelectorAll('button');
+  const estado = el.querySelector('[data-estado]');
+  botoes.forEach(b => b.disabled = true);
+  estado.textContent = publicar ? 'publicando…' : 'descartando…';
+
+  try {
+    if (publicar) {
+      const { data, error } = await sb.rpc('aplicar_proposta', { p_proposta: id });
+      if (error) throw error;
+
+      // Recarrega do banco em vez de remendar o objeto em memória: o que
+      // a tela mostra passa a ser o que ficou gravado, não o que eu
+      // esperava que ficasse.
+      DB = await montarDB();
+      renderTudo();
+
+      el.querySelector('[data-acao="publicar"]').remove();
+      el.querySelector('[data-acao="descartar"]').remove();
+      estado.className = 'ml-auto self-center text-[11px] font-medium text-emerald-700';
+      estado.textContent = data && data.versao_nova
+        ? `publicado · ${data.periodo} v${data.versao_nova}`
+        : 'publicado';
+      el.classList.remove('border-blue-200', 'bg-blue-50/50');
+      el.classList.add('border-emerald-200', 'bg-emerald-50/40');
+      if (typeof toast === 'function') toast('Publicado. O painel já mostra o valor novo.');
+    } else {
+      const { error } = await sb.rpc('descartar_proposta', { p_proposta: id, p_motivo: null });
+      if (error) throw error;
+      el.querySelectorAll('button').forEach(b => b.remove());
+      estado.textContent = 'descartada';
+      el.classList.add('opacity-60');
+    }
+  } catch (e) {
+    botoes.forEach(b => b.disabled = false);
+    estado.className = 'ml-auto self-center text-[11px] text-red-600';
+    estado.textContent = 'falhou';
+    chatBolha('erro', 'Não consegui aplicar: ' + (e.message || e));
+  }
+}
+
+/* ---------------------------------------------------------------------
+   Envio
+   --------------------------------------------------------------------- */
+async function chatEnviar(texto) {
+  if (chatOcupado || !texto.trim()) return;
+  chatOcupado = true;
+  cEl('chat-enviar').disabled = true;
+
+  chatBolha('eu', texto);
+  chatPensando();
+
+  try {
+    const { data, error } = await sb.functions.invoke('chat', {
+      body: { mensagem: texto, contexto: chatContexto(), historico: chatHist },
+    });
+
+    cEl('chat-pensando')?.remove();
+
+    if (error) {
+      // A função devolve o motivo no corpo; o erro do cliente só diz que
+      // houve erro, então vale ler o corpo antes de culpar a rede.
+      let motivo = error.message || 'erro desconhecido';
+      try {
+        const corpo = await error.context?.json?.();
+        if (corpo?.erro) motivo = corpo.erro;
+      } catch (e) {}
+      chatBolha('erro', motivo);
+      return;
+    }
+
+    if (data?.resposta) chatBolha('claude', data.resposta);
+    (data?.propostas || []).forEach(chatProposta);
+    if (Array.isArray(data?.historico)) chatHist = data.historico;
+
+  } catch (e) {
+    cEl('chat-pensando')?.remove();
+    chatBolha('erro', 'Não consegui falar com o assistente: ' + (e.message || e));
+  } finally {
+    chatOcupado = false;
+    cEl('chat-enviar').disabled = false;
+    cEl('chat-input').focus();
+  }
+}
+
+/* ---------------------------------------------------------------------
+   Abrir e fechar
+   --------------------------------------------------------------------- */
+function chatAbrir() {
+  chatAtualizaCtx();
+  cEl('chat').classList.remove('translate-x-full');
+  cEl('chat-backdrop').classList.remove('hidden');
+  cEl('chat-input').focus();
+}
+
+function chatFechar() {
+  cEl('chat').classList.add('translate-x-full');
+  cEl('chat-backdrop').classList.add('hidden');
+}
+
+/* ---------------------------------------------------------------------
+   Início — só para quem opera o painel
+   --------------------------------------------------------------------- */
+async function iniciarChat() {
+  if (!EU || (!EU.e_diretoria && !EU.e_admin)) return;
+
+  cEl('chat-fab').classList.remove('hidden');
+  cEl('chat-fab').classList.add('flex');
+
+  cEl('chat-fab').addEventListener('click', chatAbrir);
+  cEl('chat-fechar').addEventListener('click', chatFechar);
+  cEl('chat-backdrop').addEventListener('click', chatFechar);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') chatFechar(); });
+
+  const ta = cEl('chat-input');
+  ta.addEventListener('input', () => {
+    ta.style.height = 'auto';
+    ta.style.height = Math.min(ta.scrollHeight, 128) + 'px';
+  });
+  ta.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); cEl('chat-form').requestSubmit(); }
+  });
+
+  cEl('chat-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const t = ta.value;
+    ta.value = ''; ta.style.height = 'auto';
+    chatEnviar(t);
+  });
+
+  chatBolha('claude',
+    `Olá, ${(EU.nome || '').split(' ')[0]}. Pode pedir correção de número, baixa de pendência, ` +
+    `texto novo ou aba nova. Eu leio o painel, mostro o antes e o depois, e você publica.`);
+
+  // Propostas que ficaram abertas de uma sessão anterior.
+  try {
+    const pend = await api.propostasAbertas();
+    if (pend.length) {
+      chatBolha('claude', pend.length === 1
+        ? 'Tem uma proposta esperando decisão:'
+        : `Tem ${pend.length} propostas esperando decisão:`);
+      pend.forEach(chatProposta);
+    }
+  } catch (e) {}
+
+  // O rodapé da gaveta avisa quando o chat não tem como funcionar, em vez
+  // de deixar a pessoa descobrir no primeiro envio.
+  try {
+    const { error } = await sb.functions.invoke('chat', { body: { mensagem: '' } });
+    if (error) {
+      const corpo = await error.context?.json?.().catch(() => null);
+      if (corpo?.erro && /chave/i.test(corpo.erro)) {
+        const a = cEl('chat-aviso');
+        a.textContent = 'A chave da API ainda não foi configurada neste projeto, então o assistente não responde. O resto do painel funciona normalmente.';
+        a.classList.remove('hidden');
+      }
+    }
+  } catch (e) {}
+}
+</script>

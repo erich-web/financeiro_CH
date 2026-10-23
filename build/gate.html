@@ -1,0 +1,122 @@
+<!-- ===================================================================
+     Portão de entrada
+     Cobre o painel inteiro até haver sessão válida. Opaco de propósito:
+     uma tela semitransparente deixaria os números legíveis por baixo.
+     =================================================================== -->
+<div id="gate" class="fixed inset-0 z-[80] bg-slate-50 flex items-center justify-center p-4">
+  <div class="w-full max-w-sm">
+
+    <div class="text-center mb-7">
+      <div class="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-blue-600 text-white mb-4">
+        <i data-feather="home" class="w-5 h-5"></i>
+      </div>
+      <h1 class="text-xl font-bold text-slate-900 tracking-tight">Campos Hall</h1>
+      <p class="text-sm text-slate-500 mt-1">Painel de governança</p>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+
+        <!-- estado: verificando sessão -->
+        <div id="gate-carregando" class="py-6 text-center">
+          <div class="inline-block w-5 h-5 border-2 border-slate-200 border-t-blue-600 rounded-full animate-spin"></div>
+          <p class="text-sm text-slate-500 mt-3">Verificando acesso…</p>
+        </div>
+
+        <!-- estado: pedir e-mail -->
+        <form id="gate-form" class="hidden">
+          <label class="field-label" for="gate-email">Seu e-mail</label>
+          <input class="field" id="gate-email" type="email" autocomplete="email"
+                 placeholder="nome@empresa.com.br" required>
+          <button class="btn btn-primary w-full justify-center mt-4" type="submit" id="gate-enviar">
+            <i data-feather="mail" class="w-4 h-4"></i>
+            Receber link de acesso
+          </button>
+          <p class="text-xs text-slate-500 mt-4 leading-relaxed">
+            Sem senha. Você recebe um link no e-mail e entra clicando nele.
+            Apenas e-mails cadastrados pela diretoria têm acesso.
+          </p>
+          <p id="gate-erro" class="hidden text-xs text-red-600 mt-3 leading-relaxed"></p>
+        </form>
+
+        <!-- estado: link enviado -->
+        <div id="gate-enviado" class="hidden py-2 text-center">
+          <div class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 mb-3">
+            <i data-feather="check" class="w-5 h-5"></i>
+          </div>
+          <p class="text-sm font-semibold text-slate-900">Link enviado</p>
+          <p class="text-sm text-slate-500 mt-1.5 leading-relaxed">
+            Procure por <span id="gate-destino" class="font-medium text-slate-700"></span>
+            na sua caixa de entrada. O link vale por uma hora.
+          </p>
+          <button class="btn btn-ghost btn-sm mt-5" id="gate-voltar">Usar outro e-mail</button>
+        </div>
+
+        <!-- estado: e-mail não autorizado -->
+        <div id="gate-negado" class="hidden py-2 text-center">
+          <div class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-amber-50 text-amber-600 mb-3">
+            <i data-feather="alert-triangle" class="w-5 h-5"></i>
+          </div>
+          <p class="text-sm font-semibold text-slate-900">E-mail não cadastrado</p>
+          <p class="text-sm text-slate-500 mt-1.5 leading-relaxed">
+            <span id="gate-negado-email" class="font-medium text-slate-700"></span>
+            não está na lista de acesso deste painel. Fale com a diretoria.
+          </p>
+          <button class="btn btn-ghost btn-sm mt-5" id="gate-sair">Sair</button>
+        </div>
+
+      </div>
+    </div>
+
+    <p class="text-center text-[11px] text-slate-400 mt-6 leading-relaxed">
+      Campos Hall Ltda · acesso restrito a sócios e diretoria<br>
+      Todo acesso e alteração fica registrado
+    </p>
+  </div>
+</div>
+
+<!-- ===================================================================
+     Chat da diretoria
+     Gaveta sobre o painel, não aba: quem pede a correção precisa continuar
+     vendo o número que está corrigindo.
+     =================================================================== -->
+<button id="chat-fab"
+        class="hidden fixed bottom-6 right-6 z-[55] no-print items-center gap-2 rounded-full bg-blue-600 text-white pl-4 pr-5 py-3 shadow-lg hover:bg-blue-700 transition-colors">
+  <i data-feather="message-square" class="w-4 h-4"></i>
+  <span class="text-sm font-medium">Assistente</span>
+</button>
+
+<div id="chat-backdrop" class="hidden fixed inset-0 z-[65] bg-slate-900/20 no-print sm:bg-transparent"></div>
+
+<aside id="chat"
+       class="fixed inset-y-0 right-0 z-[70] w-full sm:w-[420px] bg-white border-l border-slate-200 shadow-xl
+              translate-x-full transition-transform duration-200 flex flex-col no-print">
+
+  <header class="flex items-center justify-between px-4 py-3 border-b border-slate-200 shrink-0">
+    <div class="min-w-0">
+      <p class="text-sm font-semibold text-slate-900">Assistente do painel</p>
+      <p id="chat-ctx" class="text-[11px] text-slate-500 truncate">—</p>
+    </div>
+    <button id="chat-fechar" class="btn btn-ghost btn-sm shrink-0" aria-label="Fechar">
+      <i data-feather="x" class="w-4 h-4"></i>
+    </button>
+  </header>
+
+  <div id="chat-msgs" class="flex-1 overflow-y-auto px-4 py-4 space-y-3"></div>
+
+  <div id="chat-aviso" class="hidden px-4 py-2.5 bg-amber-50 border-t border-amber-200 text-[11px] text-amber-800 leading-relaxed shrink-0"></div>
+
+  <form id="chat-form" class="border-t border-slate-200 p-3 shrink-0">
+    <div class="flex items-end gap-2">
+      <textarea id="chat-input" rows="1"
+                class="field resize-none max-h-32 py-2"
+                placeholder="Peça uma correção ou uma mudança…"></textarea>
+      <button type="submit" id="chat-enviar" class="btn btn-primary shrink-0" aria-label="Enviar">
+        <i data-feather="arrow-up" class="w-4 h-4"></i>
+      </button>
+    </div>
+    <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
+      Nada entra no painel direto. Toda mudança aparece como prévia para você publicar.
+    </p>
+  </form>
+</aside>
