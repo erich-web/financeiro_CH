@@ -18,6 +18,7 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import { traduzErroApi } from "./erros.ts";
+import { avisoSemFechamento, type LinhaFechamento, MAPA_DADOS, resumoFechamentos } from "./contexto.ts";
 
 const API = "https://api.anthropic.com/v1/messages";
 const MAX_VOLTAS = 8;
@@ -63,7 +64,10 @@ const FERRAMENTAS = [
         },
         periodo: {
           type: "string",
-          description: "AAAA-MM. Só para fechamento e pendências.",
+          description:
+            "AAAA-MM. Em fechamento, é a competência do fechamento, não o mês do " +
+            "dado: omita para ler o mais recente, que já traz o histórico mensal. " +
+            "Em pendências, filtra pelo período da pendência.",
         },
       },
       required: ["recurso"],
@@ -123,7 +127,11 @@ const FERRAMENTAS = [
   },
 ];
 
-function instrucoes(eu: Record<string, unknown>, ctx: Record<string, unknown>) {
+function instrucoes(
+  eu: Record<string, unknown>,
+  ctx: Record<string, unknown>,
+  fechamentos: LinhaFechamento[],
+) {
   return `Você é o assistente do painel de governança do Campos Hall Ltda, um centro de eventos em Campos do Jordão com 11 sócios e 12 quotas. Responde em português do Brasil.
 
 Quem está falando com você: ${eu.nome} (${eu.email}), papéis: ${
@@ -141,7 +149,11 @@ Como você trabalha:
 - Quórum é percentual de capital, não contagem de sócios, e segue as cláusulas do acordo de 26.09.2025. Consulte o recurso "quoruns" antes de afirmar qual se aplica.
 - Se a soma das participações não fechar em 100%, diga: o Anexo I ainda não foi cadastrado e qualquer apuração de quórum está sobre base incompleta.
 - Não invente número. Se o dado não está no painel e você não consegue derivá-lo do que leu, diga que falta e o que exatamente falta.
-- Seja curto. Quem usa isso está no meio do fechamento.`;
+- Seja curto. Quem usa isso está no meio do fechamento.
+
+Fechamentos cadastrados agora: ${resumoFechamentos(fechamentos)}.
+
+${MAPA_DADOS}`;
 }
 
 // ---------------------------------------------------------------------
@@ -204,15 +216,29 @@ Deno.serve(async (req) => {
 
   const propostasCriadas: unknown[] = [];
 
+  // Quais fechamentos existem, para o Claude não procurar um que não há.
+  // Passa pela RLS: a diretoria vê rascunhos, os demais só publicados.
+  const { data: fechs } = await db
+    .from("fechamentos")
+    .select("periodo,versao,estado")
+    .order("periodo", { ascending: false })
+    .order("versao", { ascending: false })
+    .limit(24);
+  const fechamentos = (fechs ?? []) as LinhaFechamento[];
+
   // -------------------------------------------------------------------
   async function executar(nome: string, entrada: Record<string, unknown>) {
     if (nome === "ler_dados") {
       const { recurso, periodo } = entrada as { recurso: string; periodo?: string };
       const mapa: Record<string, () => unknown> = {
+        // Sem periodo, só o mais recente: cada fechamento já traz o
+        // histórico mensal, e ler três repetiria o mesmo histórico três
+        // vezes na conta da Anthropic. Com periodo, todas as versões dele.
         fechamento: () => {
           let q = db.from("fechamentos").select("id,periodo,versao,estado,dados,publicado_em");
           if (periodo) q = q.eq("periodo", periodo);
-          return q.order("periodo", { ascending: false }).order("versao", { ascending: false }).limit(3);
+          return q.order("periodo", { ascending: false }).order("versao", { ascending: false })
+            .limit(periodo ? 3 : 1);
         },
         pendencias: () => {
           let q = db.from("pendencias").select("*");
@@ -227,6 +253,9 @@ Deno.serve(async (req) => {
       if (!mapa[recurso]) return { erro: `Recurso desconhecido: ${recurso}` };
       const { data, error } = (await mapa[recurso]()) as { data: unknown; error: unknown };
       if (error) return { erro: String((error as { message?: string }).message ?? error) };
+      if (recurso === "fechamento" && periodo && Array.isArray(data) && data.length === 0) {
+        return { dados: [], aviso: avisoSemFechamento(periodo, fechamentos) };
+      }
       return { dados: data };
     }
 
@@ -283,7 +312,7 @@ Deno.serve(async (req) => {
         body: JSON.stringify({
           model: MODELO,
           max_tokens: 4096,
-          system: instrucoes(eu, ctx),
+          system: instrucoes(eu, ctx, fechamentos),
           tools: FERRAMENTAS,
           messages: mensagens,
         }),

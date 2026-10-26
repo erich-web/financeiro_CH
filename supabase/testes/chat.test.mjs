@@ -3,6 +3,7 @@
 // Roda com: node --experimental-strip-types supabase/testes/chat.test.mjs
 import { readFileSync } from 'node:fs';
 import { traduzErroApi } from '../functions/chat/erros.ts';
+import { avisoSemFechamento, MAPA_DADOS, resumoFechamentos } from '../functions/chat/contexto.ts';
 
 let total = 0, falhas = 0;
 function confere(nome, ok) {
@@ -61,6 +62,27 @@ confere('caso desconhecido devolve a mensagem original',
 
 confere('corpo que não é JSON não derruba a tradução',
   /recusou o pedido \(400\): <html>/.test(traduzErroApi(400, '<html>bad</html>')));
+
+// O caso que falhou na primeira conversa real: "qual o caixa de agosto?"
+// com um único fechamento, o de 2026-09, que traz agosto dentro dele.
+const existentes = [{ periodo: '2026-09', versao: 1, estado: 'publicado' }];
+confere('lista de fechamentos vazia diz "nenhum"', resumoFechamentos([]) === 'nenhum');
+confere('lista de fechamentos traz período, versão e estado',
+  resumoFechamentos(existentes) === '2026-09 v1 (publicado)');
+const aviso = avisoSemFechamento('2026-08', existentes);
+confere('período inexistente: diz que não existe',
+  aviso.includes('Não existe fechamento com periodo 2026-08'));
+confere('período inexistente: mostra o que existe', aviso.includes('2026-09 v1 (publicado)'));
+confere('período inexistente: manda ler o mais recente sem periodo', aviso.includes('sem periodo'));
+
+// O mapa precisa cobrir cada parte de "dados" do fechamento em produção
+// (chaves conferidas no banco em 26/10/2026). Parte nova sem descrição é
+// parte que o Claude não sabe ler.
+for (const k of ['meta', 'serie_caixa', 'dre', 'balanco', 'caixa_detalhe', 'pagar', 'receber',
+                 'deals', 'mix', 'estacionamento', 'alertas', 'recomendacoes', 'delibs', 'atas', 'docs']) {
+  confere(`mapa dos dados descreve ${k}`, MAPA_DADOS.includes(k));
+}
+confere('mapa explica que periodo não é o mês do dado', /competência do fechamento, não o mês/.test(MAPA_DADOS));
 
 console.log(`   ${total - falhas}/${total}`);
 process.exit(falhas ? 1 : 0);
