@@ -128,5 +128,9 @@ python3 build/montar.py >/dev/null
 node supabase/testes/painel.test.mjs || falhou=1
 
 echo
+echo "== chat: CORS e erros da API =="
+node --experimental-strip-types --no-warnings supabase/testes/chat.test.mjs || falhou=1
+
+echo
 if [ "$falhou" = "0" ]; then echo "===== tudo verde ====="; else echo "===== houve falha ====="; fi
 exit "$falhou"

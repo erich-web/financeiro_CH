@@ -17,17 +17,25 @@
 // =====================================================================
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
+import { traduzErroApi } from "./erros.ts";
 
 const API = "https://api.anthropic.com/v1/messages";
-const MODELO = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-sonnet-5-5";
-const CHAVE = Deno.env.get("ANTHROPIC_API_KEY");
 const MAX_VOLTAS = 8;
+
+// Lidos a cada chamada, não no carregamento: o secret pode ser criado ou
+// trocado depois do deploy. trim() porque chave colada costuma trazer
+// espaço ou quebra de linha, e o cabeçalho HTTP não aceita nenhum dos dois.
+const chave = () => Deno.env.get("ANTHROPIC_API_KEY")?.trim() || "";
+const modelo = () => Deno.env.get("ANTHROPIC_MODEL")?.trim() || "claude-sonnet-5-5";
 
 // Só o painel chama esta função. Se a hospedagem mudar de endereço, basta
 // definir o secret ORIGEM_PERMITIDA com a origem nova.
+// Allow-Headers: os quatro que o supabase-js 2.45.4 manda em todo invoke.
+// Faltando um (x-client-info já faltou), o navegador barra a chamada no
+// preflight e o chat só diz "falha ao enviar".
 const cors = {
   "Access-Control-Allow-Origin": Deno.env.get("ORIGEM_PERMITIDA") ?? "https://erich-web.github.io",
-  "Access-Control-Allow-Headers": "authorization, content-type, apikey",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
@@ -137,20 +145,18 @@ Como você trabalha:
 }
 
 // ---------------------------------------------------------------------
+// Quem confere o login é a própria função, não o gateway (verify_jwt
+// desligado no deploy). O gateway só sabe validar token assinado com o
+// segredo antigo do projeto; se o Supabase passar a assinar as sessões
+// com as chaves novas, ele recusaria todo mundo. Aqui a conferência é
+// feita pelo banco: o token vai junto na consulta a v_eu, o PostgREST
+// valida a assinatura qualquer que seja o sistema, e v_eu só devolve
+// linha para e-mail cadastrado. Nada acontece antes disso — nem dizer
+// se a chave da Anthropic está configurada.
+// ---------------------------------------------------------------------
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return json({ erro: "Use POST." }, 405);
-
-  if (!CHAVE) {
-    return json(
-      {
-        erro:
-          "A chave da API Anthropic não está configurada neste projeto. " +
-          "Defina o secret ANTHROPIC_API_KEY para o chat funcionar.",
-      },
-      503,
-    );
-  }
 
   const auth = req.headers.get("Authorization") ?? "";
   if (!auth.startsWith("Bearer ")) return json({ erro: "Sem sessão." }, 401);
@@ -166,6 +172,19 @@ Deno.serve(async (req) => {
   if (erroEu || !eu) return json({ erro: "E-mail não autorizado neste painel." }, 403);
   if (!eu.e_diretoria && !eu.e_admin) {
     return json({ erro: "O chat está disponível para a diretoria." }, 403);
+  }
+
+  const CHAVE = chave();
+  const MODELO = modelo();
+  if (!CHAVE) {
+    return json(
+      {
+        erro:
+          "A chave da API Anthropic não está configurada neste projeto. " +
+          "Defina o secret ANTHROPIC_API_KEY para o chat funcionar.",
+      },
+      503,
+    );
   }
 
   let corpo: { mensagem?: string; contexto?: Record<string, unknown>; historico?: unknown[] };
@@ -252,27 +271,33 @@ Deno.serve(async (req) => {
   let textoFinal = "";
 
   for (let volta = 0; volta < MAX_VOLTAS; volta++) {
-    const resp = await fetch(API, {
-      method: "POST",
-      headers: {
-        "x-api-key": CHAVE,
-        "anthropic-version": "2023-06-01",
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        model: MODELO,
-        max_tokens: 4096,
-        system: instrucoes(eu, ctx),
-        tools: FERRAMENTAS,
-        messages: mensagens,
-      }),
-    });
+    let resp: Response;
+    try {
+      resp = await fetch(API, {
+        method: "POST",
+        headers: {
+          "x-api-key": CHAVE,
+          "anthropic-version": "2023-06-01",
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          model: MODELO,
+          max_tokens: 4096,
+          system: instrucoes(eu, ctx),
+          tools: FERRAMENTAS,
+          messages: mensagens,
+        }),
+      });
+    } catch (e) {
+      console.error("Anthropic inalcançável", String(e));
+      return json({ erro: "Não consegui falar com a Anthropic agora. Tente de novo em alguns minutos." }, 502);
+    }
 
     if (!resp.ok) {
       const detalhe = await resp.text();
       console.error("Anthropic", resp.status, detalhe);
       return json(
-        { erro: `A API respondeu ${resp.status}.`, detalhe: detalhe.slice(0, 500) },
+        { erro: traduzErroApi(resp.status, detalhe), detalhe: detalhe.slice(0, 500) },
         502,
       );
     }
