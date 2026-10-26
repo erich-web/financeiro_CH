@@ -4,6 +4,7 @@ Monta o index.html a partir das partes.
 
     python3 build/montar.py                  # prévia em build/index.preview.html
     python3 build/montar.py build/cfg.json   # index.html, pronto para publicar
+    python3 build/montar.py build/cfg.json novo/index.html   # versão de teste
 
 cfg.json: {"url": "https://xxx.supabase.co", "anon": "eyJ..."}
 
@@ -78,6 +79,11 @@ def main() -> int:
 
     conectado = not cfg['url'].startswith('__')
     destino = (RAIZ / 'index.html') if conectado else (B / 'index.preview.html')
+    # Terceiro argumento opcional: publicar em outro caminho, como novo/
+    # para testar o login sem tocar no painel que está no ar.
+    if conectado and len(sys.argv) > 2:
+        destino = RAIZ / sys.argv[2]
+        destino.parent.mkdir(parents=True, exist_ok=True)
     destino.write_text(saida, encoding='utf-8')
 
     print(f"{destino.relative_to(RAIZ)}: {len(saida):,} bytes".replace(',', '.'))

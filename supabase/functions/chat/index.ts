@@ -23,8 +23,10 @@ const MODELO = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-sonnet-5-5";
 const CHAVE = Deno.env.get("ANTHROPIC_API_KEY");
 const MAX_VOLTAS = 8;
 
+// Só o painel chama esta função. Se a hospedagem mudar de endereço, basta
+// definir o secret ORIGEM_PERMITIDA com a origem nova.
 const cors = {
-  "Access-Control-Allow-Origin": Deno.env.get("ORIGEM_PERMITIDA") ?? "*",
+  "Access-Control-Allow-Origin": Deno.env.get("ORIGEM_PERMITIDA") ?? "https://erich-web.github.io",
   "Access-Control-Allow-Headers": "authorization, content-type, apikey",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
