@@ -250,7 +250,7 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
         <div class="card">
           <div class="card-body pb-0"><div class="card-head"><h2 class="card-title">Onde está o caixa</h2><span class="card-hint" id="caixa-data"></span></div></div>
           <div class="px-2 scroll-x"><table class="tbl" id="t-caixa"></table></div>
-          <p class="px-6 py-5 text-xs text-slate-500 leading-relaxed">Rendimento de R$ 10,6 mil em julho, primeiro mês com as aplicações Trust DI e Crédito Bancário ativas.</p>
+          <p class="px-6 py-5 text-xs text-slate-500 leading-relaxed">As aplicações Trust DI e Crédito Bancário rendem desde julho de 2026. O rendimento só aparece no saldo quando é lançado na planilha de caixa.</p>
         </div>
         <div class="card card-body xl:col-span-2">
           <div class="card-head"><h2 class="card-title">Contratado a receber</h2><span class="card-hint" id="rec-hint"></span></div>
@@ -2891,8 +2891,8 @@ function renderEstacionamento() {
      'Energia, água, gás, IPTU e taxa de lixo da competência de julho correram pela conta não tributável do balancete e fecham ao centavo com esta planilha. É a parte que a contabilidade consegue enxergar, com a ressalva registrada em nota explicativa.'],
     ['eye-off', 'red', 'Os outros ' + fmtK(foraDeTudo) + ' não aparecem em lugar nenhum',
      'Materiais de ar-condicionado, extintores, frete e porta de vidro do mesmo mês foram pagos direto pelo operador sem passar por nenhuma conta do balancete.'],
-    ['alert-triangle', 'red', 'A DRE de agosto tem utilidades zeradas',
-     'Nem um centavo de energia, água ou gás, contra uma média de R$ 31,8 mil por mês de março a julho. O EBITDA do mês está superestimado em algo próximo de R$ 32 mil por causa desse arranjo.']
+    ['alert-triangle', 'red', 'Agosto e setembro estão quase sem utilidades na DRE',
+     'Nada de energia, água ou gás em agosto e só R$ 326 em setembro, contra uma média de R$ 31,8 mil por mês de março a julho. O EBITDA de cada mês fica superestimado em algo próximo de R$ 32 mil por causa desse arranjo.']
   ].map(a => {
     const tone = { blue: 'bg-blue-50 text-blue-600', amber: 'bg-amber-50 text-amber-600', red: 'bg-red-50 text-red-600' };
     return '<div class="flex gap-3">' +
