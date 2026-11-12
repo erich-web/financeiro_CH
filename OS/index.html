@@ -324,6 +324,23 @@ tbody tr:hover{background:var(--blue-s)}
 .tour-sp{height:150px}
 @media (max-width:899px){.tour{bottom:calc(56px + env(safe-area-inset-bottom,0px));padding-bottom:10px}.tour-sp{height:230px}}
 
+/* entrada e área do cliente */
+.gate{min-height:100vh;display:flex;align-items:center}
+.gate h1{font-size:40px;letter-spacing:-.03em}
+.gcard{color:var(--fg);padding:22px;gap:12px}
+.gcard h2{font-size:20px;font-weight:700}
+.brand-b{background:none;border:0;padding:0;color:inherit}
+.pnav .lnk button[aria-current="page"]{color:var(--blue);font-weight:600}
+.cnav{display:none}
+.cfoot{padding:18px max(16px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));font-size:12px;color:var(--muted);text-align:center;border-top:1px solid var(--line);background:var(--surface)}
+@media (max-width:899px){
+  .gate h1{font-size:30px}
+  .cnav{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:calc(env(safe-area-inset-top,0px) + 56px);z-index:14}
+  .cnav button{border:0;background:none;padding:10px 4px;font-weight:500;color:var(--muted);min-height:44px;border-bottom:2px solid transparent}
+  .cnav button[aria-current="page"]{color:var(--blue);border-bottom-color:var(--blue)}
+}
+.band.dark .gcard h2{color:var(--navy)}.band.dark .gcard .eyebrow{color:var(--blue)}.band.dark .gcard .sm,.band.dark .gcard small{color:var(--muted)}
+
 </style>
 </head>
 <body>
@@ -331,7 +348,8 @@ tbody tr:hover{background:var(--blue-s)}
 <div class="toast" id="toast" hidden role="status"></div>
 <script>
 // ============================================================ Campos Hall OS 2.0 · núcleo
-const KEY='campos-hall-os-2',VER=7,HOJE='2026-11-12';
+const LOCK=(typeof window!=='undefined')&&(window.CH_MODE==='clientes'||location.hash==='#clientes');
+const KEY='campos-hall-os-2'+(LOCK?'-cli':''),VER=8,HOJE='2026-11-12';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const R=v=>(v<0?'−':'')+'R$ '+Math.abs(Math.round(v)).toLocaleString('pt-BR');
@@ -410,7 +428,7 @@ const me=()=>S.role;
 const is=(...r)=>r.includes(S.role);
 
 // ------------------------------------------------------------ estado
-function load(){try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){S=null}if(!S||S.v!==VER)S=seed()}
+function load(){try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){S=null}if(!S||S.v!==VER){S=seed();S.gate=true}if(LOCK){S.gate=false;S.cli=true;S.tour=null;if(!['site','calc','portal'].includes(S.mod)){S.role='pub';S.mod='site'}}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 const uid=()=>++S.seq;
 const by=(col,id)=>S[col].find(x=>x.id==id);
@@ -464,16 +482,20 @@ function qr(seed){let h=0;for(const c of String(seed))h=(h*31+c.charCodeAt(0))>>
 
 // ------------------------------------------------------------ navegação
 function go(m,t){S.mod=m;if(t)U.tab[m]=t;U.drawer=null;U.more=false;U.find='';save();render();scrollTo(0,0)}
-function as(r,m){S.role=r;S.mod=m||role(r).mods[0];U.drawer=null;U.more=false;U.find='';save();render();scrollTo(0,0)}
+function as(r,m){if(!LOCK){S.cli=false;S.gate=false}else if(!['pub','cli'].includes(r))return;S.role=r;S.mod=m||role(r).mods[0];U.drawer=null;U.more=false;U.find='';save();render();scrollTo(0,0)}
 A.go=d=>go(d.m,d.t);A.as=d=>as(d.r,d.m);
 A.tab=d=>{U.tab[d.key]=d.t;render()};
 A.open=d=>{U.drawer={k:d.k,id:isNaN(+d.id)?d.id:+d.id};U.find='';render()};
 A.close=()=>{U.drawer=null;render()};
 A.fclose=(d,e,ev)=>{if(d.force||ev.target.classList.contains('scrim')){U.form=null;render()}};
 A.more=()=>{U.more=!U.more;render()};
-A.guide=()=>{go('demo')};
+A.guide=()=>{if(S.gate||S.cli){S.gate=false;S.cli=false;S.role='pres'}go('demo')};
+A.gate=()=>{if(LOCK)return;S.gate=true;S.tour=null;U.drawer=null;U.more=false;save();render();scrollTo(0,0)};
+A.cgo=d=>{S.gate=false;S.cli=true;S.tour=null;S.role=d.m==='portal'?'cli':'pub';S.mod=d.m;U.drawer=null;save();render();scrollTo(0,0)};
+A.enter=()=>{const e=document.getElementById('gsel');as(e?e.value:'pres')};
+function gateHTML(){return `<div class="pub"><div class="band dark gate"><div class="in"><div><div class="eyebrow">Campos do Jordão · Vila Capivari</div><h1>Campos Hall</h1><p class="lede" style="color:var(--ink-fg)">Escolha por onde entrar. O sistema operacional é para quem trabalha e decide; a área do cliente é para quem organiza eventos na casa.</p></div><div class="grid g2"><div class="card gcard"><div class="eyebrow">Sócios, diretoria e equipe</div><h2>Sistema operacional</h2><p class="sm">Gestão integrada por cargo: comercial, eventos, fornecedores, qualidade, finanças, compliance e governança.</p><label class="field">Entrar como<select id="gsel" aria-label="Perfil">${[...new Set(ROLES.map(x=>x.g))].filter(g=>g!=='Público'&&g!=='Portais externos').map(g=>`<optgroup label="${g}">${ROLES.filter(x=>x.g===g).map(x=>`<option value="${x.id}" ${x.id==='pres'?'selected':''}>${x.n}</option>`).join('')}</optgroup>`).join('')}</select></label><div class="row"><button class="btn pri big" data-a="enter">Entrar no sistema</button><button class="btn big" data-a="tour" data-n="0">Apresentação guiada</button></div><small>Demonstração: sem senha. Na versão final, cada pessoa entra com o próprio acesso.</small></div><div class="card gcard"><div class="eyebrow">Organizadores de eventos</div><h2>Área do cliente</h2><p class="sm">Conheça os espaços, simule o preço do seu evento em poucos passos e acompanhe o planejamento depois do contrato.</p><div class="list"><div><span class="x">O espaço e a planta interativa</span></div><div><span class="x">Simulador de preço com datas e hospedagem</span></div><div><span class="x">Meu evento: documentos, fornecedores e mensagens</span></div></div><div class="row"><button class="btn pri big" data-a="cgo" data-m="site">Entrar como cliente</button><button class="btn big" data-a="cgo" data-m="calc">Simular um evento</button></div><small>O cliente não vê nada da gestão interna.</small></div></div><p class="sm">Protótipo de demonstração · fornecedores e hotéis parceiros também têm portais próprios, acessíveis pelo seletor de perfil dentro do sistema.</p></div></div></div>`}
 A.reset=()=>openForm('Reiniciar a demonstração',[],'reset',null,'Reiniciar');
-F.reset=()=>{const r=S.role;S=seed();S.role=r;S.mod=role(r).mods[0];U={drawer:null,form:null,q:{},tab:{},more:false,find:'',map:{z:1,x:0,y:0}};toast('Demonstração reiniciada: todos os dados voltaram ao cenário inicial.')};
+F.reset=()=>{const r=S.role,c=S.cli;S=seed();S.cli=c;S.role=c?'pub':r;S.mod=role(S.role).mods[0];U={drawer:null,form:null,q:{},tab:{},more:false,find:'',map:{z:1,x:0,y:0}};toast('Demonstração reiniciada: todos os dados voltaram ao cenário inicial.')};
 A.tdone=d=>{const t=by('tasks',d.id);t.st='ok';t.hist.push([HOJE,'concluída por '+rn(me())]);log('Concluiu a tarefa: '+t.t);save();render();toast('Tarefa concluída.')};
 A.ap=d=>{const a=by('aprov',d.id);if(d.v==='0'){a.st='no';a.hist.push([HOJE,me(),'recusou'])}else{a.ok.push(me());a.hist.push([HOJE,me(),'aprovou']);if(a.ok.length>=a.need)a.st='ok'}
   S.tasks.filter(t=>t.ent&&t.ent[0]==='aprov'&&t.ent[1]===a.id&&(t.role===me()||a.st!=='pend')).forEach(t=>t.st='ok');
@@ -496,11 +518,13 @@ function found(){const q=U.find.toLowerCase().trim();if(q.length<2)return [];con
 function navHTML(){const r=role(S.role);const groups=[...new Set(r.mods.map(m=>MOD[m][1]))];const badge=m=>m==='home'?(myTasks().length+myAprov().length):m==='aprov'?myAprov().length:0;
   return groups.map(g=>`${groups.length>1?`<div class="lab">${g}</div>`:''}${r.mods.filter(m=>MOD[m][1]===g).map(m=>`<button data-a="go" data-m="${m}" ${S.mod===m?'aria-current="page"':''}><span>${MOD[m][0]}</span>${badge(m)?`<span class="n">${badge(m)}</span>`:''}</button>`).join('')}`).join('')}
 function roleSel(id){return `<select class="rolesel" id="${id}" data-a="role" aria-label="Trocar de perfil">${[...new Set(ROLES.map(x=>x.g))].map(g=>`<optgroup label="${g}">${ROLES.filter(x=>x.g===g).map(x=>`<option value="${x.id}" ${x.id===S.role?'selected':''}>${x.n}</option>`).join('')}</optgroup>`).join('')}</select>`}
-function demoBar(){return `<div class="demo-bar"><span><b>Modo demonstração</b> · números financeiros e agenda reais de 10/11/2026; o que é exemplo traz a etiqueta “demo”</span><span class="row"><button data-a="as" data-r="pub" data-m="site">Site público</button><button data-a="tour" data-n="0">Apresentar</button><button data-a="guide">Roteiro</button><button data-a="reset">Reiniciar</button></span></div>`}
+function demoBar(){return `<div class="demo-bar"><span><b>Modo demonstração</b> · números financeiros e agenda reais de 10/11/2026; o que é exemplo traz a etiqueta “demo”</span><span class="row"><button data-a="gate">Entrada</button><button data-a="as" data-r="pub" data-m="site">Site público</button><button data-a="tour" data-n="0">Apresentar</button><button data-a="guide">Roteiro</button><button data-a="reset">Reiniciar</button></span></div>`}
 function render(){const sc=$('.drawer')?$('.drawer').scrollTop:0;const af=document.activeElement,fid=af&&af.id,ss=af&&af.selectionStart;
   const r=role(S.role);if(!r.mods.includes(S.mod)&&!['tarefas','demo'].includes(S.mod))S.mod=r.mods[0];
   let body=(V[S.mod]||V.home)();let h;
-  if(S.role==='pub'){h=`<div class="pub">${demoBar()}<div class="pnav"><b>Campos Hall</b><span class="lnk"><button data-a="go" data-m="site">O espaço</button><button data-a="go" data-m="calc">Simular evento</button></span><span class="row"><button class="btn pri" data-a="go" data-m="calc">Simular meu evento</button>${roleSel('role2')}</span></div>${S.mod==='site'?body:`<div class="main"><div class="wrap">${body}</div></div>`}</div>`}
+  if(S.gate&&!LOCK){h=gateHTML()}
+  else if(S.cli){h=`<div class="pub"><div class="pnav"><button class="brand-b" data-a="cgo" data-m="site"><b>Campos Hall</b></button><span class="lnk"><button data-a="cgo" data-m="site" ${S.mod==='site'?'aria-current="page"':''}>O espaço</button><button data-a="cgo" data-m="calc" ${S.mod==='calc'?'aria-current="page"':''}>Simular evento</button><button data-a="cgo" data-m="portal" ${S.mod==='portal'?'aria-current="page"':''}>Meu evento</button></span><span class="row"><button class="btn pri" data-a="cgo" data-m="calc">Simular meu evento</button>${LOCK?'':'<button class="btn" data-a="gate">Sair</button>'}</span></div><div class="cnav">${[['site','O espaço'],['calc','Simular'],['portal','Meu evento']].map(x=>`<button data-a="cgo" data-m="${x[0]}" ${S.mod===x[0]?'aria-current="page"':''}>${x[1]}</button>`).join('')}</div>${S.mod==='site'?body:`<div class="main"><div class="wrap">${S.mod==='portal'?'<div class="banner b">Área do organizador em demonstração: o evento abaixo é um exemplo. Na versão final, cada cliente entra com o próprio acesso e vê só o seu evento.</div>':''}${body}</div></div>`}<div class="cfoot">Campos Hall · Av. Macedo Soares, 499 · Vila Capivari · Campos do Jordão (SP) · versão de demonstração, valores ilustrativos</div></div>`}
+  else if(S.role==='pub'){h=`<div class="pub">${demoBar()}<div class="pnav"><b>Campos Hall</b><span class="lnk"><button data-a="go" data-m="site">O espaço</button><button data-a="go" data-m="calc">Simular evento</button></span><span class="row"><button class="btn pri" data-a="go" data-m="calc">Simular meu evento</button>${roleSel('role2')}</span></div>${S.mod==='site'?body:`<div class="main"><div class="wrap">${body}</div></div>`}</div>`}
   else{const res=found();const nt=myTasks().length+myAprov().length;const bn=r.mods.slice(0,4);
   h=`<div class="app"><aside class="side"><button class="brand" data-a="go" data-m="${r.mods[0]}"><b>Campos Hall OS</b><span>Gestão integrada · 2.0</span></button>
    <div class="lab">Perfil</div>${roleSel('role')}<nav class="nav" aria-label="Módulos">${navHTML()}</nav>
@@ -1446,7 +1470,7 @@ const TOUR=[['pub','site',null,null,'O site que vende o espaço','Números da ca
  ['fin','fin','visao',null,'O dinheiro em uma tela','Caixa, carteira, a pagar e os pontos do fechamento. Os números são os mesmos do Painel de Governança.'],
  ['vice','comp',null,null,'23 obrigações com semáforo','Cinza quer dizer “sem documento”, não “em ordem”. Cada item tem dono, validade e plano de ação.'],
  ['socio','home',null,null,'A visão do sócio','Três perguntas em uma tela: como está o dinheiro, o que preciso decidir e o que está em risco.']];
-A.tour=d=>{const n=+d.n;if(isNaN(n)||n<0||n>=TOUR.length){S.tour=null;save();render();return}const t=TOUR[n];S.tour=n;S.role=t[0];S.mod=t[1];if(t[2])U.tab[t[1]]=t[2];if(t[1]==='calc')S.calc.step=2;if(t[4]==='Uma página por evento')U.tab.ev='crono';U.drawer=t[3]?{k:t[3][0],id:t[3][1]}:null;U.more=false;U.form=null;save();render();scrollTo(0,0)};
+A.tour=d=>{if(LOCK)return;const n=+d.n;if(isNaN(n)||n<0||n>=TOUR.length){S.tour=null;save();render();return}const t=TOUR[n];S.gate=false;S.cli=false;S.tour=n;S.role=t[0];S.mod=t[1];if(t[2])U.tab[t[1]]=t[2];if(t[1]==='calc')S.calc.step=2;if(t[4]==='Uma página por evento')U.tab.ev='crono';U.drawer=t[3]?{k:t[3][0],id:t[3][1]}:null;U.more=false;U.form=null;save();render();scrollTo(0,0)};
 HOOK.after=()=>{if(S.tour==null)return;const n=S.tour,t=TOUR[n];const dw=document.querySelector('.drawer');if(dw)dw.style.paddingBottom='240px';document.getElementById('app').insertAdjacentHTML('beforeend',`<div class="tour-sp"></div><div class="tour" role="region" aria-label="Apresentação guiada"><div class="tx"><small>Passo ${n+1} de ${TOUR.length} · ${rn(t[0])}</small><b>${t[4]}</b><span>${t[5]}</span></div><div class="row"><button class="btn" data-a="tour" data-n="${n-1}" ${n?'':'disabled'}>Anterior</button>${n<TOUR.length-1?`<button class="btn pri" data-a="tour" data-n="${n+1}">Próximo</button>`:`<button class="btn pri" data-a="tour" data-n="99">Concluir</button>`}<button class="btn" data-a="tour" data-n="-1" aria-label="Sair da apresentação">Sair</button></div></div>`)};
 
 load();render();
