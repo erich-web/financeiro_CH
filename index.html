@@ -121,6 +121,7 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
       <a class="nav-item" data-p="governanca"><i data-feather="users" class="w-4 h-4 shrink-0"></i>Atas e deliberações</a>
       <a class="nav-item" data-p="docs"><i data-feather="folder" class="w-4 h-4 shrink-0"></i>Central de documentos</a>
       <a class="nav-item" data-p="estacionamento"><i data-feather="truck" class="w-4 h-4 shrink-0"></i>Extra contábil · estacionamento</a>
+      <a class="nav-item" data-p="os"><i data-feather="monitor" class="w-4 h-4 shrink-0"></i>Campos Hall OS · teste<span class="ml-auto badge badge-blue">novo</span></a>
       <a class="nav-item" data-p="atualizacoes"><i data-feather="refresh-cw" class="w-4 h-4 shrink-0"></i>Atualizações</a>
     </nav>
 
@@ -422,6 +423,68 @@ tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-ser
     </section>
 
     <!-- ============ 9. ATUALIZAÇÕES ============ -->
+    <section class="page" id="os">
+      <div class="mb-7">
+        <h1 class="page-title">Campos Hall OS — protótipo para teste</h1>
+        <p class="page-sub">O protótipo do sistema de gestão integrada do Campos Hall está aberto para os sócios testarem antes da decisão de levá-lo à produção. É uma demonstração navegável: nada é enviado, pago ou assinado de verdade.</p>
+      </div>
+
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
+        <div class="card xl:col-span-2">
+          <div class="card-body">
+            <div class="card-head">
+              <div class="card-title">Abrir o protótipo</div>
+              <div class="card-hint">Funciona no computador e no celular</div>
+            </div>
+            <p class="text-sm text-slate-600 leading-relaxed">Ao abrir, toque em <b>Apresentar</b> na faixa azul do topo: a apresentação guiada percorre o sistema em dez passos, do site ao painel do sócio, em cerca de 15 minutos.</p>
+            <div class="flex flex-wrap gap-2 mt-5">
+              <a class="btn btn-primary" href="https://claude.ai/artifact/SfuKP9ER64K1dXgLwqR3MT" target="_blank" rel="noopener"><i data-feather="external-link" class="w-4 h-4"></i>Abrir o Campos Hall OS</a>
+              <a class="btn btn-ghost" href="https://claude.ai/artifact/5xWuH8v3bjpbrM6J8HMtE4" target="_blank" rel="noopener"><i data-feather="book-open" class="w-4 h-4"></i>Tutorial de demonstração</a>
+            </div>
+            <p class="card-note">Se o link pedir acesso, avise a diretoria: o protótipo é compartilhado sócio a sócio.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <div class="card-title mb-4">Como testar</div>
+            <ol class="text-sm text-slate-600 space-y-3 list-decimal pl-5 leading-relaxed">
+              <li>Siga a apresentação guiada até o fim.</li>
+              <li>No seletor de perfil, escolha <b>Sócio(a)</b> e veja “Campos Hall em uma tela”.</li>
+              <li>Troque para outros cargos e veja como cada um trabalha.</li>
+              <li>Se algo sair do lugar, use <b>Reiniciar</b> no topo.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+        <div class="card">
+          <div class="card-body">
+            <div class="card-title mb-4">O que observar</div>
+            <ul class="text-sm text-slate-600 space-y-2.5 leading-relaxed">
+              <li><span class="badge badge-blue mr-2">1</span>O sócio acompanha, delibera e fiscaliza, sem precisar operar.</li>
+              <li><span class="badge badge-blue mr-2">2</span>Cada cargo tem a sua tela inicial e um só chefe.</li>
+              <li><span class="badge badge-blue mr-2">3</span>Toda aprovação segue a alçada e deixa trilha.</li>
+              <li><span class="badge badge-blue mr-2">4</span>Em Governança, a aba “O que aprovar” mostra o que cada deliberação destrava.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <div class="card-title mb-4">O que é demonstração</div>
+            <ul class="text-sm text-slate-600 space-y-2.5 leading-relaxed">
+              <li><span class="badge badge-amber mr-2">preços</span>A tabela do simulador é ilustrativa.</li>
+              <li><span class="badge badge-amber mr-2">regras</span>Alçadas e quóruns aparecem como propostas; nenhuma está vigente.</li>
+              <li><span class="badge badge-amber mr-2">cadastros</span>Fornecedores, hotéis e parte dos eventos trazem a etiqueta “demo”.</li>
+              <li><span class="badge badge-amber mr-2">mapa</span>A planta é esquemática, com as medidas oficiais das salas.</li>
+            </ul>
+            <p class="card-note">Comentários e ajustes: leve à próxima reunião de sócios ou envie à diretoria.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="page" id="atualizacoes">
       <div class="mb-7">
         <h1 class="page-title">Atualizações</h1>
@@ -726,7 +789,7 @@ function textoPeriodo() {
 }
 
 /* ============ navegação ============ */
-const TITLES = { visao: 'Visão geral', dre: 'DRE gerencial', balanco: 'Balanço e caixa', fluxo: 'Fluxo de caixa', pipeline: 'Pipeline comercial', governanca: 'Atas e deliberações', docs: 'Central de documentos', estacionamento: 'Extra contábil — estacionamento', atualizacoes: 'Atualizações' };
+const TITLES = { os: 'Campos Hall OS · teste', visao: 'Visão geral', dre: 'DRE gerencial', balanco: 'Balanço e caixa', fluxo: 'Fluxo de caixa', pipeline: 'Pipeline comercial', governanca: 'Atas e deliberações', docs: 'Central de documentos', estacionamento: 'Extra contábil — estacionamento', atualizacoes: 'Atualizações' };
 const sidebar = () => $('#sidebar'), backdrop = () => $('#backdrop');
 function openNav() { sidebar().classList.remove('-translate-x-full'); backdrop().classList.remove('hidden'); }
 function closeNav() { sidebar().classList.add('-translate-x-full'); backdrop().classList.add('hidden'); }
