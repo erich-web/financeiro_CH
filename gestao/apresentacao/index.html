@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light only">
+<meta http-equiv="Cache-Control" content="no-cache">
+<title>Campos Hall — Apresentação de governança</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Mesma linguagem do Painel de Governança e do Campos Hall OS: Inter, fundo slate-50, cartões brancos de borda fina, azul 600. */
+:root{--navy:#0f172a;--blue:#2563eb;--green:#047857;--bg:#f8fafc;--surface:#fff;--surface2:#f1f5f9;--fg:#1e293b;--muted:#64748b;--line:#e2e8f0;--blue-s:#eff6ff;--r:12px}
+*{box-sizing:border-box}
+html{color-scheme:light}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}
+a{color:var(--blue)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 18px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:inherit;font-weight:600;text-decoration:none;cursor:pointer}
+.btn:hover{background:var(--surface2)}
+.btn.pri{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.pri:hover{background:#1d4ed8}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);font-weight:700}
+
+html,body{height:100%}
+body{display:flex;flex-direction:column;background:#0b1220;color:#e2e8f0;overflow:hidden}
+.bar{display:flex;align-items:center;gap:10px;padding:8px 12px;background:#fff;color:var(--fg);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.bar .t{flex:1;min-width:160px;font-weight:600;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .n{font-variant-numeric:tabular-nums;color:var(--muted);font-weight:600;min-width:64px;text-align:center}
+.bar .btn{min-height:40px;padding:6px 14px}
+.bar select{min-height:40px;border-radius:10px;border:1px solid var(--line);font:inherit;padding:6px 10px;max-width:260px;background:#fff;color:var(--fg)}
+.prog{height:4px;background:#1e293b}.prog i{display:block;height:100%;background:var(--blue);width:0;transition:width .2s}
+.stage{flex:1;position:relative;overflow:hidden;min-height:0}
+.canvas{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:center center;box-shadow:0 10px 40px rgba(0,0,0,.45);background:#fff}
+.sl section{position:relative;width:1920px;height:1080px;box-sizing:border-box;overflow:hidden}
+.sl ul,.sl ol{margin:0;padding-left:1.2em}.sl p,.sl h1,.sl h2{margin:0}
+.nav{position:absolute;top:0;bottom:0;width:18%;border:0;background:transparent;cursor:pointer;z-index:2}
+.nav.p{left:0}.nav.x{right:0}
+.hint{position:absolute;left:0;right:0;bottom:10px;text-align:center;font-size:13px;color:#94a3b8;pointer-events:none}
+@media (max-width:700px){.bar .hide-s{display:none}.bar select{max-width:150px}}
+.rot{display:none}
+@media (max-width:700px) and (orientation:portrait){.rot{display:block;position:absolute;left:0;right:0;top:14px;text-align:center;font-size:15px;color:#cbd5e1;padding:0 16px}.hint{display:none}}
+@media print{.bar,.prog,.nav,.hint{display:none}body{overflow:visible;background:#fff;display:block}.stage{overflow:visible}.canvas{position:static;transform:none!important;box-shadow:none;height:auto}.sl[hidden]{display:block!important}.sl section{page-break-after:always}@page{size:1920px 1080px;margin:0}}
+
+</style>
+</head>
+<body>
+<div class="bar">
+  <a class="btn" href="../">← Voltar</a>
+  <span class="t hide-s">Campos Hall — Apresentação</span>
+  <select id="jump" aria-label="Ir para o slide"><optgroup label="Parte 1 — para aprovar"><option value="0">1. Governança do Campos Hall: o que aprovar hoje</option><option value="1">2. Temos diretoria eleita e um ativo que dá resultado — e sete travas</option><option value="2">3. Cinco números que mostram o custo de não mudar</option><option value="3">4. Encher Campos do Jordão o ano inteiro com os melhores congressos e eve</option><option value="4">5. Oito metas: dobrar a receita em três anos vendendo a baixa temporada</option><option value="5">6. A proposta em dez pontos</option><option value="6">7. Diretoria estratégica, executivos de mercado e times com dono</option><option value="7">8. Regras escritas e reuniões com data marcada</option><option value="8">9. Hoje e com a proposta, lado a lado</option><option value="9">10. Converter congressistas em hóspedes dos nossos hotéis</option><option value="10">11. Uma verba por diretoria e um prazo para avaliar</option><option value="11">12. O que pedimos aos sócios hoje</option><option value="12">13. O melhor centro de convenções do Brasil, medido</option></optgroup><optgroup label="Parte 2 — anexo"><option value="13">14. Anexo: a gestão vista com lupa</option><option value="14">15. Três sócios patrocinam; dois executivos respondem pelo resultado; um s</option><option value="15">16. Quem responde pelo quê</option><option value="16">17. Cada pessoa, três responsabilidades e um chefe</option><option value="17">18. Como um evento percorre a casa</option><option value="18">19. A semana, o mês e o trimestre</option><option value="19">20. Estrutura inteligente: poucas pessoas, regras claras</option><option value="20">21. Gastos e investimentos: quem aprova o quê</option><option value="21">22. Vender rápido e controlar o dinheiro</option><option value="22">23. Mesmas regras para todos, inclusive para nós</option><option value="23">24. Ferramentas, papéis e indicadores do programa</option><option value="24">25. Homologar, medir e cobrar desempenho</option><option value="25">26. Cozinha e elevadores: o Campos Hall investe</option><option value="26">27. Encher a baixa temporada com congressos que voltam</option><option value="27">28. Cada função com dono e regra escrita</option><option value="28">29. Matriz de compliance no painel, com semáforo</option><option value="29">30. Zero incidentes: o que a casa precisa ter antes de cada evento</option><option value="30">31. O que cada sócia vê todo mês, sem pedir</option><option value="31">32. O playbook vira sistema: uma tela por cargo, as regras embutidas</option><option value="32">33. Seis números que definem as primeiras prioridades</option></optgroup></select>
+  <button class="btn" id="prev" aria-label="Slide anterior">‹ Anterior</button>
+  <span class="n" id="count">1 / 33</span>
+  <button class="btn pri" id="next" aria-label="Próximo slide">Próximo ›</button>
+  <button class="btn hide-s" id="full">Tela cheia</button>
+  <a class="btn hide-s" href="../Campos-Hall-Apresentacao.pdf" download>PDF</a>
+</div>
+<div class="prog"><i id="bar"></i></div>
+<div class="stage" id="stage">
+  <button class="nav p" id="zp" aria-label="Slide anterior" tabindex="-1"></button>
+  <button class="nav x" id="zx" aria-label="Próximo slide" tabindex="-1"></button>
+  <div class="canvas" id="canvas"><div class="sl" data-i="0" hidden><section id="capa" data-transition="fade" style="background:#0F2238;color:#F7F6F2;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#8FB0F0">Reunião de sócios · Campos Hall · novembro de 2026</p>
+<div style="display:flex;flex-direction:column;gap:40px">
+<hr style="width:160px;border-top:8px solid #2457D6">
+<h1 style="font-family:'Source Serif 4', Georgia, serif;font-size:112px;font-weight:600;line-height:1.05;color:#F7F6F2;width:1560px">Governança do Campos Hall: o que aprovar hoje</h1>
+<p style="font-size:36px;line-height:1.4;color:#BFCCE0;width:1480px">Primeiro os problemas, depois as soluções, em dez pontos. O modelo é definido por cargos e regras — vale para quem quer que ocupe cada função. Detalhes no anexo, para quem quiser ver com lupa.</p>
+</div>
+<div style="display:flex;gap:64px">
+<p style="font-size:24px;color:#8FB0F0">Parte 1 · para aprovar · 10 slides</p>
+<p style="font-size:24px;color:#8FB0F0">Parte 2 · anexo com lupa</p>
+<p style="font-size:24px;color:#8FB0F0">Template de governança · para discussão</p>
+</div>
+</section>
+</div><div class="sl" data-i="1" hidden><section id="partida" data-transition="fade" style="background:#F7F6F2;color:#0F2238;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#2457D6">Para aprovar · 1 · de onde partimos</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F2238">Temos diretoria eleita e um ativo que dá resultado — e sete travas</h2>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;background:#FFFFFF;border:2px solid #1F6E4A;border-radius:16px;padding:32px 36px;display:flex;flex-direction:column;gap:14px">
+<p style="font-size:34px;font-weight:600;color:#1F6E4A">O que já temos</p>
+<ul style="font-size:26px;line-height:1.5;color:#3C4756">
+<li><b>Diretoria eleita e atuante</b>, formada por sócios que dedicam tempo ao Campos Hall além das suas empresas</li>
+<li>5.800 m² para até 5 mil pessoas, em um destino consolidado</li>
+<li>Margem EBITDA de <b>33%</b> (R$ 1,11 mi de jan a ago/2026)</li>
+<li>Congressos que voltam: SBD, ABHV, SOPATI, Quadril, L'Étape</li>
+<li>A rede hoteleira dos sócios — vantagem que ninguém copia</li>
+</ul>
+</div>
+<div style="flex:1;background:#FFFFFF;border:2px solid #B4452B;border-radius:16px;padding:32px 36px;display:flex;flex-direction:column;gap:14px">
+<p style="font-size:34px;font-weight:600;color:#B4452B">O que nos trava</p>
+<ol style="font-size:26px;line-height:1.5;color:#3C4756">
+<li>Sócios como executivos, sem tempo, microgerenciando</li>
+<li>Equipes sem líder claro nem descrição de função</li>
+<li>Pouca transparência e prestação de contas → pouca confiança</li>
+<li>Iniciativas fora da atividade-fim: festas, eventos próprios, empresas de serviços</li>
+<li>Politização: ruído, fofoca, grupos de interesse</li>
+<li>Acordo travado: pouca autonomia para investir, contratar, decidir</li>
+<li>Conflitos de interesse: sócios fornecedores e leads hoteleiros</li>
+</ol>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between">
+<p style="font-size:24px;color:#6B7686">O problema é o sistema de gestão, não as pessoas — a diretoria atual é parte da solução</p>
+<p style="font-size:24px;color:#6B7686">2</p>
+</div>
+</section>
+</div><div class="sl" data-i="2" hidden><section id="custo-problemas" data-transition="fade" style="background:#EDEFF3;color:#0F2238;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#2457D6">Para aprovar · 2 · o que as travas custam</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F2238">Cinco números que mostram o custo de não mudar</h2>
+</div>
+<div style="display:flex;gap:24px">
+<div style="flex:1;background:#FFFFFF;border:1px solid #D7DBE3;border-radius:16px;padding:28px 30px"><p style="font-family:'Source Serif 4', Georgia, serif;font-size:60px;font-weight:600;color:#B4452B;line-height:1">semanas</p><p style="font-size:25px;line-height:1.4;color:#3C4756;padding-top:12px">para assinar um contrato: toda assinatura depende de dois diretores sem dedicação diária</p></div>
+<div style="flex:1;background:#FFFFFF;border:1px solid #D7DBE3;border-radius:16px;padding:28px 30px"><p style="font-family:'Source Serif 4', Georgia, serif;font-size:60px;font-weight:600;color:#B4452B;line-height:1">29%</p><p style="font-size:25px;line-height:1.4;color:#3C4756;padding-top:12px">da carteira vencida — R$ 147,9 mil — sem rotina de cobrança</p></div>
+<div style="flex:1;background:#FFFFFF;border:1px solid #D7DBE3;border-radius:16px;padding:28px 30px"><p style="font-family:'Source Serif 4', Georgia, serif;font-size:60px;font-weight:600;color:#B4452B;line-height:1">−R$ 126 mil</p><p style="font-size:25px;line-height:1.4;color:#3C4756;padding-top:12px">nos eventos próprios de jan a ago: R$ 248 mil de custo para R$ 122 mil de receita</p></div>
+</div>
+<div style="display:flex;gap:24px">
+<div style="flex:1;background:#FFFFFF;border:1px solid #D7DBE3;border-radius:16px;padding:28px 30px"><p style="font-family:'Source Serif 4', Georgia, serif;font-size:60px;font-weight:600;color:#B4452B;line-height:1">65%</p><p style="font-size:25px;line-height:1.4;color:#3C4756;padding-top:12px">da receita em quatro meses (mai–ago); prejuízo até abril — a baixa temporada está vazia</p></div>
+<div style="flex:1;background:#FFFFFF;border:1px solid #D7DBE3;border-radius:16px;padding:28px 30px"><p style="font-family:'Source Serif 4', Georgia, serif;font-size:60px;font-weight:600;color:#B4452B;line-height:1">R$ 755 mil</p><p style="font-size:25px;line-height:1.4;color:#3C4756;padding-top:12px">contratados até ago/2027, para uma casa de ~R$ 5 mi por ano: o funil de vendas está vazio</p></div>
+<div style="flex:1;background:#0F2238;border-radius:16px;padding:28px 30px;display:flex;flex-direction:column;justify-content:center"><p style="font-size:26px;line-height:1.45;color:#F7F6F2">Nada disso é falta de mercado ou de ativo. <b>É falta de estrutura, autonomia e regra.</b></p></div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between">
+<p style="font-size:24px;color:#6B7686">Fonte: painel de governança do Campos Hall, fechamento de setembro de 2026</p>
+<p style="font-size:24px;color:#6B7686">3</p>
+</div>
+</section>
+</div><div class="sl" data-i="3" hidden><section id="proposito" data-transition="fade" style="background:#0F2238;color:#F7F6F2;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#8FB0F0">Para aprovar · 3 · para quê</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:72px;font-weight:600;line-height:1.1;color:#F7F6F2">Encher Campos do Jordão o ano inteiro com os melhores congressos e eventos do Brasil</h2>
+</div>
+<div style="display:flex;gap:24px">
+<div style="flex:1;background:#17304F;border-radius:16px;padding:24px 28px;display:flex;flex-direction:column;gap:8px"><p style="font-size:28px;font-weight:600;color:#8FB0F0">Para o organizador</p><p style="font-size:26px;line-height:1.35;color:#DCE3EE">O evento que dá certo e volta: espaço, hospedagem e operação resolvidos em um só lugar</p></div>
+<div style="flex:1;background:#17304F;border-radius:16px;padding:24px 28px;display:flex;flex-direction:column;gap:8px"><p style="font-size:28px;font-weight:600;color:#8FB0F0">Para a cidade e os hotéis</p><p style="font-size:26px;line-height:1.35;color:#DCE3EE">Demanda nos meses em que a serra está vazia: cada congresso ocupa quartos, restaurantes e comércio</p></div>
+<div style="flex:1;background:#17304F;border-radius:16px;padding:24px 28px;display:flex;flex-direction:column;gap:8px"><p style="font-size:28px;font-weight:600;color:#8FB0F0">Para os sócios</p><p style="font-size:26px;line-height:1.35;color:#DCE3EE">Um ativo que se paga, presta contas todo mês e vale mais a cada ano</p></div>
+</div>
+<div style="border-left:6px solid #2457D6;padding:6px 0 6px 28px"><p style="font-size:30px;line-height:1.35;color:#F7F6F2"><b>Ambição 2029:</b> ser reconhecido como o melhor centro de convenções do Brasil no seu porte — receita dobrada, congressos que renovam e NPS de 75 ou mais</p></div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between">
+<p style="font-size:24px;color:#8FB0F0">O propósito é o critério das decisões: traz mais e melhores eventos para a cidade fora da alta temporada, com resultado para a sociedade?</p>
+<p style="font-size:24px;color:#8FB0F0">4</p>
+</div>
+</section>
+</div><div class="sl" data-i="4" hidden><section id="metas" data-transition="fade" style="background:#F7F6F2;color:#0F2238;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:28px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#2457D6">Para aprovar · 4 · metas</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F2238">Oito metas: dobrar a receita em três anos vendendo a baixa temporada</h2>
+</div>
+<table style="width:100%;border-collapse:collapse;font-size:24px;line-height:1.3;background:#FFFFFF;border:1px solid #D7DBE3">
+<tr style="background:#0F2238;color:#F7F6F2;text-align:left"><th style="padding:10px 18px;font-weight:600;width:38%">Indicador</th><th style="padding:10px 18px;font-weight:600;width:20%">Base 2026</th><th style="padding:10px 18px;font-weight:600;width:22%">Meta 2027</th><th style="padding:10px 18px;font-weight:600;width:20%">Meta 2029</th></tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:10px 18px;font-weight:600;color:#0F2238">Receita bruta anual</td><td style="padding:10px 18px;color:#6B7686">cerca de R$ 5 mi</td><td style="padding:10px 18px;color:#0F2238">R$ 6,5 mi</td><td style="padding:10px 18px;font-weight:600;color:#1F6E4A">R$ 10 mi</td></tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:10px 18px;font-weight:600;color:#0F2238">Margem EBITDA</td><td style="padding:10px 18px;color:#6B7686">36% (jan–set)</td><td style="padding:10px 18px;color:#0F2238">33% ou mais, com a nova estrutura</td><td style="padding:10px 18px;font-weight:600;color:#1F6E4A">38% ou mais</td></tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:10px 18px;font-weight:600;color:#0F2238">Resultado líquido para os sócios</td><td style="padding:10px 18px;color:#6B7686">R$ 298 mil (jan–set)</td><td style="padding:10px 18px;color:#0F2238">R$ 0,8 mi</td><td style="padding:10px 18px;font-weight:600;color:#1F6E4A">R$ 2 mi</td></tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:10px 18px;font-weight:600;color:#0F2238">Dias de evento de setembro a abril</td><td style="padding:10px 18px;color:#6B7686">34 na grade de 2027</td><td style="padding:10px 18px;color:#0F2238">70</td><td style="padding:10px 18px;font-weight:600;color:#1F6E4A">120</td></tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:10px 18px;font-weight:600;color:#0F2238">Congressos recorrentes com contrato para o ano seguinte</td><td style="padding:10px 18px;color:#6B7686">3 de 6; nenhum para 2028</td><td style="padding:10px 18px;color:#0F2238">8 contratos de 2028</td><td style="padding:10px 18px;font-weight:600;color:#1F6E4A">12 âncoras por ano</td></tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:10px 18px;font-weight:600;color:#0F2238">Satisfação do organizador (NPS)</td><td style="padding:10px 18px;color:#6B7686">não medido</td><td style="padding:10px 18px;color:#0F2238">60, medido em todo evento</td><td style="padding:10px 18px;font-weight:600;color:#1F6E4A">75</td></tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:10px 18px;font-weight:600;color:#0F2238">Congressistas em hotéis parceiros</td><td style="padding:10px 18px;color:#6B7686">não medido</td><td style="padding:10px 18px;color:#0F2238">40%</td><td style="padding:10px 18px;font-weight:600;color:#1F6E4A">60%</td></tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:10px 18px;font-weight:600;color:#0F2238">Licenças em dia · carteira vencida</td><td style="padding:10px 18px;color:#6B7686">várias sem data · 16%</td><td style="padding:10px 18px;color:#0F2238">100% · abaixo de 10%</td><td style="padding:10px 18px;font-weight:600;color:#1F6E4A">100% · abaixo de 5%</td></tr>
+</table>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between">
+<p style="font-size:24px;color:#6B7686">Metas propostas pela gestão, a fixar no orçamento 2027 (deliberação 6) · bases: painel e Campos Hall OS, posição de 10/11/2026</p>
+<p style="font-size:24px;color:#6B7686">5</p>
+</div>
+</section>
+</div><div class="sl" data-i="5" hidden><section id="dez-pontos" data-transition="fade" style="background:#F7F6F2;color:#0F2238;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#2457D6">Para aprovar · 5 · a proposta</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F2238">A proposta em dez pontos</h2>
+</div>
+<div style="display:flex;gap:40px">
+<ol style="flex:1;font-size:27px;line-height:1.45;color:#3C4756;padding-left:44px">
+<li style="padding-bottom:14px"><b>Diretoria de sócios no nível estratégico:</b> três diretores estatutários patrocinam, aprovam e avaliam; não operam o dia a dia</li>
+<li style="padding-bottom:14px"><b>Executivos de mercado nas diretorias</b> comercial e de operações e eventos respondem pelo resultado, cada um com um diretor-patrocinador</li>
+<li style="padding-bottom:14px"><b>Verba para cada diretoria montar seu time</b>, seguindo o que já existe hoje; diretoria remunerada como prevê o acordo (14.1.1)</li>
+<li style="padding-bottom:14px"><b>Descrição de função</b> para cada diretor e funcionário; um só chefe para cada pessoa</li>
+<li style="padding-bottom:14px"><b>Mais autonomia, menos burocracia:</b> receita, contratos e descontos 100% com executivos e diretoria; gastos e investimentos até R$ 300 mil pela diretoria</li>
+</ol>
+<ol start="6" style="flex:1;font-size:27px;line-height:1.45;color:#3C4756;padding-left:44px">
+<li style="padding-bottom:14px"><b>Ritos de governança e transparência:</b> comitê executivo semanal, fechamento até o dia 15, painel, reunião mensal de sócios, Conselho Fiscal</li>
+<li style="padding-bottom:14px"><b>Regras para tudo que não é atividade-fim:</b> sócio que faz evento assume o risco e contrata; filantrópico só sem renúncia de receita</li>
+<li style="padding-bottom:14px"><b>Hotéis dos sócios e partes relacionadas:</b> programa agressivo de hospedagem com regras iguais; sócio fornecedor a preço de mercado, com abstenção</li>
+<li style="padding-bottom:14px"><b>Regras para fornecedores e catering:</b> homologação, metas de serviço, avaliação, penalidades</li>
+<li style="padding-bottom:14px"><b>Deliberações em reunião, com ata e quórum;</b> avaliação do modelo pelos sócios em 180 dias</li>
+</ol>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between">
+<p style="font-size:24px;color:#6B7686">Tudo dentro do acordo de sócios; nada exige alterá-lo nem terceirizar a gestão</p>
+<p style="font-size:24px;color:#6B7686">6</p>
+</div>
+</section>
+</div><div class="sl" data-i="6" hidden><section id="pessoas" data-transition="fade" style="background:#EDEFF3;color:#0F2238;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:22px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#2457D6">Para aprovar · 6 · quem (pontos 1 a 4)</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F2238">Diretoria estratégica, executivos de mercado e times com dono</h2>
+</div>
+<div style="display:flex;flex-direction:column;align-items:center;width:1664px">
+<div style="display:flex;gap:24px">
+<div style="width:452px;background:#FFFFFF;border:1px solid #D7DBE3;border-radius:12px;padding:14px 24px;text-align:center"><p style="font-size:26px;font-weight:600">Diretor Presidente</p><p style="font-size:24px;color:#6B7686">Preside ritos e assembleias · patrocina o comercial · decide impasses</p></div>
+<div style="width:512px;background:#0F2238;color:#F7F6F2;border-radius:12px;padding:14px 24px;text-align:center"><p style="font-size:26px;font-weight:600">Sócios + Conselho Fiscal</p><p style="font-size:24px;color:#BFCCE0">Decidem estratégia e orçamento · elegem três diretores · fiscalizam todo mês</p></div>
+<div style="width:452px;background:#FFFFFF;border:1px solid #D7DBE3;border-radius:12px;padding:14px 24px;text-align:center"><p style="font-size:26px;font-weight:600">Diretor Vice-Presidente</p><p style="font-size:24px;color:#6B7686">Substitui o Presidente · patrocina operações e patrimônio</p></div>
+</div>
+<div style="width:3px;height:22px;background:#2457D6"></div>
+<div style="display:flex;gap:24px">
+<div style="width:496px;background:#FFFFFF;border:2px solid #1F6E4A;border-radius:12px;padding:16px 22px;display:flex;flex-direction:column;gap:6px"><p style="font-size:24px;font-weight:600;color:#1F6E4A;text-transform:uppercase;letter-spacing:2px">Comercial · executivo de mercado</p><p style="font-size:26px;font-weight:600">Diretor Comercial</p><p style="font-size:24px;line-height:1.35"><b>Executivo de contas</b> · agência de marketing</p></div>
+<div style="width:496px;background:#FFFFFF;border:2px solid #1F6E4A;border-radius:12px;padding:16px 22px;display:flex;flex-direction:column;gap:6px"><p style="font-size:24px;font-weight:600;color:#1F6E4A;text-transform:uppercase;letter-spacing:2px">Operações e eventos · executivo de mercado</p><p style="font-size:26px;font-weight:600">Gerente de operações e eventos</p><p style="font-size:24px;line-height:1.35"><b>Coordenador de eventos</b> e <b>supervisor operacional</b> (novos) · equipe de manutenção</p></div>
+<div style="width:496px;background:#FFFFFF;border:1px solid #D7DBE3;border-radius:12px;padding:16px 22px;display:flex;flex-direction:column;gap:6px"><p style="font-size:24px;font-weight:600;color:#2457D6;text-transform:uppercase;letter-spacing:2px">Financeiro · sócio</p><p style="font-size:26px;font-weight:600">Diretor Adm.-Financeiro</p><p style="font-size:24px;line-height:1.35">Caixa, aprovações, fechamento dia 15 · assistente administrativo · jurídico e contabilidade externos</p></div>
+</div>
+</div>
+<ul style="font-size:24px;line-height:1.35;color:#3C4756;width:1620px">
+<li><b>Execução com os executivos:</b> cada um responde pelo resultado da sua área e tem um único diretor-patrocinador; o comitê executivo semanal, presidido pelo Diretor Presidente, decide o que cruza áreas</li>
+<li><b>Verba por diretoria:</b> cada executivo contrata, avalia e lidera o seu time dentro da verba aprovada no orçamento — sem passar pela assembleia</li>
+<li><b>Descrição de função escrita</b> para cada diretor e funcionário; ninguém recebe ordens de sócios, só do seu chefe</li>
+<li><b>Executivos de mercado</b> com experiência comprovada em eventos ou hotelaria, contratados pelo Campos Hall dentro da verba, com dedicação mínima em contrato</li>
+</ul>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between">
+<p style="font-size:24px;color:#6B7686">A diretoria eleita continua no nível estratégico; a proposta coloca executivos de mercado nas diretorias operacionais, cada um com um patrocinador</p>
+<p style="font-size:24px;color:#6B7686">7</p>
+</div>
+</section>
+</div><div class="sl" data-i="7" hidden><section id="regras-ritos" data-transition="fade" style="background:#F7F6F2;color:#0F2238;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#2457D6">Para aprovar · 7 · como (pontos 5 a 10)</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F2238">Regras escritas e reuniões com data marcada</h2>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1.15;background:#FFFFFF;border:1px solid #E1E4EA;border-radius:16px;padding:28px 34px;display:flex;flex-direction:column;gap:12px">
+<p style="font-size:32px;font-weight:600;color:#0F2238">Regras</p>
+<ul style="font-size:25px;line-height:1.45;color:#3C4756">
+<li><b>Receita, contratos, preços e descontos:</b> 100% com os executivos e a diretoria, sem limite de valor e sem passar pelos sócios</li>
+<li><b>Gastos e investimentos:</b> a diretoria decide até <b>R$ 300 mil</b> dentro do orçamento; acima, ou fora do orçamento, os sócios</li>
+<li><b>Fora da atividade-fim:</b> sócio que quer fazer evento assume o risco e contrata o Campos Hall como cliente; filantrópico só sem renúncia de receita; evento próprio só com orçamento aprovado e produtor assumindo o risco; novo negócio só com 75% dos sócios</li>
+<li><b>Partes relacionadas:</b> preço de mercado, contrato escrito, aprovação com abstenção, Conselho Fiscal revisa</li>
+<li><b>Fornecedores e catering:</b> homologação, metas de serviço, avaliação após cada evento, penalidades; catering com cinco fornecedores homologados, sem exclusividade; o cliente escolhe</li>
+</ul>
+</div>
+<div style="flex:1;background:#FFFFFF;border:1px solid #E1E4EA;border-radius:16px;padding:28px 34px;display:flex;flex-direction:column;gap:12px">
+<p style="font-size:32px;font-weight:600;color:#0F2238">Ritos</p>
+<ul style="font-size:25px;line-height:1.45;color:#3C4756">
+<li><b>Toda semana:</b> comitê executivo de 1 h (presidido pelo Diretor Presidente: diretor financeiro, gerente de operações, diretor comercial) e painel com oito indicadores</li>
+<li><b>Todo mês:</b> fechamento até o dia 15; reunião de diretoria; reunião de sócios por vídeo com o painel (cláusula 5.2.1)</li>
+<li><b>Todo trimestre:</b> Conselho Fiscal; comitê de operações; avaliação dos gestores e da diretoria</li>
+<li><b>Deliberações só em reunião</b>, com pauta enviada antes, ata e quórum — nada decidido no corredor</li>
+<li><b>Dia 180:</b> os sócios avaliam o modelo com números: manter, ajustar ou encerrar</li>
+</ul>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between">
+<p style="font-size:24px;color:#6B7686">Mais autonomia para quem administra, mais transparência para quem fiscaliza: é assim que se recupera a confiança</p>
+<p style="font-size:24px;color:#6B7686">8</p>
+</div>
+</section>
+</div><div class="sl" data-i="8" hidden><section id="antes-depois" data-transition="fade" style="background:#EDEFF3;color:#0F2238;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#2457D6">Para aprovar · 8 · o que muda na prática</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F2238">Hoje e com a proposta, lado a lado</h2>
+</div>
+<table style="width:1664px;border-collapse:collapse;font-size:24px;line-height:1.35;color:#3C4756">
+<tr><td style="padding:9px 18px;font-weight:600;background:#0F2238;color:#F7F6F2;width:360px">Assunto</td><td style="padding:9px 18px;font-weight:600;background:#B4452B;color:#F7F6F2;width:600px">Hoje</td><td style="padding:9px 18px;font-weight:600;background:#1F6E4A;color:#F7F6F2">Com a proposta</td></tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:9px 18px;font-weight:600;color:#0F2238">Quem manda na operação</td><td style="padding:9px 18px">Vários sócios dão ordens à equipe</td><td style="padding:9px 18px">Só o executivo da área, dentro da verba; sócios decidem em assembleia e fiscalizam</td></tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:9px 18px;font-weight:600;color:#0F2238">Diretoria</td><td style="padding:9px 18px">Sócios sem tempo acumulam a execução</td><td style="padding:9px 18px">Sócios na estratégia e na fiscalização; executivos de mercado na execução, cada um com verba e time</td></tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:9px 18px;font-weight:600;color:#0F2238">Contratos e decisões</td><td style="padding:9px 18px">Semanas; quase tudo sobe aos sócios</td><td style="padding:9px 18px">Receita e contratos com os executivos; gastos e investimentos até R$ 300 mil pela diretoria</td></tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:9px 18px;font-weight:600;color:#0F2238">Transparência</td><td style="padding:9px 18px">Prestação de contas irregular</td><td style="padding:9px 18px">Fechamento dia 15, painel, reunião mensal, Conselho Fiscal</td></tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:9px 18px;font-weight:600;color:#0F2238">Eventos de sócios e iniciativas paralelas</td><td style="padding:9px 18px">Sem critério; deram prejuízo</td><td style="padding:9px 18px">Sócio assume o risco e contrata; filantrópico só sem renúncia de receita</td></tr>
+<tr><td style="padding:9px 18px;font-weight:600;color:#0F2238">Conflitos de interesse</td><td style="padding:9px 18px">Sem regra escrita</td><td style="padding:9px 18px">Mesmas regras para todos: preço de mercado, abstenção, registro</td></tr>
+</table>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between">
+<p style="font-size:24px;color:#6B7686">Para cada trava, uma regra escrita — não uma pessoa a mais mandando</p>
+<p style="font-size:24px;color:#6B7686">9</p>
+</div>
+</section>
+</div><div class="sl" data-i="9" hidden><section id="hospedagem" data-transition="fade" style="background:#EDEFF3;color:#0F2238;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#2457D6">Para aprovar · 9 · hotéis dos sócios (ponto 8)</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F2238">Converter congressistas em hóspedes dos nossos hotéis</h2>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;background:#FFFFFF;border:2px solid #1F6E4A;border-radius:16px;padding:28px 34px;display:flex;flex-direction:column;gap:12px">
+<p style="font-size:32px;font-weight:600;color:#1F6E4A">O pacote congresso + hospedagem</p>
+<ul style="font-size:25px;line-height:1.45;color:#3C4756">
+<li><b>Pré-reserva de quartos</b> nos hotéis dos sócios, por categoria — do econômico ao luxo — com tarifa de congresso abaixo do balcão</li>
+<li><b>Transfer</b> hotel ↔ Campos Hall nos dias do evento</li>
+<li><b>Early check-in e late check-out</b> garantidos</li>
+<li><b>Cashback ao produtor do evento:</b> parte das diárias geradas pelo bloqueio volta ao organizador (ou vira crédito na próxima locação)</li>
+<li><b>Desconto para o congressista</b> e, quanto mais diárias confirmadas, maior o desconto na locação do espaço</li>
+</ul>
+</div>
+<div style="flex:1;background:#FFFFFF;border:1px solid #E1E4EA;border-radius:16px;padding:28px 34px;display:flex;flex-direction:column;gap:12px">
+<p style="font-size:32px;font-weight:600;color:#0F2238">Como operacionalizar</p>
+<ol style="font-size:25px;line-height:1.45;color:#3C4756">
+<li><b>Adesão:</b> cada hotel de sócio assina o contrato-padrão do programa — quartos, tarifa, prazo de liberação, comissão, early/late. Regras iguais para todos</li>
+<li><b>Proposta casada:</b> toda proposta do Campos Hall sai com o bloco de hospedagem anexo, por categoria</li>
+<li><b>Reserva:</b> página do evento com código por hotel no motor de reservas, ou central de reservas para congressos grandes — o congressista escolhe</li>
+<li><b>Acompanhamento:</b> ocupação do bloco toda semana no CRM; transfer e benefícios pelo coordenador de eventos</li>
+<li><b>Fechamento:</b> comissão do programa paga pelos hotéis (hipótese: 10% das diárias) financia cashback, transfer e desconto — e vira receita do Campos Hall</li>
+</ol>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between">
+<p style="font-size:24px;color:#6B7686">Nenhum direcionamento: o cliente escolhe; relatório de diárias por hotel a cada trimestre; percentuais são hipóteses a calibrar com os hotéis</p>
+<p style="font-size:24px;color:#6B7686">10</p>
+</div>
+</section>
+</div><div class="sl" data-i="10" hidden><section id="custo-prazo" data-transition="fade" style="background:#F7F6F2;color:#0F2238;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#2457D6">Para aprovar · 10 · verba e prazo</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F2238">Uma verba por diretoria e um prazo para avaliar</h2>
+</div>
+<table style="width:1664px;border-collapse:collapse;font-size:24px;line-height:1.35;color:#3C4756">
+<tr style="background:#0F2238;color:#F7F6F2"><td style="padding:9px 18px;font-weight:600;width:340px">Verba</td><td style="padding:9px 18px;font-weight:600">O que contrata, seguindo o que já existe hoje</td><td style="padding:9px 18px;font-weight:600;width:420px">Hipótese mensal (novo)</td></tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:9px 18px;font-weight:600;color:#0F2238">Operações e eventos</td><td style="padding:9px 18px">Gerente de operações (dedicação em contrato), coordenador de eventos, supervisor operacional; manutenção já existe</td><td style="padding:9px 18px">R$ 24 mil</td></tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:9px 18px;font-weight:600;color:#0F2238">Comercial e marketing</td><td style="padding:9px 18px">Diretor comercial, executivo de contas, agência de marketing, CRM — reorganizando a linha atual de assessoria (R$ 43,7 mil/mês)</td><td style="padding:9px 18px">R$ 10 mil além da linha atual</td></tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:9px 18px;font-weight:600;color:#0F2238">Financeiro e administrativo</td><td style="padding:9px 18px">Assistente administrativo já existe; jurídico externo, seguros, nutricionista, treinamentos</td><td style="padding:9px 18px">R$ 8 a 13 mil</td></tr>
+<tr><td style="padding:9px 18px;font-weight:600;color:#0F2238">Diretoria</td><td style="padding:9px 18px">Remuneração conforme o acordo de sócios: 4% a 6% do faturamento (cláusula 14.1.1), a fixar pelos sócios</td><td style="padding:9px 18px">R$ 17 a 25 mil na receita atual</td></tr>
+</table>
+<div style="display:flex;gap:32px">
+<div style="flex:1;background:#FFFFFF;border:1px solid #E1E4EA;border-radius:16px;padding:22px 30px"><p style="font-size:25px;line-height:1.45;color:#3C4756"><b>Todas as contratações são do Campos Hall.</b> Cada diretor contrata dentro da sua verba, aprovada no orçamento; novo custo recorrente da ordem de <b>R$ 60 a 70 mil/mês</b> (hipótese), em parte compensado pela reorganização da assessoria atual e pelo fim dos prejuízos em eventos próprios</p></div>
+<div style="flex:1;background:#FFFFFF;border:1px solid #E1E4EA;border-radius:16px;padding:22px 30px"><p style="font-size:25px;line-height:1.45;color:#3C4756"><b>180 dias:</b> dias 0–30 posse, regimento, procurações, Conselho Fiscal · dias 30–90 contratações, CRM, homologações, programa de hospedagem · dias 90–180 painel mensal, calendário de 36 meses, licenças em dia, plano 2027 · <b>dia 180: os sócios avaliam</b> — manter, ajustar ou encerrar</p></div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between">
+<p style="font-size:24px;color:#6B7686">Diretoria: 4–6% sobre a receita média de R$ 418,6 mil/mês (jan–ago 2026); demais valores são hipóteses a validar no orçamento 2027</p>
+<p style="font-size:24px;color:#6B7686">11</p>
+</div>
+</section>
+</div><div class="sl" data-i="11" hidden><section id="aprovar" data-transition="fade" style="background:#0F2238;color:#F7F6F2;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#8FB0F0">Para aprovar · 11 · deliberação</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#F7F6F2">O que pedimos aos sócios hoje</h2>
+</div>
+<table style="width:1664px;border-collapse:collapse;font-size:24px;line-height:1.35;color:#DCE3EE">
+<tr style="border-bottom:1px solid #2B4A74"><td style="padding:9px 16px;font-weight:600;color:#8FB0F0;width:56px">1</td><td style="padding:9px 16px"><b style="color:#F7F6F2">Regimento interno e políticas</b> — organograma, funções, ritos, alçadas; comercial, partes relacionadas, eventos fora da atividade-fim, hospedagem, fornecedores e catering, compliance</td><td style="padding:9px 16px;width:470px">7 dos 12 votos · 5.5</td></tr>
+<tr style="border-bottom:1px solid #2B4A74"><td style="padding:9px 16px;font-weight:600;color:#8FB0F0">2</td><td style="padding:9px 16px"><b style="color:#F7F6F2">Eleição da diretoria:</b> três sócios para os cargos estatutários (Presidente, Vice-Presidente e Adm.-Financeiro)</td><td style="padding:9px 16px">8 votos (2/3); quotas ligadas se abstêm · 6.3</td></tr>
+<tr style="border-bottom:1px solid #2B4A74"><td style="padding:9px 16px;font-weight:600;color:#8FB0F0">3</td><td style="padding:9px 16px"><b style="color:#F7F6F2">Remuneração da diretoria</b> conforme o acordo: 4% a 6% do faturamento</td><td style="padding:9px 16px">7 votos; interessados se abstêm · 14.1.1</td></tr>
+<tr style="border-bottom:1px solid #2B4A74"><td style="padding:9px 16px;font-weight:600;color:#8FB0F0">4</td><td style="padding:9px 16px"><b style="color:#F7F6F2">Conselho Fiscal</b> com três membros</td><td style="padding:9px 16px">7 dos 12 votos · 6.12</td></tr>
+<tr style="border-bottom:1px solid #2B4A74"><td style="padding:9px 16px;font-weight:600;color:#8FB0F0">5</td><td style="padding:9px 16px"><b style="color:#F7F6F2">Alçada da diretoria para gastos e investimentos</b> até R$ 300 mil dentro do orçamento; provisória de R$ 100 mil até o orçamento 2027</td><td style="padding:9px 16px">7 dos 12 votos · 5.5, 6.4</td></tr>
+<tr style="border-bottom:1px solid #2B4A74"><td style="padding:9px 16px;font-weight:600;color:#8FB0F0">6</td><td style="padding:9px 16px"><b style="color:#F7F6F2">Diretrizes do orçamento e do plano de negócios 2027</b>, com propósito, metas e a verba de cada diretoria</td><td style="padding:9px 16px">8 votos (2/3) · 5.6.1, 6.11</td></tr>
+<tr><td style="padding:9px 16px;font-weight:600;color:#8FB0F0">7</td><td style="padding:9px 16px"><b style="color:#F7F6F2">Investimentos em cozinha e elevadores:</b> autorização para orçar e contratar dentro do orçamento; catering com cinco fornecedores homologados usando a cozinha do Campos Hall</td><td style="padding:9px 16px">7 votos; 75% se acima de R$ 300 mil em bens (5.6.2 c)</td></tr>
+</table>
+<p style="font-size:24px;line-height:1.45;color:#BFCCE0;width:1600px"><b style="color:#F7F6F2">Não vão à votação</b> (atos de gestão dentro das verbas): contratações, procurações, homologações, jurídico, seguros, CRM, painel. Abstenção conta como contra; convocação com 8 dias e voto por e-mail (5.2.2, 5.2.3). Nada altera o acordo de sócios.</p>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between">
+<p style="font-size:24px;color:#8FB0F0">Quóruns a confirmar com o jurídico; contratações dos executivos são atos de gestão dentro das verbas, com abstenção de quem tiver interesse</p>
+<p style="font-size:24px;color:#8FB0F0">12</p>
+</div>
+</section>
+</div><div class="sl" data-i="12" hidden><section id="futuro" data-transition="fade" style="background:#0F2238;color:#F7F6F2;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#8FB0F0">Aprovando hoje · para onde vamos</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#F7F6F2">O melhor centro de convenções do Brasil, medido</h2>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1.25;background:#17304F;border-radius:16px;padding:32px 36px;display:flex;flex-direction:column;gap:14px">
+<p style="font-size:30px;font-weight:600;color:#F7F6F2">Como saberemos que chegamos lá, em 2029</p>
+<ul style="font-size:25px;line-height:1.5;color:#DCE3EE">
+<li>Receita de R$ 10 mi, com metade fora de maio a agosto</li>
+<li>Satisfação dos organizadores (NPS) ≥ 75; renovação de congressos recorrentes ≥ 80%</li>
+<li>120 dias de evento de setembro a abril; 12 congressos-âncora por ano</li>
+<li>Proposta em 48 h; contrato em 7 dias; resposta a RFP com kit técnico em 72 h</li>
+<li>Zero incidentes graves; matriz de compliance 100% vigente</li>
+<li>Selos e reconhecimento: Cadastur, acessibilidade, ISO 20121, Prêmio Caio, ABRACCEF, ICCA</li>
+</ul>
+</div>
+<div style="flex:1;background:#2457D6;border-radius:16px;padding:32px 36px;display:flex;flex-direction:column;gap:14px">
+<p style="font-size:30px;font-weight:600;color:#F7F6F2">O que ninguém copia</p>
+<ul style="font-size:25px;line-height:1.5;color:#F7F6F2">
+<li>A rede hoteleira dos sócios + um destino turístico consolidado + 5.800 m² para até 5 mil pessoas a cerca de 170 km de São Paulo</li>
+<li>O modelo transforma isso em produto: <b>congresso + hospedagem</b>, com regras iguais para todos os hotéis</li>
+<li>Benchmarks a visitar: Royal Palm Hall, Gramado, resorts de convenções; padrões AIPC</li>
+</ul>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between">
+<p style="font-size:24px;color:#8FB0F0">Metas propostas, a calibrar no orçamento 2027; benchmarks a confirmar antes de citar</p>
+<p style="font-size:24px;color:#8FB0F0">13</p>
+</div>
+</section>
+</div><div class="sl" data-i="13" hidden><section id="anexo" data-transition="fade" style="background:#0F2238;color:#F7F6F2;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#8FB0F0">Parte 2</p>
+<div style="display:flex;flex-direction:column;gap:40px">
+<hr style="width:160px;border-top:8px solid #2457D6">
+<h1 style="font-family:'Source Serif 4', Georgia, serif;font-size:104px;font-weight:600;line-height:1.05;color:#F7F6F2;width:1560px">Anexo: a gestão vista com lupa</h1>
+<p style="font-size:34px;line-height:1.45;color:#BFCCE0;width:1500px">Para quem quiser entender como a casa vai funcionar no detalhe: organograma e atribuições de cada pessoa · fluxo de um evento · ritos e regras de decisão · alçadas · políticas comercial e financeira · partes relacionadas e eventos · programa de hospedagem · fornecedores e catering · investimentos · marketing e calendário · funções de suporte · licenças e laudos · vigilância sanitária e segurança · painel de governança · Campos Hall OS · prioridades dos primeiros 180 dias.</p>
+</div>
+<p style="font-size:24px;color:#8FB0F0">Nada aqui precisa ser votado hoje; tudo decorre dos dez pontos da Parte 1</p>
+</section>
+</div><div class="sl" data-i="14" hidden><section id="organograma" data-transition="fade" style="background:#F7F6F2;color:#0F2238;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#2457D6">Anexo · Organograma proposto</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F2238">Três sócios patrocinam; dois executivos respondem pelo resultado; um só chefe</h2>
+</div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:0;width:1664px">
+<div style="display:flex;gap:24px;align-items:stretch">
+<div style="width:500px"></div>
+<div style="width:512px;background:#0F2238;color:#F7F6F2;border-radius:12px;padding:12px 24px;text-align:center"><p style="font-size:26px;font-weight:600">Sócias · assembleia</p><p style="font-size:24px;color:#BFCCE0">Estratégia, orçamento, eleição, alçadas acima de R$ 300 mil</p></div>
+<div style="width:452px;border:2px dashed #6B7686;border-radius:12px;padding:12px 24px;text-align:center;display:flex;flex-direction:column;justify-content:center"><p style="font-size:26px;font-weight:600;color:#0F2238">Conselho Fiscal</p><p style="font-size:24px;color:#6B7686">3 membros · parecer trimestral</p></div>
+</div>
+<div style="width:3px;height:16px;background:#6B7686"></div>
+<div style="display:flex;gap:24px;align-items:stretch">
+<div style="width:496px;background:#FFFFFF;border:1px solid #D7DBE3;border-radius:12px;padding:12px 24px;text-align:center;display:flex;flex-direction:column;justify-content:center"><p style="font-size:26px;font-weight:600">Diretor Presidente</p><p style="font-size:24px;color:#6B7686">Preside ritos e assembleias · patrocina o comercial</p></div>
+<div style="width:496px;background:#FFFFFF;border:1px solid #D7DBE3;border-radius:12px;padding:12px 24px;text-align:center;display:flex;flex-direction:column;justify-content:center"><p style="font-size:26px;font-weight:600">Diretor Vice-Presidente</p><p style="font-size:24px;color:#6B7686">Substitui o Presidente · patrocina operações e patrimônio</p></div>
+<div style="width:496px;background:#FFFFFF;border:1px solid #D7DBE3;border-radius:12px;padding:12px 24px;text-align:center;display:flex;flex-direction:column;justify-content:center"><p style="font-size:26px;font-weight:600">Diretor Adm.-Financeiro</p><p style="font-size:24px;color:#6B7686">Caixa, fechamento e painel · lidera o administrativo</p></div>
+</div>
+<div style="width:3px;height:16px;background:#2457D6"></div>
+<div style="display:flex;gap:24px;align-items:stretch">
+<div style="width:496px;background:#FFFFFF;border:2px solid #1F6E4A;border-radius:12px;padding:14px 20px;display:flex;flex-direction:column;gap:6px"><p style="font-size:24px;font-weight:600;color:#1F6E4A;text-transform:uppercase;letter-spacing:2px">Comercial · executivo de mercado</p><p style="font-size:26px;font-weight:600;color:#0F2238">Diretor Comercial</p><p style="font-size:24px;line-height:1.35"><b>Executivo de contas</b></p><p style="font-size:24px;line-height:1.35;color:#6B7686">Agência de marketing</p></div>
+<div style="width:496px;background:#FFFFFF;border:2px solid #1F6E4A;border-radius:12px;padding:14px 20px;display:flex;flex-direction:column;gap:6px"><p style="font-size:24px;font-weight:600;color:#1F6E4A;text-transform:uppercase;letter-spacing:2px">Operações · executivo de mercado</p><p style="font-size:26px;font-weight:600;color:#0F2238">Gerente de operações e eventos</p><p style="font-size:24px;line-height:1.35"><b>Coordenador(a) de eventos</b> · novo</p><p style="font-size:24px;line-height:1.35"><b>Supervisor(a) operacional</b> · novo</p><p style="font-size:24px;line-height:1.35"><b>Manutenção</b> · duas pessoas</p></div>
+<div style="width:496px;background:#FFFFFF;border:1px solid #D7DBE3;border-radius:12px;padding:14px 20px;display:flex;flex-direction:column;gap:6px"><p style="font-size:24px;font-weight:600;color:#2457D6;text-transform:uppercase;letter-spacing:2px">Administrativo · equipe</p><p style="font-size:26px;font-weight:600;color:#0F2238">Assistente administrativo</p><p style="font-size:24px;line-height:1.35">Contas, documentos, licenças, fornecedores</p><p style="font-size:24px;line-height:1.35;color:#6B7686">Contabilidade e jurídico externos</p></div>
+</div>
+<div style="width:3px;height:16px;background:#6B7686"></div>
+<div style="display:flex;gap:24px;align-items:stretch">
+<div style="width:1612px;border:2px dashed #6B7686;border-radius:12px;padding:12px 24px;text-align:center;display:flex;flex-direction:column;justify-content:center"><p style="font-size:24px;line-height:1.35;color:#3C4756"><b>Fornecedores homologados por evento:</b> limpeza · segurança · montagem · audiovisual · catering — com SLA e avaliação</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between">
+<p style="font-size:24px;color:#6B7686">Diretoria estatutária de três sócios (6.3): Presidente, Vice-Presidente (título a verificar) e Adm.-Financeiro; comercial e operações são executivos de mercado, cada um com um patrocinador</p>
+<p style="font-size:24px;color:#6B7686">15</p>
+</div>
+</section>
+</div><div class="sl" data-i="15" hidden><section id="atrib-diretoria" data-transition="fade" style="background:#EDEFF3;color:#0F2238;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#2457D6">Anexo · atribuições da diretoria</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F2238">Quem responde pelo quê</h2>
+</div>
+<div style="display:flex;gap:20px">
+<div style="flex:1;background:#FFFFFF;border:1px solid #E1E4EA;border-radius:16px;padding:22px 24px;display:flex;flex-direction:column;gap:8px">
+<p style="font-size:27px;font-weight:600;color:#0F2238">Diretor Presidente</p>
+<p style="font-size:24px;color:#6B7686">Sócio · 2 a 3 h por semana nos ritos</p>
+<ul style="font-size:24px;line-height:1.4;color:#3C4756">
+<li>Preside e convoca as assembleias; relação com os sócios</li>
+<li>Preside o comitê executivo semanal; decide impasses</li>
+<li>Representação institucional; plano e orçamento</li>
+<li>Patrocina e avalia o Diretor Comercial a cada trimestre</li>
+<li>Não recebe demandas operacionais nem dá ordens</li>
+</ul>
+</div>
+<div style="flex:1;background:#FFFFFF;border:1px solid #E1E4EA;border-radius:16px;padding:22px 24px;display:flex;flex-direction:column;gap:8px">
+<p style="font-size:27px;font-weight:600;color:#0F2238">Diretor Vice-Presidente</p>
+<p style="font-size:24px;color:#6B7686">Terceira cadeira (6.3) · 1 a 2 h por semana</p>
+<ul style="font-size:24px;line-height:1.4;color:#3C4756">
+<li>Substitui o Presidente nos ritos e na representação</li>
+<li>Patrocina e avalia o gerente de operações</li>
+<li>Acompanha investimentos, manutenção e licenças</li>
+<li>Preside o comitê de operações trimestral</li>
+<li>Abstém-se em contratos com empresas ligadas a ele</li>
+</ul>
+</div>
+<div style="flex:1;background:#FFFFFF;border:1px solid #E1E4EA;border-radius:16px;padding:22px 24px;display:flex;flex-direction:column;gap:8px">
+<p style="font-size:27px;font-weight:600;color:#0F2238">Diretor Adm.-Financeiro</p>
+<p style="font-size:24px;color:#6B7686">Sócio · 3 a 4 h por semana + fechamento</p>
+<ul style="font-size:24px;line-height:1.4;color:#3C4756">
+<li>Caixa, aplicações, reserva mínima</li>
+<li>Dupla aprovação acima de R$ 20 mil, com o executivo da área</li>
+<li>Fechamento até o dia 15 e painel</li>
+<li>Orçamento e controle de desvios (5.5 b)</li>
+<li>Lidera o assistente administrativo; contabilidade, bancos, Conselho Fiscal</li>
+</ul>
+</div>
+<div style="flex:1;background:#FFFFFF;border:2px solid #1F6E4A;border-radius:16px;padding:22px 24px;display:flex;flex-direction:column;gap:8px">
+<p style="font-size:27px;font-weight:600;color:#0F2238">Diretor Comercial</p>
+<p style="font-size:24px;color:#6B7686">Executivo de mercado · patrocinador: Presidente</p>
+<ul style="font-size:24px;line-height:1.4;color:#3C4756">
+<li>Meta de receita e ocupação; tabela de preços</li>
+<li>Descontos de 15% a 30% com margem mínima</li>
+<li>Assina contratos padrão por procuração (6.7.1)</li>
+<li>Parcerias: hotéis, agências, organizadores</li>
+<li>Lidera o executivo de contas e a agência de marketing</li>
+</ul>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between">
+<p style="font-size:24px;color:#6B7686">O gerente de operações e eventos está no slide da equipe; descrições completas no playbook de governança</p>
+<p style="font-size:24px;color:#6B7686">16</p>
+</div>
+</section>
+</div><div class="sl" data-i="16" hidden><section id="atrib-equipe" data-transition="fade" style="background:#F7F6F2;color:#0F2238;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#2457D6">Anexo · atribuições da equipe</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F2238">Cada pessoa, três responsabilidades e um chefe</h2>
+</div>
+<div style="display:flex;gap:20px">
+<div style="flex:1;background:#FFFFFF;border:2px solid #1F6E4A;border-radius:16px;padding:14px 20px;display:flex;flex-direction:column;gap:4px"><p style="font-size:25px;font-weight:600;line-height:1.2">Gerente de operações e eventos</p><p style="font-size:24px;color:#1F6E4A;font-weight:600">Executivo de mercado · patrocinador: Vice-Presidente</p><ul style="font-size:24px;line-height:1.3;color:#3C4756"><li>Entrega de cada evento: plano, fornecedores, manutenção</li><li>Lidera coordenador, supervisor e manutenção</li><li>Experiência comprovada em eventos ou hotelaria; dedicação mínima em contrato</li></ul></div>
+<div style="flex:1;background:#FFFFFF;border:2px solid #1F6E4A;border-radius:16px;padding:14px 20px;display:flex;flex-direction:column;gap:4px"><p style="font-size:25px;font-weight:600;line-height:1.2">Coordenador(a) de eventos · novo</p><p style="font-size:24px;color:#1F6E4A;font-weight:600">CLT · ao gerente de operações</p><ul style="font-size:24px;line-height:1.3;color:#3C4756"><li>Dono do evento do contrato ao pós-evento; contato do cliente</li><li>Briefing, planta, cronograma, fornecedores homologados</li><li>Pesquisa de satisfação e relatório de cada evento</li></ul></div>
+<div style="flex:1;background:#FFFFFF;border:2px solid #1F6E4A;border-radius:16px;padding:14px 20px;display:flex;flex-direction:column;gap:4px"><p style="font-size:25px;font-weight:600;line-height:1.2">Supervisor(a) operacional · novo</p><p style="font-size:24px;color:#1F6E4A;font-weight:600">CLT · ao gerente de operações</p><ul style="font-size:24px;line-height:1.3;color:#3C4756"><li>Presença em todos os eventos, da montagem ao fechamento</li><li>Checklist de entrega e devolução do espaço e da cozinha</li><li>Registra ocorrências; cobre as ausências do gerente</li></ul></div>
+</div>
+<div style="display:flex;gap:20px">
+<div style="flex:1;background:#FFFFFF;border:1px solid #E1E4EA;border-radius:16px;padding:14px 20px;display:flex;flex-direction:column;gap:4px"><p style="font-size:25px;font-weight:600;line-height:1.2">Executivo de contas</p><p style="font-size:24px;color:#2457D6;font-weight:600">Ao diretor comercial</p><ul style="font-size:24px;line-height:1.3;color:#3C4756"><li>Prospecção; resposta a leads em 24 h; propostas em 48 h</li><li>Descontos até 15%; tudo registrado no CRM</li><li>Acompanha até o sinal e entrega o briefing ao coordenador</li></ul></div>
+<div style="flex:1;background:#FFFFFF;border:1px solid #E1E4EA;border-radius:16px;padding:14px 20px;display:flex;flex-direction:column;gap:4px"><p style="font-size:25px;font-weight:600;line-height:1.2">Assistente administrativo</p><p style="font-size:24px;color:#2457D6;font-weight:600">Ao diretor financeiro</p><ul style="font-size:24px;line-height:1.3;color:#3C4756"><li>Contas a pagar e a receber; notas e faturamento</li><li>Cobrança semanal; documentos para a contabilidade</li><li>Cadastro de fornecedores; matriz de licenças e seguros</li></ul></div>
+<div style="flex:1;background:#FFFFFF;border:1px solid #E1E4EA;border-radius:16px;padding:14px 20px;display:flex;flex-direction:column;gap:4px"><p style="font-size:25px;font-weight:600;line-height:1.2">Equipe de manutenção</p><p style="font-size:24px;color:#2457D6;font-weight:600">Ao gerente de operações e ao supervisor</p><ul style="font-size:24px;line-height:1.3;color:#3C4756"><li>Manutenção preventiva e corretiva com checklist semanal</li><li>Apoio à montagem e desmontagem</li><li>Demandas só da coordenação — nunca de sócios</li></ul></div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between">
+<p style="font-size:24px;color:#6B7686">Limpeza, segurança e montagem pesada seguem terceirizadas por evento, com fornecedores homologados</p>
+<p style="font-size:24px;color:#6B7686">17</p>
+</div>
+</section>
+</div><div class="sl" data-i="17" hidden><section id="fluxo" data-transition="fade" style="background:#EDEFF3;color:#0F2238;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#2457D6">Anexo · Fluxo de trabalho</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F2238">Como um evento percorre a casa</h2>
+</div>
+<div style="display:flex;align-items:stretch;gap:0;width:1664px">
+<div style="width:392px;background:#FFFFFF;border:1px solid #D7DBE3;border-radius:16px;padding:22px 24px;display:flex;flex-direction:column;gap:10px">
+<p style="font-size:24px;font-weight:600;color:#2457D6;letter-spacing:2px;text-transform:uppercase">1 · Vender</p>
+<ul style="font-size:24px;line-height:1.4;color:#3C4756">
+<li>Lead chega (site, indicação, hotéis, agências) e entra no CRM</li>
+<li>Qualificação e visita</li>
+<li>Proposta em 48 h, dentro da política de preços</li>
+<li>Contrato padrão e sinal</li>
+</ul>
+<p style="font-size:24px;line-height:1.4;color:#0F2238"><b>Executivo de contas</b> · diretor comercial aprova e assina · assistente administrativo fatura o sinal</p>
+</div>
+<div style="width:32px;display:flex;align-items:center;justify-content:center"><p style="font-size:40px;color:#2457D6">›</p></div>
+<div style="width:392px;background:#FFFFFF;border:2px solid #1F6E4A;border-radius:16px;padding:22px 24px;display:flex;flex-direction:column;gap:10px">
+<p style="font-size:24px;font-weight:600;color:#1F6E4A;letter-spacing:2px;text-transform:uppercase">2 · Planejar</p>
+<ul style="font-size:24px;line-height:1.4;color:#3C4756">
+<li>Briefing recebido do comercial</li>
+<li>Planta, cronograma e roteiro do evento</li>
+<li>Fornecedores homologados acionados (catering, A/V, segurança, limpeza)</li>
+<li>Checklist pré-evento e riscos</li>
+</ul>
+<p style="font-size:24px;line-height:1.4;color:#0F2238"><b>Coordenador(a) de eventos</b> · sob o gerente de operações</p>
+</div>
+<div style="width:32px;display:flex;align-items:center;justify-content:center"><p style="font-size:40px;color:#2457D6">›</p></div>
+<div style="width:392px;background:#FFFFFF;border:1px solid #D7DBE3;border-radius:16px;padding:22px 24px;display:flex;flex-direction:column;gap:10px">
+<p style="font-size:24px;font-weight:600;color:#2457D6;letter-spacing:2px;text-transform:uppercase">3 · Executar</p>
+<ul style="font-size:24px;line-height:1.4;color:#3C4756">
+<li>Montagem e vistoria de entrega</li>
+<li>Evento: supervisor no chão, coordenador com o cliente</li>
+<li>Ocorrências registradas na hora</li>
+<li>Desmontagem e checklist de devolução</li>
+</ul>
+<p style="font-size:24px;line-height:1.4;color:#0F2238"><b>Supervisor operacional</b> · equipe de manutenção · fornecedores em SLA</p>
+</div>
+<div style="width:32px;display:flex;align-items:center;justify-content:center"><p style="font-size:40px;color:#2457D6">›</p></div>
+<div style="width:392px;background:#FFFFFF;border:1px solid #D7DBE3;border-radius:16px;padding:22px 24px;display:flex;flex-direction:column;gap:10px">
+<p style="font-size:24px;font-weight:600;color:#2457D6;letter-spacing:2px;text-transform:uppercase">4 · Fechar</p>
+<ul style="font-size:24px;line-height:1.4;color:#3C4756">
+<li>Faturamento do saldo e cobrança</li>
+<li>Pesquisa de satisfação do cliente e avaliação dos fornecedores</li>
+<li>Relatório do evento: receita, custo, margem, ocorrências</li>
+<li>Penalidades a fornecedores, se houver</li>
+</ul>
+<p style="font-size:24px;line-height:1.4;color:#0F2238"><b>Assistente administrativo</b> · coordenador de eventos · gerente de operações</p>
+</div>
+</div>
+<div style="width:1664px;background:#0F2238;border-radius:12px;padding:16px 28px;display:flex;justify-content:space-between;align-items:center">
+<p style="font-size:24px;color:#F7F6F2"><b>Todo mês:</b> fechamento até o dia 15 (diretor financeiro) → painel → reunião de diretoria → reunião de sócias</p>
+<p style="font-size:24px;color:#8FB0F0">Toda semana: comitê executivo</p>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between">
+<p style="font-size:24px;color:#6B7686">Um responsável por etapa e uma passagem de bastão registrada no CRM; o sócio não entra no fluxo</p>
+<p style="font-size:24px;color:#6B7686">18</p>
+</div>
+</section>
+</div><div class="sl" data-i="18" hidden><section id="ritos" data-transition="fade" style="background:#F7F6F2;color:#0F2238;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#2457D6">Anexo · Gestão por ritos e comitês</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F2238">A semana, o mês e o trimestre</h2>
+</div>
+<div style="display:flex;gap:24px;align-items:stretch">
+<div style="flex:1;background:#FFFFFF;border:2px solid #2457D6;border-radius:16px;padding:20px 24px;display:flex;flex-direction:column;gap:10px">
+<p style="font-size:30px;font-weight:600;color:#2457D6">Toda semana</p>
+<p style="font-size:24px;line-height:1.28;color:#3C4756"><b>Comitê executivo · 1 h</b><br>Presidente (preside), dir. financeiro, ger. operações, dir. comercial<br><span style="color:#6B7686">Caixa, pipeline, eventos da semana, pendências, exceções de alçada</span></p>
+<p style="font-size:24px;line-height:1.28;color:#3C4756"><b>Reunião de operações e eventos · 45 min</b><br>ger. operações, coord. eventos, supervisor, exec. de contas<br><span style="color:#6B7686">Plano de cada evento, fornecedores, manutenção</span></p>
+<p style="font-size:24px;line-height:1.28;color:#3C4756"><b>Painel semanal</b> na sexta, aos quatro</p>
+</div>
+<div style="flex:1;background:#FFFFFF;border:1px solid #E1E4EA;border-radius:16px;padding:20px 24px;display:flex;flex-direction:column;gap:10px">
+<p style="font-size:30px;font-weight:600;color:#0F2238">Todo mês</p>
+<p style="font-size:24px;line-height:1.28;color:#3C4756"><b>Fechamento e comitê financeiro · até o dia 15</b><br>dir. financeiro, assistente adm., contabilidade, Presidente<br><span style="color:#6B7686">DRE, caixa, carteira, painel</span></p>
+<p style="font-size:24px;line-height:1.28;color:#3C4756"><b>Comitê comercial</b><br>dir. comercial, exec. de contas, agência, Presidente<br><span style="color:#6B7686">Pipeline, preços, parcerias hoteleiras</span></p>
+<p style="font-size:24px;line-height:1.28;color:#3C4756"><b>Reunião de diretoria</b> · os três diretores estatutários<br><span style="color:#6B7686">Decisões de alçada, ata</span></p>
+<p style="font-size:24px;line-height:1.28;color:#3C4756"><b>Reunião de sócias (5.2.1)</b> · por vídeo<br><span style="color:#6B7686">Painel e deliberações</span></p>
+</div>
+<div style="flex:1;background:#FFFFFF;border:1px solid #E1E4EA;border-radius:16px;padding:20px 24px;display:flex;flex-direction:column;gap:10px">
+<p style="font-size:30px;font-weight:600;color:#0F2238">Todo trimestre</p>
+<p style="font-size:24px;line-height:1.28;color:#3C4756"><b>Comitê de operações</b><br>ger. operações, coordenador, supervisor, Vice-Presidente<br><span style="color:#6B7686">Padrões, manutenção, temporada</span></p>
+<p style="font-size:24px;line-height:1.28;color:#3C4756"><b>Comitê de fornecedores e catering</b><br>ger. operações, coordenador, assistente adm., nutricionista<br><span style="color:#6B7686">Homologações, avaliações, penalidades</span></p>
+<p style="font-size:24px;line-height:1.28;color:#3C4756"><b>Conselho Fiscal</b> · parecer sobre contas e partes relacionadas</p>
+<p style="font-size:24px;line-height:1.28;color:#3C4756"><b>Avaliação pelas sócias</b> da diretoria e gestores; dia 180: manter, ajustar ou encerrar</p>
+</div>
+</div>
+<div style="width:1664px;background:#0F2238;border-radius:12px;padding:12px 28px"><p style="font-size:24px;line-height:1.3;color:#F7F6F2"><b>Tempo da diretoria:</b> comitê executivo semanal + reuniões mensais + painel ≈ <b>2 a 4 horas por semana por diretor</b>, nos ritos — o resto roda com os executivos</p></div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between">
+<p style="font-size:24px;color:#6B7686">Todo rito tem pauta fixa, ata e lista de decisões; o que não está em pauta não é decidido no corredor</p>
+<p style="font-size:24px;color:#6B7686">19</p>
+</div>
+</section>
+</div><div class="sl" data-i="19" hidden><section id="decisao" data-transition="fade" style="background:#EDEFF3;color:#0F2238;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#2457D6">Anexo · Como se decide com pouco tempo dos sócios</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F2238">Estrutura inteligente: poucas pessoas, regras claras</h2>
+</div>
+<ul style="font-size:28px;line-height:1.5;color:#3C4756;width:1560px">
+<li><b>Dois executivos de mercado respondem pelo resultado</b> — diretor comercial e gerente de operações e eventos — cada um com um único diretor-patrocinador; o financeiro fica com um sócio</li>
+<li>Cada um decide sozinho dentro da sua verba, da sua alçada e das políticas; a diretoria só entra nas exceções</li>
+<li>O que cruza áreas ou passa da alçada entra na pauta do <b>comitê executivo</b> semanal, presidido pelo Diretor Presidente, com uma página de contexto na véspera; impasse: o Presidente decide; ata em 48 h</li>
+<li>Urgência: Presidente e executivos decidem em até 24 h pelo canal formal e registram no comitê seguinte</li>
+<li><b>Ninguém pula degrau:</b> sócios falam com a diretoria; a diretoria com os executivos nos ritos; os executivos com as suas equipes</li>
+<li><b>Painel com oito indicadores</b> toda semana: receita e EBITDA vs. orçamento, ocupação e eventos contratados, prazo de proposta e de contrato, carteira vencida, satisfação de clientes e fornecedores, custo da estrutura</li>
+</ul>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between">
+<p style="font-size:24px;color:#6B7686">A casa funciona sem a presença diária de ninguém da sociedade; a presença necessária é a dos ritos</p>
+<p style="font-size:24px;color:#6B7686">20</p>
+</div>
+</section>
+</div><div class="sl" data-i="20" hidden><section id="alcadas" data-transition="fade" style="background:#F7F6F2;color:#0F2238;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#2457D6">Anexo · Alçadas de decisão</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F2238">Gastos e investimentos: quem aprova o quê</h2>
+</div>
+<table style="width:1664px;border-collapse:collapse;font-size:26px;line-height:1.4;color:#3C4756">
+<tr style="background:#0F2238;color:#F7F6F2">
+<td style="padding:12px 20px;font-weight:600;width:360px">Gasto ou investimento (dentro do orçamento)</td>
+<td style="padding:12px 20px;font-weight:600">Quem aprova</td>
+<td style="padding:12px 20px;font-weight:600;width:640px">Base</td>
+</tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:12px 20px">Até R$ 50 mil</td><td style="padding:12px 20px">Executivo da área, dentro da verba</td><td style="padding:12px 20px">Regimento interno</td></tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:12px 20px">R$ 50 mil a R$ 150 mil</td><td style="padding:12px 20px">Diretor Presidente + diretor financeiro</td><td style="padding:12px 20px">Regimento; assinatura de dois diretores (6.6)</td></tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:12px 20px">R$ 150 mil a R$ 300 mil</td><td style="padding:12px 20px">Diretoria em conjunto, maioria</td><td style="padding:12px 20px">Reunião com 48 h de convocação (6.10)</td></tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:12px 20px;font-weight:600;color:#B4452B">Acima de R$ 300 mil</td><td style="padding:12px 20px">Sócias</td><td style="padding:12px 20px">Bens móveis &gt; R$ 300 mil em 12 meses: 75% (5.6.2 c)</td></tr>
+<tr><td style="padding:12px 20px;font-weight:600;color:#B4452B">Fora do orçamento</td><td style="padding:12px 20px">Sócias, qualquer valor</td><td style="padding:12px 20px">Desvio &gt; 30% no item: maioria (5.5 b); novo negócio: 75% (5.6.2 a)</td></tr>
+</table>
+<ul style="font-size:26px;line-height:1.5;color:#3C4756;width:1560px">
+<li><b>Receita não tem alçada:</b> contratos com clientes, preços e descontos são dos executivos e da diretoria, conforme a política comercial</li>
+<li>Sem fracionar compras para caber na alçada; partes relacionadas sempre pelos sócios, com abstenção dos ligados</li>
+<li><b>Alçada provisória de R$ 100 mil</b> para a diretoria até a aprovação do orçamento de 2027</li>
+</ul>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between">
+<p style="font-size:24px;color:#6B7686">Valores por operação; a diretoria decide gastos e investimentos até R$ 300 mil, conforme premissa dos sócios</p>
+<p style="font-size:24px;color:#6B7686">21</p>
+</div>
+</section>
+</div><div class="sl" data-i="21" hidden><section id="politicas" data-transition="fade" style="background:#EDEFF3;color:#0F2238;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#2457D6">Anexo · políticas comercial e financeira</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F2238">Vender rápido e controlar o dinheiro</h2>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;background:#FFFFFF;border:1px solid #E1E4EA;border-radius:16px;padding:32px 36px;display:flex;flex-direction:column;gap:14px">
+<p style="font-size:34px;font-weight:600;color:#0F2238">Comercial</p>
+<ul style="font-size:25px;line-height:1.5;color:#3C4756">
+<li>Política aprovada pela diretoria: tabela de preços, condições de pagamento e <b>margem mínima por evento</b></li>
+<li>Descontos: até 15% pelo executivo de contas; de 15% a 30% com o diretor comercial; acima de 30% só a diretoria</li>
+<li>Procuração ao diretor comercial (6.7.1) para contratos padrão; fora do padrão (cessão gratuita, permuta, exclusividade), dois diretores</li>
+<li>CRM obrigatório; briefing entregue ao coordenador de eventos; relatório semanal</li>
+<li>Meta: proposta em 48 h, contrato em até uma semana; sinal não reembolsável e saldo antes do evento</li>
+</ul>
+</div>
+<div style="flex:1;background:#FFFFFF;border:1px solid #E1E4EA;border-radius:16px;padding:32px 36px;display:flex;flex-direction:column;gap:14px">
+<p style="font-size:34px;font-weight:600;color:#0F2238">Financeiro</p>
+<ul style="font-size:25px;line-height:1.5;color:#3C4756">
+<li>Diretor financeiro na tesouraria e supervisão; assistente administrativo no administrativo-financeiro</li>
+<li><b>Dupla aprovação</b> para pagamentos acima de R$ 20 mil</li>
+<li>Fechamento até o <b>dia 15</b>: DRE, caixa, carteira e vencidos no painel</li>
+<li>Rotina semanal de cobrança (hoje R$ 147,9 mil vencidos)</li>
+<li>Orçamento anual por item; desvio acima de 30% volta aos sócios (5.5 b); estacionamento e patrocínio dentro da DRE; ISS da cessão de espaço em parecer</li>
+</ul>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between">
+<p style="font-size:24px;color:#6B7686">Caixa de R$ 1,29 mi em 30/09, 90% aplicado: política de reserva mínima definida pela diretoria</p>
+<p style="font-size:24px;color:#6B7686">22</p>
+</div>
+</section>
+</div><div class="sl" data-i="22" hidden><section id="relacionadas" data-transition="fade" style="background:#F7F6F2;color:#0F2238;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#2457D6">Anexo · partes relacionadas e eventos fora da atividade-fim</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F2238">Mesmas regras para todos, inclusive para nós</h2>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;background:#FFFFFF;border:1px solid #E1E4EA;border-radius:16px;padding:32px 36px;display:flex;flex-direction:column;gap:14px">
+<p style="font-size:34px;font-weight:600;color:#0F2238">Sócios fornecedores e hotéis de sócios</p>
+<ul style="font-size:25px;line-height:1.5;color:#3C4756">
+<li>Serviço de sócio ou empresa ligada: homologação, preço de mercado, contrato escrito, aprovação dos sócios com abstenção do interessado</li>
+<li><b>Declaração anual de interesses</b> de cada sócio e diretor; quem tem interesse não negocia nem decide</li>
+<li><b>Hospedagem:</b> os hotéis dos sócios entram no programa de hospedagem por adesão, com condições e comissão iguais; o cliente escolhe; relatório de diárias por hotel</li>
+<li>Clientes, agenda e CRM são do Campos Hall; acesso só para a equipe</li>
+<li>Conselho Fiscal revisa as transações com partes relacionadas a cada trimestre</li>
+</ul>
+</div>
+<div style="flex:1;background:#FFFFFF;border:1px solid #E1E4EA;border-radius:16px;padding:32px 36px;display:flex;flex-direction:column;gap:14px">
+<p style="font-size:34px;font-weight:600;color:#0F2238">Eventos de sócios, filantrópicos e próprios</p>
+<ul style="font-size:25px;line-height:1.5;color:#3C4756">
+<li><b>Evento de sócio:</b> o sócio é o produtor — assume o risco e contrata o Campos Hall como cliente: tabela cheia, contrato padrão, pagamento antecipado; o envolvido se abstém</li>
+<li><b>Filantrópico ou institucional:</b> só sem renúncia de receita — locação e custos pagos pela entidade, por patrocinador ou pelo sócio proponente; nunca cessão gratuita; aprovação da diretoria; não concorre com datas comerciais</li>
+<li><b>Evento próprio do Campos Hall:</b> só com orçamento aprovado pelos sócios, produtor parceiro assumindo o risco e patrocínio vendido antes — jan–ago deram −R$ 126 mil</li>
+<li><b>Novo negócio ou empresa de serviços:</b> só com 75% dos sócios (5.6.2 a)</li>
+</ul>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between">
+<p style="font-size:24px;color:#6B7686">A regra de hospedagem transforma a rede hoteleira dos sócios em produto: congresso + hospedagem, igual para todos os hotéis</p>
+<p style="font-size:24px;color:#6B7686">23</p>
+</div>
+</section>
+</div><div class="sl" data-i="23" hidden><section id="hospedagem-anexo" data-transition="fade" style="background:#F7F6F2;color:#0F2238;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#2457D6">Anexo · programa de hospedagem</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F2238">Ferramentas, papéis e indicadores do programa</h2>
+</div>
+<div style="display:flex;gap:24px">
+<div style="flex:1;background:#FFFFFF;border:1px solid #E1E4EA;border-radius:16px;padding:24px 28px;display:flex;flex-direction:column;gap:8px">
+<p style="font-size:28px;font-weight:600;color:#0F2238">Ferramentas</p>
+<ul style="font-size:24px;line-height:1.4;color:#3C4756">
+<li>Contrato-padrão de bloqueio: quartos por categoria, tarifa de congresso, data de liberação, no-show, comissão, early/late</li>
+<li>Tabela de tarifas por categoria, revista por temporada</li>
+<li>Página do evento com links e códigos de reserva por hotel (motor de reservas dos hotéis); central de reservas terceirizada nos congressos grandes</li>
+<li>CRM com "diárias geradas" por evento e planilha de ocupação semanal</li>
+<li>Transfer contratado por evento; kit de boas-vindas</li>
+</ul>
+</div>
+<div style="flex:1;background:#FFFFFF;border:1px solid #E1E4EA;border-radius:16px;padding:24px 28px;display:flex;flex-direction:column;gap:8px">
+<p style="font-size:28px;font-weight:600;color:#0F2238">Papéis</p>
+<ul style="font-size:24px;line-height:1.4;color:#3C4756">
+<li><b>Diretor comercial:</b> negocia o bloco com o organizador e os hotéis</li>
+<li><b>Executivo de contas:</b> inclui o bloco em toda proposta</li>
+<li><b>Coordenador de eventos:</b> transfer, early/late, acompanhamento da ocupação</li>
+<li><b>Assistente administrativo:</b> apuração da comissão, cashback e faturamento</li>
+<li><b>Hotéis aderentes:</b> inventário, tarifa e atendimento ao padrão do programa</li>
+<li><b>Conselho Fiscal:</b> relatório trimestral de diárias por hotel</li>
+</ul>
+</div>
+<div style="flex:1;background:#FFFFFF;border:1px solid #E1E4EA;border-radius:16px;padding:24px 28px;display:flex;flex-direction:column;gap:8px">
+<p style="font-size:28px;font-weight:600;color:#0F2238">Regras e indicadores</p>
+<ul style="font-size:24px;line-height:1.4;color:#3C4756">
+<li>Participação por adesão; bloco distribuído por categoria e disponibilidade, nunca por sócio</li>
+<li>O cliente e o congressista escolhem; nenhum direcionamento pelo comercial</li>
+<li>Comissão e benefícios iguais para todos os hotéis</li>
+<li>Indicadores: diárias geradas por evento; % de congressistas em hotéis de sócios; ocupação do bloco; receita de comissão; satisfação com a hospedagem</li>
+<li>Riscos tratados: liberação do bloco 30 dias antes; bloqueio antecipado na alta temporada</li>
+</ul>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between">
+<p style="font-size:24px;color:#6B7686">Meta sugerida: medir a linha de base em 2027 e dobrar as diárias geradas em 24 meses; percentuais e prazos a calibrar com os hotéis</p>
+<p style="font-size:24px;color:#6B7686">24</p>
+</div>
+</section>
+</div><div class="sl" data-i="24" hidden><section id="fornecedores-catering" data-transition="fade" style="background:#F7F6F2;color:#0F2238;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#2457D6">Anexo · fornecedores e catering</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F2238">Homologar, medir e cobrar desempenho</h2>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;background:#FFFFFF;border:1px solid #E1E4EA;border-radius:16px;padding:32px 36px;display:flex;flex-direction:column;gap:14px">
+<p style="font-size:34px;font-weight:600;color:#0F2238">Fornecedores</p>
+<ul style="font-size:25px;line-height:1.5;color:#3C4756">
+<li><b>Homologação obrigatória:</b> documentação, regularidade fiscal, seguro, referências, visita técnica</li>
+<li><b>Metas de serviço (SLA)</b> em contrato por categoria</li>
+<li><b>Avaliação após cada evento</b> pela operação e pelo cliente; nota mínima 70</li>
+<li>Penalidades: 1ª falha notificação; 2ª multa de 10% do contrato do evento; 3ª suspensão; falhas graves, suspensão imediata</li>
+<li>Dois homologados por categoria crítica; ligados a sócios ou gestores: mesmas regras, decisão sem o interessado</li>
+</ul>
+</div>
+<div style="flex:1;background:#FFFFFF;border:1px solid #E1E4EA;border-radius:16px;padding:32px 36px;display:flex;flex-direction:column;gap:14px">
+<p style="font-size:34px;font-weight:600;color:#0F2238">Catering</p>
+<ul style="font-size:25px;line-height:1.5;color:#3C4756">
+<li><b>Homologação sanitária</b> além da comercial: alvará, vigilância sanitária, responsável técnico, boas práticas</li>
+<li>Cozinha: infraestrutura e equipamentos são investimento do Campos Hall, usados por todos os homologados</li>
+<li><b>Cinco fornecedores homologados</b>, sem exclusividade — o cliente escolhe; vaga reaberta quando um sai</li>
+<li><b>Nutricionista</b> fiscaliza: nota de 0 a 10 por evento; checklist de entrada e devolução; rastreabilidade dos insumos</li>
+<li>Fornecedor ligado a sócio ou gestor: mesmas regras e taxa, aprovação com abstenção; Conselho Fiscal revisa</li>
+</ul>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between">
+<p style="font-size:24px;color:#6B7686">Custos com eventos de R$ 703 mil em jan–ago: a política de fornecedores é também uma política de custo</p>
+<p style="font-size:24px;color:#6B7686">25</p>
+</div>
+</section>
+</div><div class="sl" data-i="25" hidden><section id="investimentos" data-transition="fade" style="background:#EDEFF3;color:#0F2238;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:28px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#2457D6">Anexo · investimentos combinados</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F2238">Cozinha e elevadores: o Campos Hall investe</h2>
+</div>
+<div style="display:flex;gap:28px">
+<div style="flex:1;background:#FFFFFF;border:2px solid #1F6E4A;border-radius:16px;padding:20px 24px;display:flex;flex-direction:column;gap:8px">
+<p style="font-size:27px;font-weight:600;color:#1F6E4A">Cozinha</p>
+<ul style="font-size:24px;line-height:1.3;color:#3C4756">
+<li>Infraestrutura e equipamentos são do Campos Hall, usados pelos <b>cinco fornecedores homologados</b> — nenhum depende de equipamento próprio</li>
+<li>Projeto com o nutricionista responsável técnico: atende à licença sanitária (RDC 216) e ao checklist de entrega e devolução</li>
+<li>Manutenção, seguro e inventário do Campos Hall; taxa de uso da cozinha embutida na taxa de catering</li>
+<li>Valor a orçar com dois ou três fornecedores de equipamentos</li>
+</ul>
+</div>
+<div style="flex:1;background:#FFFFFF;border:2px solid #1F6E4A;border-radius:16px;padding:20px 24px;display:flex;flex-direction:column;gap:8px">
+<p style="font-size:27px;font-weight:600;color:#1F6E4A">Elevadores</p>
+<ul style="font-size:24px;line-height:1.3;color:#3C4756">
+<li>Modernização ou instalação com laudo técnico, ART e contrato de manutenção mensal</li>
+<li>Resolve acessibilidade (NBR 9050) e carga de montagem; entra na matriz de licenças e laudos</li>
+<li>Prazo de obra na baixa temporada (set–abr), para não parar eventos</li>
+<li>Valor a orçar; garantia e assistência técnica em contrato</li>
+</ul>
+</div>
+<div style="flex:1;background:#FFFFFF;border:1px solid #E1E4EA;border-radius:16px;padding:20px 24px;display:flex;flex-direction:column;gap:8px">
+<p style="font-size:27px;font-weight:600;color:#0F2238">Como aprovar e acompanhar</p>
+<ul style="font-size:24px;line-height:1.3;color:#3C4756">
+<li>Orçamentos em até 30 dias; decisão no orçamento 2027 com valor fechado</li>
+<li>Dentro da alçada se couber no orçamento; acima de R$ 300 mil em bens em 12 meses, 75% dos sócios (5.6.2 c)</li>
+<li>Gerente de operações conduz; diretor financeiro aprova pagamentos; Conselho Fiscal acompanha</li>
+<li>Entrega medida: cozinha licenciada e em uso pelos homologados; elevadores com laudo e manutenção ativa</li>
+</ul>
+</div>
+</div>
+<div style="background:#0F2238;border-radius:12px;padding:14px 26px"><p style="font-size:24px;line-height:1.4;color:#F7F6F2"><b>Regra:</b> investimentos são do Campos Hall e servem a todos os fornecedores e clientes — nenhum ativo da casa pertence a sócio ou a fornecedor</p></div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between">
+<p style="font-size:24px;color:#6B7686">Item 7 da deliberação; valores a orçar antes da convocação</p>
+<p style="font-size:24px;color:#6B7686">26</p>
+</div>
+</section>
+</div><div class="sl" data-i="26" hidden><section id="marketing" data-transition="fade" style="background:#F7F6F2;color:#0F2238;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#2457D6">Anexo · Conteúdo, calendário e marketing</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F2238">Encher a baixa temporada com congressos que voltam</h2>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;background:#FFFFFF;border:1px solid #E1E4EA;border-radius:16px;padding:32px 36px;display:flex;flex-direction:column;gap:14px">
+<p style="font-size:34px;font-weight:600;color:#0F2238">Conteúdo e calendário</p>
+<ul style="font-size:25px;line-height:1.5;color:#3C4756">
+<li><b>Calendário-âncora de 36 meses:</b> congressos recorrentes com data reservada e preferência para a edição seguinte</li>
+<li><b>Baixa temporada (set–abr):</b> congressos médicos e científicos, convenções corporativas, esportivos, feiras; fins de semana para sociais</li>
+<li><b>Kit técnico</b> para responder a RFPs em 72 h: plantas, capacidades por formato (lotação AVCB), energia, internet, A/V, docas, hotéis parceiros</li>
+<li><b>Conteúdo próprio</b> só como âncora de baixa temporada, com produtor parceiro, orçamento e patrocínio vendido antes</li>
+</ul>
+</div>
+<div style="flex:1;background:#FFFFFF;border:1px solid #E1E4EA;border-radius:16px;padding:32px 36px;display:flex;flex-direction:column;gap:14px">
+<p style="font-size:34px;font-weight:600;color:#0F2238">Marketing e marca</p>
+<ul style="font-size:25px;line-height:1.5;color:#3C4756">
+<li><b>Posicionamento:</b> o centro de convenções da Serra da Mantiqueira, com rede hoteleira integrada</li>
+<li><b>Ativos:</b> marca registrada, fotos e vídeo, tour 360, site com kit técnico e pedido de proposta, cases por segmento</li>
+<li><b>Canais B2B:</b> organizadoras de congressos, sociedades médicas, agências corporativas, Convention Bureau, famtours na baixa</li>
+<li><b>Metas no CRM:</b> leads qualificados, custo por lead, conversão por origem; agência sob o diretor comercial; sócios opinam no comitê comercial</li>
+</ul>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between">
+<p style="font-size:24px;color:#6B7686">Hipótese de verba: 3% a 5% da receita, em parte substituindo a assessoria atual; só R$ 755 mil contratados até ago/2027 — o funil é a prioridade</p>
+<p style="font-size:24px;color:#6B7686">27</p>
+</div>
+</section>
+</div><div class="sl" data-i="27" hidden><section id="suporte" data-transition="fade" style="background:#EDEFF3;color:#0F2238;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#2457D6">Anexo · Funções de suporte</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F2238">Cada função com dono e regra escrita</h2>
+</div>
+<table style="width:1664px;border-collapse:collapse;font-size:24px;line-height:1.4;color:#3C4756">
+<tr style="background:#0F2238;color:#F7F6F2">
+<td style="padding:10px 18px;font-weight:600;width:280px">Função</td>
+<td style="padding:10px 18px;font-weight:600">O que passa a existir</td>
+<td style="padding:10px 18px;font-weight:600;width:250px">Dono</td>
+</tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:10px 18px;font-weight:600;color:#0F2238">Jurídico</td><td style="padding:10px 18px">Escritório externo; minutas padrão de evento e fornecedor; societário, LGPD, trabalhista</td><td style="padding:10px 18px">Diretor financeiro</td></tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:10px 18px;font-weight:600;color:#0F2238">Tributário e contábil</td><td style="padding:10px 18px">ISS sobre cessão de espaço (LC 116, item 3.03) em parecer; estacionamento e patrocínio na DRE</td><td style="padding:10px 18px">Diretor financeiro</td></tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:10px 18px;font-weight:600;color:#0F2238">TI, internet e A/V</td><td style="padding:10px 18px">Internet dedicada e Wi-Fi para milhares; CRM, gestão de eventos e painel; A/V básico próprio</td><td style="padding:10px 18px">Gerente de operações · TI terceirizada</td></tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:10px 18px;font-weight:600;color:#0F2238">Pessoas e temporada</td><td style="padding:10px 18px">Quadro fixo enxuto; temporada por intermitentes e temporários; NRs; padrão de serviço de hotelaria</td><td style="padding:10px 18px">Assistente adm. e gerente de operações</td></tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:10px 18px;font-weight:600;color:#0F2238">Seguros e riscos</td><td style="padding:10px 18px">Patrimonial, RC geral e de eventos, D&amp;O; cliente e fornecedor com RC próprio; matriz de riscos</td><td style="padding:10px 18px">Diretor financeiro</td></tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:10px 18px;font-weight:600;color:#0F2238">Sustentabilidade e acessibilidade</td><td style="padding:10px 18px">Resíduos (PGRS), energia, fornecedores locais, NBR 9050; ISO 20121 em 36 meses</td><td style="padding:10px 18px">Gerente de operações</td></tr>
+<tr><td style="padding:10px 18px;font-weight:600;color:#0F2238">Relações institucionais</td><td style="padding:10px 18px">Prefeitura, Bombeiros, Convention Bureau, Cadastur, ABRACCEF, Prêmio Caio, sociedades médicas</td><td style="padding:10px 18px">Diretor presidente, com o comercial</td></tr>
+</table>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between">
+<p style="font-size:24px;color:#6B7686">Custo adicional estimado: R$ 5 a 10 mil/mês (nutricionista, seguros, internet, treinamentos) — hipótese a orçar; detalhes na Versão 3 do documento</p>
+<p style="font-size:24px;color:#6B7686">28</p>
+</div>
+</section>
+</div><div class="sl" data-i="28" hidden><section id="compliance" data-transition="fade" style="background:#F7F6F2;color:#0F2238;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#2457D6">Anexo · Licenças, alvarás e laudos</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F2238">Matriz de compliance no painel, com semáforo</h2>
+</div>
+<table style="width:1664px;border-collapse:collapse;font-size:24px;line-height:1.3;color:#3C4756">
+<tr style="background:#0F2238;color:#F7F6F2">
+<td style="padding:6px 16px;font-weight:600">Documento</td>
+<td style="padding:6px 16px;font-weight:600;width:340px">Órgão</td>
+<td style="padding:6px 16px;font-weight:600;width:230px">Renovação</td>
+<td style="padding:6px 16px;font-weight:600;width:290px">Dono</td>
+</tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:6px 16px">Alvará de funcionamento</td><td style="padding:6px 16px">Prefeitura</td><td style="padding:6px 16px">Anual (verificar)</td><td style="padding:6px 16px">Assist. adm. / Dir. financeiro</td></tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:6px 16px"><b>AVCB</b> com lotação máxima — nenhum evento acima dela</td><td style="padding:6px 16px">Corpo de Bombeiros</td><td style="padding:6px 16px">Conforme classificação</td><td style="padding:6px 16px">Gerente de operações</td></tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:6px 16px">Licença sanitária da cozinha e responsável técnico</td><td style="padding:6px 16px">Vigilância Sanitária</td><td style="padding:6px 16px">Anual</td><td style="padding:6px 16px">Nutricionista / Ger. oper.</td></tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:6px 16px">Autorização e plano de segurança para grandes eventos</td><td style="padding:6px 16px">Prefeitura, PM, Bombeiros</td><td style="padding:6px 16px">Por evento</td><td style="padding:6px 16px">Coordenador de eventos</td></tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:6px 16px">ART de estruturas temporárias e laudo elétrico do evento</td><td style="padding:6px 16px">CREA / responsável técnico</td><td style="padding:6px 16px">Por evento</td><td style="padding:6px 16px">Gerente de operações</td></tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:6px 16px">Laudos: elétrica, para-raios, PMOC, reservatórios, pragas, gás</td><td style="padding:6px 16px">Empresas habilitadas</td><td style="padding:6px 16px">Semestral / anual</td><td style="padding:6px 16px">Gerente de operações</td></tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:6px 16px">Brigada de incêndio treinada e plano de emergência</td><td style="padding:6px 16px">—</td><td style="padding:6px 16px">Anual</td><td style="padding:6px 16px">Supervisor operacional</td></tr>
+<tr style="border-bottom:1px solid #D7DBE3"><td style="padding:6px 16px">Segurança privada autorizada; acessibilidade; resíduos</td><td style="padding:6px 16px">Polícia Federal; Prefeitura</td><td style="padding:6px 16px">Contrato / anual</td><td style="padding:6px 16px">Gerente de operações</td></tr>
+<tr><td style="padding:6px 16px">Cadastur, certidões negativas, seguros, marca, LGPD</td><td style="padding:6px 16px">MTur, Receita, seguradora, INPI</td><td style="padding:6px 16px">Contínuo / anual</td><td style="padding:6px 16px">Assist. adm. / Dir. financeiro</td></tr>
+</table>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between">
+<p style="font-size:24px;color:#6B7686">O assistente administrativo confere todo mês; comitê de operações a cada trimestre; Conselho Fiscal verifica; validades a confirmar com a Prefeitura</p>
+<p style="font-size:24px;color:#6B7686">29</p>
+</div>
+</section>
+</div><div class="sl" data-i="29" hidden><section id="sanitario" data-transition="fade" style="background:#EDEFF3;color:#0F2238;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#2457D6">Anexo · Vigilância sanitária e segurança</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F2238">Zero incidentes: o que a casa precisa ter antes de cada evento</h2>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;background:#FFFFFF;border:1px solid #E1E4EA;border-radius:16px;padding:32px 36px;display:flex;flex-direction:column;gap:14px">
+<p style="font-size:34px;font-weight:600;color:#0F2238">Segurança alimentar</p>
+<ul style="font-size:25px;line-height:1.5;color:#3C4756">
+<li>Base: RDC ANVISA 216/2004 e Portaria CVS 5/2013 (SP); exigências municipais a confirmar</li>
+<li>Licença sanitária da cozinha em nome do Campos Hall; <b>nutricionista responsável técnico</b></li>
+<li>Manual de boas práticas e POPs; laudos de potabilidade e reservatórios; controle de pragas; registro de temperaturas</li>
+<li>Fornecedor de catering: licença e RT próprios, exames dos manipuladores, transporte refrigerado, rastreabilidade</li>
+<li>Checklist de entrada e devolução da cozinha; nota 0–10 por evento; protocolo para suspeita de surto</li>
+</ul>
+</div>
+<div style="flex:1;background:#FFFFFF;border:1px solid #E1E4EA;border-radius:16px;padding:32px 36px;display:flex;flex-direction:column;gap:14px">
+<p style="font-size:34px;font-weight:600;color:#0F2238">Segurança do público e do prédio</p>
+<ul style="font-size:25px;line-height:1.5;color:#3C4756">
+<li><b>Plano de segurança por faixa de público</b> (até 500, até 2.000, acima): controle de acesso e contagem, segurança privada, brigada, posto médico nos grandes</li>
+<li>Checklist pré-evento assinado: rotas de fuga, extintores e hidrantes, iluminação de emergência, alarme, gerador</li>
+<li>Comunicação à PM e à Guarda Municipal; trânsito e estacionamento; plano de abandono</li>
+<li>Segurança do trabalho: PGR e PCMSO, NR-35 na montagem, NR-10; fornecedores entregam documentação antes de montar</li>
+<li>Relatório de ocorrências por evento; revisão trimestral no comitê de operações</li>
+</ul>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between">
+<p style="font-size:24px;color:#6B7686">Dono: gerente de operações; executor: supervisor operacional; nutricionista por contrato (hipótese R$ 2–4 mil/mês ou por evento)</p>
+<p style="font-size:24px;color:#6B7686">30</p>
+</div>
+</section>
+</div><div class="sl" data-i="30" hidden><section id="tela-painel" data-transition="fade" style="background:#EDEFF3;color:#0F2238;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#2457D6">Anexo · painel de governança (tela ilustrativa)</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F2238">O que cada sócia vê todo mês, sem pedir</h2>
+</div>
+<div style="display:flex;height:600px;background:#F1F5F9;border:1px solid #CBD5E1;border-radius:16px;overflow:hidden;box-shadow:0 16px 48px rgba(15,34,56,0.14)">
+<div style="width:260px;background:#FFFFFF;border-right:1px solid #E2E8F0;padding:24px;display:flex;flex-direction:column;gap:6px">
+<p style="font-size:26px;font-weight:600;color:#0F172A">Campos Hall</p>
+<p style="font-size:24px;color:#64748B">Governança</p>
+<div style="height:16px"></div>
+<p style="font-size:24px;font-weight:600;color:#1D4ED8;background:#DBEAFE;padding:10px 14px;border-radius:8px">Visão geral</p>
+<p style="font-size:24px;color:#475569;padding:10px 14px">DRE</p>
+<p style="font-size:24px;color:#475569;padding:10px 14px">Caixa</p>
+<p style="font-size:24px;color:#475569;padding:10px 14px">Carteira</p>
+<p style="font-size:24px;color:#475569;padding:10px 14px">Atas e decisões</p>
+<p style="font-size:24px;color:#475569;padding:10px 14px">Votações</p>
+</div>
+<div style="flex:1;padding:24px;display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<p style="font-size:28px;font-weight:600;color:#0F172A">Fechamento de setembro de 2026</p>
+<p style="font-size:24px;color:#166534;background:#DCFCE7;padding:6px 14px;border-radius:999px">Publicado em 06/10 · dentro do prazo</p>
+</div>
+<div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:12px">
+<div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:2px"><p style="font-size:24px;color:#64748B">Receita bruta jan–ago</p><p style="font-size:40px;font-weight:600;line-height:1.1;color:#0F172A">R$ 3,35 mi</p></div>
+<div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:2px"><p style="font-size:24px;color:#64748B">EBITDA · 33%</p><p style="font-size:40px;font-weight:600;line-height:1.1;color:#2563EB">R$ 1,11 mi</p></div>
+<div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:2px"><p style="font-size:24px;color:#64748B">Caixa em 30/09</p><p style="font-size:40px;font-weight:600;line-height:1.1;color:#0F172A">R$ 1,29 mi</p></div>
+<div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:2px"><p style="font-size:24px;color:#64748B">Inadimplência · meta 5%</p><p style="font-size:40px;font-weight:600;line-height:1.1;color:#E11D48">29%</p></div>
+</div>
+<div style="display:flex;gap:16px">
+<div style="flex:1;background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px">
+<p style="font-size:24px;font-weight:600;color:#0F172A">Ações do COMEX (exemplo)</p>
+<div style="display:flex;justify-content:space-between;align-items:center"><p style="font-size:24px;color:#475569">Cobrar as nove parcelas vencidas · Deise</p><p style="font-size:24px;color:#92400E;background:#FEF3C7;padding:4px 10px;border-radius:999px">em andamento</p></div>
+<div style="display:flex;justify-content:space-between;align-items:center"><p style="font-size:24px;color:#475569">Linha de custo direto por evento · Deise</p><p style="font-size:24px;color:#92400E;background:#FEF3C7;padding:4px 10px;border-radius:999px">em andamento</p></div>
+<div style="display:flex;justify-content:space-between;align-items:center"><p style="font-size:24px;color:#475569">Minuta padrão de locação · Karoline</p><p style="font-size:24px;color:#475569;background:#E2E8F0;padding:4px 10px;border-radius:999px">a iniciar</p></div>
+</div>
+<div style="flex:1;background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px">
+<p style="font-size:24px;font-weight:600;color:#0F172A">Votações · assembleia (exemplo)</p>
+<div style="display:flex;justify-content:space-between;align-items:center"><p style="font-size:24px;color:#475569">Eleição da diretoria · 2/3</p><p style="font-size:24px;color:#1D4ED8;background:#DBEAFE;padding:4px 10px;border-radius:999px">voto antecipado aberto</p></div>
+<div style="display:flex;justify-content:space-between;align-items:center"><p style="font-size:24px;color:#475569">Conselho Fiscal · maioria absoluta</p><p style="font-size:24px;color:#1D4ED8;background:#DBEAFE;padding:4px 10px;border-radius:999px">voto antecipado aberto</p></div>
+<p style="font-size:24px;color:#64748B">Abstenções registradas nos itens com partes relacionadas</p>
+</div>
+</div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between">
+<p style="font-size:24px;color:#6B7686">Indicadores reais do fechamento de setembro de 2026; ações e votações são exemplos de uso. Voto antecipado por e-mail previsto na cláusula 5.2.3</p>
+<p style="font-size:24px;color:#6B7686">31</p>
+</div>
+</section>
+</div><div class="sl" data-i="31" hidden><section id="sistema-os" data-transition="fade" style="background:#F7F6F2;color:#0F2238;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:26px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#2457D6">Anexo · Campos Hall OS</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F2238">O playbook vira sistema: uma tela por cargo, as regras embutidas</h2>
+</div>
+<ul style="font-size:25px;line-height:1.4;color:#3C4756">
+<li><b>Cada cargo vê o que é seu:</b> tarefas, aprovações e os indicadores pelos quais responde; o sócio vê dinheiro, decisões e riscos em uma tela</li>
+<li><b>As regras rodam sozinhas:</b> lead vira tarefa de 24 h, pré-reserva vence em 7 dias, gasto acima da alçada segue ao aprovador certo, licença a 60 dias do vencimento alerta o dono</li>
+<li><b>O cliente simula o preço</b> na planta, escolhe datas e hospedagem e recebe a proposta formal em até 48 h</li>
+</ul>
+<div style="display:flex;gap:24px">
+<div style="flex:1;background:#FFFFFF;border:1px solid #D7DBE3;border-radius:16px;padding:20px 24px;display:flex;flex-direction:column;gap:8px"><p style="font-size:24px;font-weight:600;color:#2457D6;text-transform:uppercase;letter-spacing:2px">Fase 1 · primeiros 60 dias</p><p style="font-size:28px;font-weight:600;color:#0F2238">Vender, entregar e enxergar o dinheiro</p><p style="font-size:24px;line-height:1.35;color:#3C4756">CRM e propostas · calendário de espaços · evento com seis marcos · control tower no celular · financeiro e indicadores · tarefas e aprovações</p></div>
+<div style="flex:1;background:#FFFFFF;border:1px solid #D7DBE3;border-radius:16px;padding:20px 24px;display:flex;flex-direction:column;gap:8px"><p style="font-size:24px;font-weight:600;color:#2457D6;text-transform:uppercase;letter-spacing:2px">Fase 2 · de 60 a 120 dias</p><p style="font-size:28px;font-weight:600;color:#0F2238">Qualidade, compras e conformidade</p><p style="font-size:24px;line-height:1.35;color:#3C4756">Fornecedores e scorecard · cozinha e catering · satisfação e NPS · compras · licenças e patrimônio · portal do cliente</p></div>
+<div style="flex:1;background:#FFFFFF;border:1px solid #D7DBE3;border-radius:16px;padding:20px 24px;display:flex;flex-direction:column;gap:8px"><p style="font-size:24px;font-weight:600;color:#2457D6;text-transform:uppercase;letter-spacing:2px">Fase 3 · depois de 120 dias</p><p style="font-size:28px;font-weight:600;color:#0F2238">Portais e automação</p><p style="font-size:24px;line-height:1.35;color:#3C4756">Portais do fornecedor e do hotel · revenue management · marketing · integrações com contabilidade, banco, nota fiscal e assinatura</p></div>
+</div>
+<div style="background:#0F2238;border-radius:12px;padding:14px 26px"><p style="font-size:24px;line-height:1.4;color:#F7F6F2"><b>Regra:</b> o que não está no sistema não aconteceu — reserva, desconto, aprovação, checklist e ata fora dele não valem</p></div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between">
+<p style="font-size:24px;color:#6B7686">Protótipo: erich-web.github.io/financeiro_CH/OS · prazos indicativos, a confirmar depois da aprovação</p>
+<p style="font-size:24px;color:#6B7686">32</p>
+</div>
+</section>
+</div><div class="sl" data-i="32" hidden><section id="prioridades" data-transition="fade" style="background:#EDEFF3;color:#0F2238;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#2457D6">Anexo · primeiros 180 dias</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F2238">Seis números que definem as primeiras prioridades</h2>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:24px 28px">
+<div style="box-sizing:border-box;width:536px;background:#FFFFFF;border:1px solid #D7DBE3;border-radius:16px;padding:22px 26px;display:flex;flex-direction:column;gap:8px"><p style="font-family:'Source Serif 4', Georgia, serif;font-size:54px;font-weight:600;color:#B4452B;line-height:1">64 de 83</p><p style="font-size:24px;line-height:1.25;color:#3C4756">dias de evento de 2027 são reserva sem contrato</p><p style="font-size:24px;line-height:1.25;color:#1F6E4A;font-weight:600">Transformar reservas em contratos com sinal · 60 dias</p></div>
+<div style="box-sizing:border-box;width:536px;background:#FFFFFF;border:1px solid #D7DBE3;border-radius:16px;padding:22px 26px;display:flex;flex-direction:column;gap:8px"><p style="font-family:'Source Serif 4', Georgia, serif;font-size:54px;font-weight:600;color:#B4452B;line-height:1">36 dias</p><p style="font-size:24px;line-height:1.25;color:#3C4756">da alta temporada em uma única reserva (26/06 a 31/07)</p><p style="font-size:24px;line-height:1.25;color:#1F6E4A;font-weight:600">Dar preço ao bloco de julho: tabela ou risco do produtor · 30 dias</p></div>
+<div style="box-sizing:border-box;width:536px;background:#FFFFFF;border:1px solid #D7DBE3;border-radius:16px;padding:22px 26px;display:flex;flex-direction:column;gap:8px"><p style="font-family:'Source Serif 4', Georgia, serif;font-size:54px;font-weight:600;color:#B4452B;line-height:1">zero</p><p style="font-size:24px;line-height:1.25;color:#3C4756">contratos para 2028 e 2029</p><p style="font-size:24px;line-height:1.25;color:#1F6E4A;font-weight:600">Preferência de data aos recorrentes; oito contratos até dez/2027</p></div>
+<div style="box-sizing:border-box;width:536px;background:#FFFFFF;border:1px solid #D7DBE3;border-radius:16px;padding:22px 26px;display:flex;flex-direction:column;gap:8px"><p style="font-family:'Source Serif 4', Georgia, serif;font-size:54px;font-weight:600;color:#B4452B;line-height:1">9 dias</p><p style="font-size:24px;line-height:1.25;color:#3C4756">de evento em jan, fev, mar, out, nov e dez de 2027</p><p style="font-size:24px;line-height:1.25;color:#1F6E4A;font-weight:600">Campanha e tarifa de terça a quinta · 45 dias</p></div>
+<div style="box-sizing:border-box;width:536px;background:#FFFFFF;border:1px solid #D7DBE3;border-radius:16px;padding:22px 26px;display:flex;flex-direction:column;gap:8px"><p style="font-family:'Source Serif 4', Georgia, serif;font-size:54px;font-weight:600;color:#B4452B;line-height:1">R$ 18 mil</p><p style="font-size:24px;line-height:1.25;color:#3C4756">na conta corrente em 31/10; 16% da carteira vencida</p><p style="font-size:24px;line-height:1.25;color:#1F6E4A;font-weight:600">Caixa mínimo e régua de cobrança · 30 dias</p></div>
+<div style="box-sizing:border-box;width:536px;background:#FFFFFF;border:1px solid #D7DBE3;border-radius:16px;padding:22px 26px;display:flex;flex-direction:column;gap:8px"><p style="font-family:'Source Serif 4', Georgia, serif;font-size:54px;font-weight:600;color:#B4452B;line-height:1">0 de 12</p><p style="font-size:24px;line-height:1.25;color:#3C4756">declarações de interesse entregues</p><p style="font-size:24px;line-height:1.25;color:#1F6E4A;font-weight:600">Regularizar partes relacionadas · 45 dias</p></div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between">
+<p style="font-size:24px;color:#6B7686">Doze prioridades com dono e prazo no playbook, seção 14 · fonte: Campos Hall OS e painel, 10/11/2026</p>
+<p style="font-size:24px;color:#6B7686">33</p>
+</div>
+</section>
+</div></div>
+  <div class="rot">Vire o celular na horizontal para ler melhor</div>
+  <div class="hint" id="hint">Use as setas do teclado, os botões acima ou toque nas laterais do slide</div>
+</div>
+<script>
+(function(){
+  var N=33,cur=0,sl=[].slice.call(document.querySelectorAll('.sl')),cv=document.getElementById('canvas'),st=document.getElementById('stage');
+  function fit(){var s=Math.min(st.clientWidth/1920,st.clientHeight/1080);cv.style.transform='translate(-50%,-50%) scale('+s+')'}
+  function go(i){cur=Math.max(0,Math.min(N-1,i));sl.forEach(function(e,k){e.hidden=k!==cur});
+    document.getElementById('count').textContent=(cur+1)+' / '+N;document.getElementById('bar').style.width=((cur+1)/N*100)+'%';
+    document.getElementById('jump').value=cur;document.getElementById('prev').disabled=cur===0;document.getElementById('next').disabled=cur===N-1;
+    try{history.replaceState(null,'','#'+(cur+1))}catch(e){}
+    if(cur>0){var h=document.getElementById('hint');if(h)h.style.display='none'}}
+  ['prev','zp'].forEach(function(id){document.getElementById(id).onclick=function(){go(cur-1)}});
+  ['next','zx'].forEach(function(id){document.getElementById(id).onclick=function(){go(cur+1)}});
+  document.getElementById('jump').onchange=function(e){go(+e.target.value)};
+  document.getElementById('full').onclick=function(){var d=document.documentElement;if(document.fullscreenElement)document.exitFullscreen();else if(d.requestFullscreen)d.requestFullscreen()};
+  document.addEventListener('keydown',function(e){if(e.target.tagName==='SELECT')return;
+    if(['ArrowRight','PageDown',' ','Enter'].indexOf(e.key)>=0){e.preventDefault();go(cur+1)}
+    if(['ArrowLeft','PageUp','Backspace'].indexOf(e.key)>=0){e.preventDefault();go(cur-1)}
+    if(e.key==='Home')go(0);if(e.key==='End')go(N-1)});
+  var x0=null;st.addEventListener('touchstart',function(e){x0=e.touches[0].clientX},{passive:true});
+  st.addEventListener('touchend',function(e){if(x0==null)return;var dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>50)go(cur+(dx<0?1:-1));x0=null});
+  window.addEventListener('resize',fit);fit();
+  var h=parseInt((location.hash||'').slice(1),10);go(h>=1&&h<=N?h-1:0);
+})();
+</script>
+</body></html>
