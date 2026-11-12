@@ -393,6 +393,26 @@ tbody tr:hover{background:var(--blue-s)}
 .btn.back{flex:none;white-space:nowrap}
 @media (max-width:899px){.btn.back{padding:7px 10px}}
 
+/* tutorial: quadro compacto no celular */
+.thead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.tclose{flex:none;width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--muted);font-size:15px;line-height:1}
+.tmore{display:none;align-self:flex-start}
+@media (max-width:899px){
+  .tcard{padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px));gap:8px;border-radius:16px;max-height:none}
+  .tcard.mid{max-height:none}
+  .tcard h2{font-size:18px}
+  .tcard small{font-size:12px}
+  .tprog{height:4px}
+  .tmore{display:inline-block;min-height:36px;color:var(--blue);font-weight:600;padding:2px 0}
+  .tcard.cmp{font-size:15px;line-height:1.45}
+  .tcard.cmp .tbody{flex:none;overflow:hidden}
+  .tcard.cmp .tbody p:not(:first-child),.tcard.cmp .tx,.tcard.cmp .tfoot{display:none}
+  .tcard.cmp .tbody p{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .tcard.cmp .tbtn .btn{min-height:46px}
+  .tcard.big.cmp{font-size:17px}.tcard.big.cmp h2{font-size:20px}
+  .tcard.open{max-height:80vh}
+}
+
 </style>
 </head>
 <body>
@@ -1639,26 +1659,28 @@ const TS=[
  {c:8,r:'socio',m:'gov',tab:['gov','rp'],sel:'.main .card',t:'Negócios com sócios',d:['Toda operação entre o Campos Hall e um sócio, ou empresa de sócio, fica registrada aqui: reservas, hotéis do programa, fornecedores.','A regra proposta é simples: quem tem interesse não negocia nem decide, as condições são as de mercado e o Conselho Fiscal revisa.']},
  {c:8,r:'socio',m:'home',t:'Fim do tutorial',d:['O senhor viu o caminho inteiro: o cliente chega pelo site, o comercial fecha o contrato, a operação entrega o evento, os fornecedores e os hotéis são medidos, o financeiro acompanha o dinheiro e os sócios decidem.','Agora pode explorar à vontade. O botão “Reiniciar”, na faixa azul do topo, desfaz tudo o que foi clicado.','Para rever um assunto, abra “Capítulos”.']}];
 const tIdx=c=>TS.findIndex(s=>s.c===c),tCnt=c=>TS.filter(s=>s.c===c).length;
-function tourApply(n){const s=TS[n];S.tour=n;S.gate=!!s.gate;S.cli=!!s.cli;S.role=s.r;S.mod=s.m;U.form=null;U.more=false;U.find='';if(s.tab)U.tab[s.tab[0]]=s.tab[1];U.drawer=s.dr?{k:s.dr[0],id:s.dr[1]}:null;if(s.pre)s.pre();U.tourJump=1;U.tourMin=0;S.tourSeen=S.tourSeen||{};if(n===tIdx(s.c)+tCnt(s.c)-1)S.tourSeen[s.c]=1;save();render()}
-A.tour=d=>{if(LOCK)return;const v=d.n;if(v==='menu'){S.tour='menu';save();render();return}if(v==='big'){S.tourBig=!S.tourBig;save();render();return}if(v==='min'){U.tourMin=!U.tourMin;render();return}const n=+v;if(isNaN(n)||n<0){S.tour=null;S.cli=false;save();render();return}if(n>=TS.length){S.tour='menu';save();render();return}tourApply(n)};
+function tourApply(n){const s=TS[n];S.tour=n;S.gate=!!s.gate;S.cli=!!s.cli;S.role=s.r;S.mod=s.m;U.form=null;U.more=false;U.find='';if(s.tab)U.tab[s.tab[0]]=s.tab[1];U.drawer=s.dr?{k:s.dr[0],id:s.dr[1]}:null;if(s.pre)s.pre();U.tourJump=1;U.tourOpen=0;S.tourSeen=S.tourSeen||{};if(n===tIdx(s.c)+tCnt(s.c)-1)S.tourSeen[s.c]=1;save();render()}
+A.tour=d=>{if(LOCK)return;const v=d.n;if(v==='menu'){S.tour='menu';save();render();return}if(v==='big'){S.tourBig=!S.tourBig;save();render();return}if(v==='min'){U.tourOpen=!U.tourOpen;render();return}const n=+v;if(isNaN(n)||n<0){S.tour=null;S.cli=false;save();render();return}if(n>=TS.length){S.tour='menu';save();render();return}tourApply(n)};
 function tourTarget(){const s=TS[S.tour];if(!s||!s.sel||U.form)return null;const e=document.querySelectorAll(innerWidth<900&&s.selM?s.selM:s.sel)[s.i||0];if(!e)return null;const r=e.getBoundingClientRect();return r.width<4||r.height<4?null:e}
 function tourPlace(){const card=document.getElementById('tcard');if(!card)return;const e=tourTarget(),P=['tp0','tp1','tp2','tp3'].map(i=>document.getElementById(i)),ring=document.getElementById('tring'),W=innerWidth,H=innerHeight,mob=W<900;
-  if(!e){P[0].style.cssText=U.form?'display:none':'inset:0';for(let i=1;i<4;i++)P[i].style.cssText='display:none';ring.style.display='none';card.className='tcard'+(S.tourBig?' big':'')+(U.form?' low':' mid');return}
+  if(!e){P[0].style.cssText=U.form?'display:none':'inset:0';for(let i=1;i<4;i++)P[i].style.cssText='display:none';ring.style.display='none';card.className='tcard'+(S.tourBig?' big':'')+(U.form?' low':' mid')+(mob?(U.tourOpen?' open':' cmp'):'');card.style.maxHeight=mob&&U.tourOpen?'80vh':'';return}
   const r=e.getBoundingClientRect(),p=8,t=Math.max(0,r.top-p),l=Math.max(0,r.left-p),b=Math.min(H,r.bottom+p),rt=Math.min(W,r.right+p);
   P[0].style.cssText=`left:0;top:0;width:100%;height:${t}px`;P[1].style.cssText=`left:0;top:${b}px;width:100%;height:${Math.max(0,H-b)}px`;P[2].style.cssText=`left:0;top:${t}px;width:${l}px;height:${Math.max(0,b-t)}px`;P[3].style.cssText=`left:${rt}px;top:${t}px;width:${Math.max(0,W-rt)}px;height:${Math.max(0,b-t)}px`;
   ring.style.cssText=`left:${l}px;top:${t}px;width:${rt-l}px;height:${b-t}px`;
   const above=t,below=H-b;let cls='tcard'+(S.tourBig?' big':'');
-  if(mob)cls+=(t>H*.5?' top':' bot')+(U.tourMin?' min':'');else{cls+=(r.left+r.width/2<W/2)?' right':' left';cls+=t>H*.5?' top':' bot'}
-  card.className=cls;const wide=mob||(rt-l)>W-540,isTop=/ top/.test(cls);card.style.maxHeight=wide&&!U.tourMin?Math.max(mob?300:260,isTop?t-20:H-(t+Math.min(b-t,170))-20)+'px':''}
+  if(mob)cls+=(t>H*.55?' top':' bot')+(U.tourOpen?' open':' cmp');else{cls+=(r.left+r.width/2<W/2)?' right':' left';cls+=t>H*.5?' top':' bot'}
+  card.className=cls;const wide=mob||(rt-l)>W-540,isTop=/ top/.test(cls);card.style.maxHeight=mob?(U.tourOpen?'80vh':''):wide?Math.max(260,isTop?t-20:H-(t+Math.min(b-t,170))-20)+'px':''}
 function tourScroll(){const e=tourTarget();if(!e){scrollTo(0,0);return}const mob=innerWidth<900;e.scrollIntoView({block:'start'});if(!e.closest('.drawer')){const r=e.getBoundingClientRect();if(r.top<70)scrollBy(0,r.top-(mob?70:90))}}
 HOOK.after=()=>{if(S.tour==null||LOCK)return;const app=document.getElementById('app');
   if(S.tour==='menu'){app.insertAdjacentHTML('beforeend',`<div class="tmenu" role="dialog" aria-label="Tutorial passo a passo"><div class="tbox${S.tourBig?' big':''}"><div class="row sp"><div><small>Tutorial passo a passo</small><h2>Escolha por onde começar</h2></div><button class="btn" data-a="tour" data-n="big" aria-pressed="${!!S.tourBig}">${S.tourBig?'Letra normal':'Letra maior'}</button></div><p>São nove assuntos curtos. Em cada passo, a tela destaca o que importa e um quadro explica o que é e o que fazer. O senhor avança no seu ritmo e pode sair quando quiser.</p><button class="btn pri big" data-a="tour" data-n="0">Começar do início</button><div class="tcaps">${CAPS.map((c,i)=>`<button data-a="tour" data-n="${tIdx(i)}"><span class="num">${i+1}</span><span class="x"><b>${c[0]}</b><small>${c[1]} · ${tCnt(i)} passos</small></span>${S.tourSeen&&S.tourSeen[i]?'<span class="pill p-g">visto</span>':''}</button>`).join('')}</div><button class="btn big" data-a="tour" data-n="-1">Fechar o tutorial</button></div></div>`);return}
   const n=S.tour,s=TS[n],k=n-tIdx(s.c)+1,tot=tCnt(s.c),last=n===TS.length-1;
   app.insertAdjacentHTML('beforeend',`<div class="tpan" id="tp0"></div><div class="tpan" id="tp1"></div><div class="tpan" id="tp2"></div><div class="tpan" id="tp3"></div><div id="tring"></div>
-  <div class="tcard" id="tcard" role="dialog" aria-label="Explicação do passo"><div class="row sp"><small>Capítulo ${s.c+1} de ${CAPS.length} · ${CAPS[s.c][0]} · passo ${k} de ${tot}</small><button class="tlk" data-a="tour" data-n="big">${S.tourBig?'Letra normal':'Letra maior'}</button></div><div class="tprog"><i style="width:${(n+1)/TS.length*100}%"></i></div>
+  <div class="tcard" id="tcard" role="dialog" aria-label="Explicação do passo"><div class="thead"><small>${s.c+1} de ${CAPS.length} · ${CAPS[s.c][0]} · passo ${k} de ${tot}</small><button class="tclose" data-a="tour" data-n="-1" aria-label="Sair do tutorial">✕</button></div><div class="tprog"><i style="width:${(n+1)/TS.length*100}%"></i></div>
    <h2>${s.t}</h2><div class="tbody">${s.d.map(p=>`<p>${p}</p>`).join('')}${s.x?`<div class="tx"><b>Experimente</b>${s.x}</div>`:''}</div>
+   <button class="tlk tmore" data-a="tour" data-n="min">${U.tourOpen?'Mostrar menos':'Ler a explicação completa'}</button>
    <div class="tbtn"><button class="btn big" data-a="tour" data-n="${n-1}" ${n?'':'disabled'}>Voltar</button><button class="btn pri big" data-a="tour" data-n="${last?'menu':n+1}">${last?'Concluir':'Continuar'}</button></div>
-   <div class="row sp"><button class="tlk" data-a="tour" data-n="menu">Capítulos</button><button class="tlk tmin" data-a="tour" data-n="min">${U.tourMin?'Ler a explicação':'Ver a tela'}</button><button class="tlk" data-a="tour" data-n="-1">Sair do tutorial</button></div></div>`);
+   <div class="row sp tfoot"><button class="tlk" data-a="tour" data-n="menu">Capítulos</button><button class="tlk" data-a="tour" data-n="big">${S.tourBig?'Letra normal':'Letra maior'}</button><button class="tlk" data-a="tour" data-n="-1">Sair do tutorial</button></div></div>`);
+  if(innerWidth<900){const db=document.querySelector('.demo-bar');if(db)db.style.display='none'}
   const dw=document.querySelector('.drawer');if(dw){dw.style.paddingBottom='60vh';dw.style.animation='none'}
   if(U.tourJump){U.tourJump=0;tourScroll()}tourPlace()};
 addEventListener('scroll',()=>{if(S&&typeof S.tour==='number')tourPlace()},true);addEventListener('resize',()=>{if(S&&typeof S.tour==='number')tourPlace()});
